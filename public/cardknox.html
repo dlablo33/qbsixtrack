@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+
+    <!-- Use the following src for the script on your form and replace ****version**** with the desired version: src="https://cdn.cardknox.com/ifields/****version****/ifields.min.js" -->
+    <script src="https://cdn.cardknox.com/ifields/2.9.2109.2701/ifields.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function(event) {
+            if (/[?&](is)?debug/i.test(window.location.search)){
+                setDebugEnv(true);
+            }
+
+            /*
+             * [Contitional]
+             * Required if you want to enable Google Pay payment method on your website
+             * For more information please refer to documentation
+             */
+            ckGooglePay.enableGooglePay({amountField: 'amount'});
+        });
+
+        //Google Pay
+        const gpRequest = {
+            merchantInfo: {
+                merchantName: "Example Merchant"
+            },
+            buttonOptions: {
+                buttonSizeMode: GPButtonSizeMode.fill
+            },
+            billingParams: {
+                //phoneNumberRequired: true,
+                emailRequired: true,
+                billingAddressRequired: true,
+                billingAddressFormat: GPBillingAddressFormat.full
+            },
+            shippingParams: {
+                phoneNumberRequired: true,
+                emailRequired: true,
+                onGetShippingCosts: function (shippingData) {
+                    logDebug({
+                        label: "onGetShippingCosts",
+                        data: shippingData
+                    });
+                    return {
+                        "shipping-001": "0.00",
+                        "shipping-002": "1.99",
+                        "shipping-003": "10.00"
+                    }
+                },
+                onGetShippingOptions: function (shippingData) {
+                    logDebug({
+                        label: "onGetShippingOptions",
+                        data: shippingData
+                    });
+                    let selectedOptionid = "shipping-001";
+                    if (shippingData && shippingData.shippingOptionData && shippingData.shippingOptionData.id !== "shipping_option_unselected") {
+                        selectedOptionid = shippingData.shippingOptionData.id;
+                    }
+                    return {
+                        defaultSelectedOptionId: selectedOptionid,
+                        shippingOptions: [
+                            {
+                                "id": "shipping-001",
+                                "label": "Free: Standard shipping",
+                                "description": "Free Shipping delivered in 5 business days."
+                            },
+                            {
+                                "id": "shipping-002",
+                                "label": "$1.99: Standard shipping",
+                                "description": "Standard shipping delivered in 3 business days."
+                            },
+                            {
+                                "id": "shipping-003",
+                                "label": "$10: Express shipping",
+                                "description": "Express shipping delivered in 1 business day."
+                            },
+                        ]
+                    };
+                }
+            },
+            onGetTransactionInfo: function () {
+                let amt = getAmount();
+                return {
+                    displayItems: [
+                        {
+                            label: "Subtotal",
+                            type: "SUBTOTAL",
+                            price: amt.toString(),
+                        },
+                        {
+                            label: "Tax",
+                            type: "TAX",
+                            price: (0.1 * amt).toString(),
+                        }
+                    ],
+                    countryCode: 'US',
+                    currencyCode: "USD",
+                    totalPriceStatus: "FINAL",
+                    totalPrice: (1.1 * amt).toString(),
+                    totalPriceLabel: "Total"
+                }
+            },
+            onBeforeProcessPayment: function () {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        //Do some validation here
+                        resolve(iStatus.success);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            },
+            onProcessPayment: function (paymentResponse) {
+                return new Promise(function (resolve, reject) {
+                    try {
+                        // show returned data in developer console for debugging
+                        console.log("paymentResponse", JSON.stringify(paymentResponse));
+                        paymentToken = paymentResponse.paymentData.paymentMethodData.tokenizationData.token;
+                        console.log("paymentToken", paymentToken);
+                        const amt = (paymentResponse && paymentResponse.transactionInfo && paymentResponse.transactionInfo.totalPrice) || 0;
+                        try {
+                            if (amt <= 0) {
+                                throw "Payment is not authorized. Invalid amount. Amount must be greater than 0";
+                            }
+                            setGPPayload(JSON.stringify(paymentResponse, null, 2));
+                            resolve({status: iStatus.success});
+                        } catch (err) {
+                            const emsg = JSON.stringify(err);
+                            console.error(emsg);
+                            setGPPayload("");
+                            setTimeout(function () { alert(emsg) }, 500);
+                            reject({error: err});
+                        }
+                    } catch (err) {
+                        setGPPayload("");
+                        reject(err);
+                    }
+                });
+            },
+            onPaymentCanceled: function(respCanceled) {
+                setTimeout(function () { alert("Payment was canceled") }, 500);
+            },
+            handleResponse: function (resp) {
+                const respObj = JSON.parse(resp);
+                if (respObj) {
+                    if (respObj.xError) {
+                        setTimeout(function () { alert(`There was a problem with your order (${respObj.xRefNum})!`) }, 500);
+                    } else
+                        setTimeout(function () { alert(`Thank you for your order (${respObj.xRefNum})!`) }, 500);
+                }
+            },
+            getGPEnvironment: function () {
+                if (/[?&]prod/.test(window.location.search)) {
+                    return GPEnvironment.production;
+                }
+                return GPEnvironment.test;
+            },
+            initGP: function() {
+                return {
+                    merchantInfo: this.merchantInfo,
+                    buttonOptions: this.buttonOptions,
+                    environment: this.getGPEnvironment(),
+                    billingParameters: this.billingParams,
+                    shippingParameters: {
+                        emailRequired: this.shippingParams.emailRequired,
+                        onGetShippingCosts: "gpRequest.shippingParams.onGetShippingCosts",
+                        onGetShippingOptions: "gpRequest.shippingParams.onGetShippingOptions"
+                    },
+                    onGetTransactionInfo: "gpRequest.onGetTransactionInfo",
+                    onBeforeProcessPayment: "gpRequest.onBeforeProcessPayment",
+                    onProcessPayment: "gpRequest.onProcessPayment",
+                    onPaymentCanceled: "gpRequest.onPaymentCanceled",
+                    onGPButtonLoaded: "gpRequest.gpButtonLoaded",
+                    isDebug: isDebugEnv
+                };
+            },
+            gpButtonLoaded: function(resp) {
+                if (!resp) return;
+                if (resp.status === iStatus.success) {
+                    showHide("divGpay", true);
+                    showHide("lbGPPayload", true);
+                } else if (resp.reason) {
+                    alert(resp.reason);
+                }
+            }
+        };
+        function setGPPayload(value) {
+            const gpTxt = document.getElementById('gp-payload');
+            gpTxt.value = value;
+            showHide(gpTxt, value);
+        }
+
+        function showHide(elem, toShow) {
+            if (typeof(elem) === "string") {
+                elem = document.getElementById(elem);
+            }
+            if (elem) {
+                toShow ? elem.classList.remove("hidden") : elem.classList.add("hidden");
+            }
+        }
+        function getAmount () {
+            return roundToNumber(document.getElementById("amount").value || "0", 2);
+        }
+    </script>
+    <style>
+        body {
+            margin: 10px;
+        }
+
+        iframe.gp {
+            display: inline-block;
+            border: 0;
+            width: 250px;
+            height: 45px;
+            padding: 0px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            position: absolute;
+        }
+        div.gp {
+            overflow: hidden;
+            display: inline-block;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        input {
+            border: 1px solid black;
+            font-size: 14px;
+            padding: 3px;
+            width: 243px;
+            margin-bottom: 12px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        textarea {
+            border: 1px solid black;
+            width: 350px;
+        }
+    </style>
+</head>
+<body>
+<form id="payment-form" method="POST">
+    <input id="amount" name="xAmount" placeholder="Amount" type="number" inputmode="decimal"></input>
+    <br/>
+    <div id="divGpay" class="gp hidden">
+        <iframe id="igp" class="gp" data-ifields-id="igp" data-ifields-oninit="gpRequest.initGP" src="https://cdn.cardknox.com/ifields/2.9.2109.2701/igp.htm"
+                allowpaymentrequest
+                sandbox="allow-popups allow-modals allow-scripts allow-same-origin allow-forms allow-popups-to-escape-sandbox allow-top-navigation"
+                title="GPay checkout page">
+        </iframe>
+        <br/>
+    </div>
+    <br />
+    <br />
+    <label id="lbGPPayload" class="hidden">Google Pay Payload: </label>
+    <br />
+    <textarea id="gp-payload" class="hidden" rows="10" readonly="true"></textarea>
+</form>
+</body>
+</html>
