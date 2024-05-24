@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,30 +78,25 @@
       margin-top: 20px;
     }
 
-    .btn-regreso {
+    .btn-regreso, .btn-pdf, .btn-email {
       background-color: #27ae60;
       color: white;
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .btn-pdf {
+      background-color: #e74c3c; /* Color rojo */
+    }
+
+    .btn-email {
+      background-color: #3498db; /* Color azul */
     }
   </style>
 </head>
-
-<?php
-$cliente = $items[0]->customer_name; // Obtener el valor de "Cliente" del primer elemento
-$facturacion = $items[0]->bill_line2; // Obtener el valor de "Facturación" del primer elemento
- // Obtener el valor de "Dirección" del primer elemento
-
-$numeroFactura = $items[0]->NumeroFactura;
-$bol = $items[0]->bol;
-$trailer = $items[0]->Trailer;
-$fechaCreacion = $items[0]->create_time;
-$ultimaModificacion = $items[0]->last_updated_time;
-
-?>
-
 
 <body>
   <div class="factura-header">
@@ -108,75 +104,102 @@ $ultimaModificacion = $items[0]->last_updated_time;
     {{-- Agrega aquí tu logo o detalles de la empresa --}}
   </div>
 
-  <!-- Contenido de la factura -->
+  @if($items->isNotEmpty())
+    <?php
+      $cliente = $items[0]->customer_name; // Obtener el valor de "Cliente" del primer elemento
+      $facturacion = $items[0]->bill_line2; // Obtener el valor de "Facturación" del primer elemento
+      $numeroFactura = $items[0]->NumeroFactura;
+      $bol = $items[0]->bol;
+      $trailer = $items[0]->Trailer;
+      $fechaCreacion = $items[0]->create_time;
+      $ultimaModificacion = $items[0]->last_updated_time;
+    ?>
 
-  <table>
-    <tbody>
-      <tr>
-        <th colspan="5" style="text-align: right;">Cliente</th>
-        <td>{{ $cliente }}</td>
-      </tr>
-      <tr>
-        <th colspan="5" style="text-align: right;">Facturación</th>
-        <td>{{ $facturacion }}</td>
-      </tr>
-    </tbody>
-  </table>
+    <!-- Contenido de la factura -->
 
-  <!-- Otro contenido de la factura -->
-
-  <table>
-    <thead>
-      <tr>
-        <th>Número Factura</th>
-        <th>BOL</th>
-        <th>Trailer</th>
-        <th>Fecha Creación</th>
-        <th>Última Modificación</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{ $numeroFactura }}</td>
-        <td>{{ $bol }}</td>
-        <td>{{ $trailer }}</td>
-        <td>{{ $fechaCreacion }}</td>
-        <td>{{ $ultimaModificacion }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Otra tabla o contenido -->
-
-  <table>
-    <thead>
-      <tr>
-        <th>Servicio</th>
-        <th>Tipo</th>
-        <th>Cantidad</th>
-        <th>Rate</th>
-        <th>Monto Total</th>
-        <th>Moneda</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach ($items as $Item)
+    <table>
+      <tbody>
         <tr>
-          <td>{{ $Item->item_names }}</td>
-          <td>{{ $Item->item_account_name }}</td>
-          <td>{{ $Item->quantity }}</td>
-          <td>{{ $Item->unit_price }}</td>
-          <td>{{ $Item->total_amt }}</td>
-          <td>{{ $Item->currency_value }}</td>
+          <th colspan="5" style="text-align: right;">Cliente</th>
+          <td>{{ $cliente }}</td>
         </tr>
-      @endforeach
-    </tbody>
-  </table>
+        <tr>
+          <th colspan="5" style="text-align: right;">Facturación</th>
+          <td>{{ $facturacion }}</td>
+        </tr>
+      </tbody>
+    </table>
 
-  <!-- Botón de regreso -->
-  <div class="button-container">
-    <a href="{{ route('invoice.invoice-list') }}" class="btn-regreso">Regresar</a>
-  </div>
+    <!-- Otro contenido de la factura -->
+
+    <table>
+      <thead>
+        <tr>
+          <th>Número Factura</th>
+          <th>BOL</th>
+          <th>Trailer</th>
+          <th>Fecha Creación</th>
+          <th>Última Modificación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ $numeroFactura }}</td>
+          <td>{{ $bol }}</td>
+          <td>{{ $trailer }}</td>
+          <td>{{ $fechaCreacion }}</td>
+          <td>{{ $ultimaModificacion }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Otra tabla o contenido -->
+
+    <table>
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Tipo</th>
+          <th>Cantidad</th>
+          <th>Rate</th>
+          <th>Monto Total</th>
+          <th>Moneda</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach ($items as $Item)
+          <tr>
+            <td>{{ $Item->item_names }}</td>
+            <td>{{ $Item->item_account_name }}</td>
+            <td>{{ $Item->quantity }}</td>
+            <td>{{ $Item->unit_price }}</td>
+            @if($Item->item_names != null)
+              <td>{{ number_format($Item->quantity * $Item->unit_price, 2, '.', '') }}</td>
+            @else
+              <td>{{ $Item->total_amt }}</td>
+            @endif
+            <td>{{ $Item->currency_value }}</td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+
+    <!-- Botón de regreso -->
+    <!-- Botones para generar PDF y enviar correo -->
+    <div class="button-container">
+      <a href="{{ route('invoice.invoice-list') }}" class="btn-regreso">Regresar</a>
+      <a href="{{ route('item.generatePDF', ['NumeroFactura' => $numeroFactura]) }}" class="btn-pdf">Generar PDF</a>
+      
+      <!-- Formulario para enviar el correo -->
+      <form action="{{ route('item.sendEmail', ['NumeroFactura' => $numeroFactura]) }}" method="POST" style="display:inline;">
+        @csrf
+        <input type="email" name="email" placeholder="Correo electrónico" required>
+        <button type="submit" class="btn-email">Enviar por correo</button>
+      </form>
+    </div>
+  @else
+    <p>No se encontraron elementos para la factura especificada.</p>
+  @endif
 
   <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -185,4 +208,5 @@ $ultimaModificacion = $items[0]->last_updated_time;
     // Agrega aquí tu código JavaScript
   </script>
 </body>
+
 @endsection

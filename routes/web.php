@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingsController;
+use App\Marchant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Sabberworm\CSS\Settings;
 
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
 
@@ -71,7 +75,6 @@ Route::delete('/marchants/destroy/{id}', [MarchantController::class, 'destroy'])
 
 //Route For payemnt Request
 Route::get('/invoice', [InvoiceController::class, 'index'])->name('invoice.index');
-Route::post('/invoice', [InvoiceController::class, 'store'])->name('invoice.store');
 
 Route::get('/invoices', [InvoiceController::class, 'invoiceList'])->name('invoice.invoice-list');
 Route::get('/invoices/edit/{id}', [InvoiceController::class, 'edit'])->name('invoice.edit-invoice');
@@ -110,3 +113,57 @@ Route::get('/test-database', function () {
         die("Could not connect to the database.  Please check your configuration. Error:" . $e );
     }
 });
+
+//propias
+Route::post('/invoice/download', 'InvoiceController@download')->name('invoice.download');
+Route::get('/invoice/{numeroFactura}/download-pdf', 'ItemController@downloadPDF')->name('item.download-pdf');
+
+Route::get('settings/{id}/edit', [settingsController::class, 'edit'])->name('settings.edit');
+Route::post('cardknox/{id}/update', 'settingsController@update')->name('cardknox.update');
+Route::get('cardknox.index', 'settingsController@index')->name('cardknox.index');
+Route::post('/product', 'ProductController@store')->name('product.store');
+Route::get('/settings/products/create', 'ProductController@create');
+
+Route::post('merchants', 'MerchantController@store');
+// web.php
+// routes/web.php
+Route::get('/item/{NumeroFactura}/pdf', [ItemController::class, 'generatePDF'])->name('item.generatePDF');
+Route::post('/item/{NumeroFactura}/email', [ItemController::class, 'sendEmail'])->name('item.sendEmail');
+Route::get('/marchants/{id}/edit', [MarchantController::class, 'edit'])->name('marchants.edit');
+Route::get('/marchants/{cliente_Id}/precios', 'MarchantController@show')->name('marchants.show');
+
+// Ruta para manejar el envío del formulario y almacenar la factura
+Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoice.store');
+
+Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
+
+// ==============================================================================================================================
+Route::get('/precios/{cliente_id}/{product_id}', function ($cliente_id, $product_id) {
+    // Implement your logic to retrieve the price data based on $customerId and $productId
+    // Assuming you have a 'precios' table with 'cliente_id' and 'producto_id' columns
+    $precio = Marchant::where('cliente_id', $cliente_id)
+      ->where('producto_id', $product_id)
+      ->first();
+  
+    // Return the price data in JSON format
+    if ($precio) {
+      return response()->json([$precio]);
+    } else {
+      // Handle no-price scenario (e.g., return empty array or appropriate error response)
+      return response()->json([], 404); // Not Found
+    }
+  });
+
+Route::get('/get-products-by-customer/{cliente_id}', [InvoiceController::class, 'getProductsByCustomer']);
+Route::get('/get-prices-by-product-and-customer/{cliente_id}/{product_id}', [InvoiceController::class, 'getPricesByProductAndCustomer']);
+
+
+
+
+
+
+
+
+
+
+

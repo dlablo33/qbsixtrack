@@ -36,7 +36,7 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            'host' => env('MAIL_HOST', 'mail.stenergy-aaf.fly.dev'),
             'port' => env('MAIL_PORT', 587),
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
@@ -50,7 +50,7 @@ return [
         ],
 
         'mailgun' => [
-            'transport' => 'mailgun',
+            'transport' => 'smtp',
         ],
 
         'postmark' => [
@@ -74,8 +74,8 @@ return [
 
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'arman.ullah@nexdecade.com'),
-        'name' => env('MAIL_FROM_NAME', 'Quickbook Panelone'),
+        'address' => env('MAIL_FROM_ADDRESS', 'csaucedo@aaf.mx'),
+        'name' => env('MAIL_FROM_NAME', 'STenergy'),
     ],
 
     /*

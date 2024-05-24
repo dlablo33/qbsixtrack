@@ -3,9 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
-class Product extends Model
+class Precio extends Model
 {
     protected $table = "products";
     protected $fillable = 
@@ -14,13 +13,19 @@ class Product extends Model
     "clv_producto",
     "nombre",
     "created_at",
-    "updated_at",
+    "updated",
     ];
 
     public function products()
     {
         return $this->belongsToMany(Product::class, 'product_id');
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class); // One price belongs to one product
+    }
+
 
 
 }

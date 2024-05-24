@@ -55,56 +55,62 @@
                         </a>
                     </li>
 
-
-                    <!-- QB Settings -->
+               
+                    <!-- qb confi -->
+                    <?php if(Auth::user()->tipo_usuario == 1): ?>  
                     <li class="nav-item has-treeview <?php echo e($menu == 'settings' ? 'menu-is-opening menu-open' : ''); ?>">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cogs"></i>
-                            <p>
-                                QB Settings
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('settings')); ?>" class="nav-link">
-                                    <p>Quickbooks Settings</p>
-                                </a>
-                            </li>
+      <a href="#" class="nav-link">
+        <i class="nav-icon fas fa-cogs"></i>
+        <p>
+          QB Settings
+          <i class="fas fa-angle-left right"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item ml-2">
+          <a href="<?php echo e(route('settings')); ?>" class="nav-link">
+            <p>Quickbooks Settings</p>
+          </a>
+        </li>
 
-                            <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('cardknox')); ?>" class="nav-link">
-                                    <p>Cardknox Settings</p>
-                                </a>
-                            </li>
-                            <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('change.password')); ?>" class="nav-link">
-                                    <p>Change Password</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+        <li class="nav-item ml-2">
+          <a href="<?php echo e(route('cardknox')); ?>" class="nav-link">
+            <p>Usuarios</p>
+          </a>
+        </li>
+        <li class="nav-item ml-2">
+          <a href="<?php echo e(route('change.password')); ?>" class="nav-link">
+            <p>Change Password</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+  <?php endif; ?>
+
+                     
 
                     <!-- Customers Section -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
                             <p>
-                                Customers
+                                Clientes
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
                                 <a href="<?php echo e(route('customers.index')); ?>" class="nav-link">
-                                    <p>Customer List</p>
+                                    <p>Lista de Clientes</p>
                                 </a>
                             </li>
+                            <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
                                 <a href="<?php echo e(route('customers.create')); ?>" class="nav-link">
-                                    <p>Add Customer</p>
+                                    <p>Agregar Cliente</p>
                                 </a>
                             </li>
+                            <?php endif; ?>
                         </ul>
                     </li>
 
@@ -113,21 +119,23 @@
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-box"></i>
                             <p>
-                                Products
+                                Productos
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
                                 <a href="<?php echo e(route('products.index')); ?>" class="nav-link">
-                                    <p>Product List</p>
+                                    <p>Lista de productos</p>
                                 </a>
                             </li>
+                            <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
                                 <a href="<?php echo e(route('products.create')); ?>" class="nav-link">
-                                    <p>Add Product</p>
+                                    <p>Agregar Producto</p>
                                 </a>
                             </li>
+                            <?php endif; ?>
                         </ul>
                     </li>
 
@@ -141,38 +149,40 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                        <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('invoice.index')); ?>" class="nav-link">
-                                    <p>Create Invoice</p>
+                            <a href="<?php echo e(route('invoice.index')); ?>" class="nav-link">
+                                    <p>Lista Remisiones</p>
                                 </a>
                             </li>
+                            <?php endif; ?>
                             <li class="nav-item ml-2">
                                 <a href="<?php echo e(route('invoice.invoice-list')); ?>" class="nav-link">
-                                    <p>Manage Invoice</p>
+                                    <p>Lista Invoice</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <?php if(Auth::user()->id == 1): ?>
+                    <?php if(Auth::user()->id >= 1): ?>
                         <!-- Merchant Section -->
                         <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-store"></i>
                                 <p>
-                                    Merchant
+                                    Precios
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item ml-2">
                                     <a href="<?php echo e(route('marchants.index')); ?>" class="nav-link">
-                                        <p>Merchant List</p>
+                                        <p>Lista de Precios</p>
                                     </a>
                                 </li>
                                 <li class="nav-item ml-2">
                                     <a href="<?php echo e(route('marchants.create')); ?>" class="nav-link">
-                                        <p>Add Merchant</p>
+                                        <p>Nuevo Precio</p>
                                     </a>
                                 </li>
                             </ul>

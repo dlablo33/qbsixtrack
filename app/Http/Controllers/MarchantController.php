@@ -1,104 +1,136 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
-
+use App\Factura;
+use App\Marchant;
+use App\Precio;
+use App\Customer;
+use App\Product;
 use Illuminate\Http\Request;
-use App\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
-use App\Mail\WelcomeMail;
+
 
 class MarchantController extends Controller
 {
+
     public function index()
     {
         $data = [];
-        $marchants = User::all();
+        $marchants = Marchant::orderBy('id','DESC')->get();
         $data['menu'] = "marchant";
         $data['menu_sub'] = "";
         $data['marchants'] = $marchants;
+
         return view('marchants.index', $data);
-       // return view('marchants.index', compact('data'));
+
     }
 
-    public function create()
-    {
-        $data['menu'] = "marchant";
-        $data['menu_sub'] = "";
-        return view('marchants.create',$data);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
-
-        try {
-            DB::beginTransaction();
-            $merchant = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-            ]);
-
-            // Send welcome email
-            Mail::to($merchant->email)->send(new WelcomeMail($merchant, $request->password));
-            DB::commit();
-            return redirect()->route('marchants.index')->with('success', 'Merchant created successfully');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to create payment request or send  email', ['error' => $e->getMessage()]);
-
-            return redirect()->back()->withInput()->withErrors(['error' => 'Something went wrong. Please try again.']);
+        public function create()
+        {
+            $clientes = Customer::all(); 
+            $productos = Product::all(); 
+            $precios = precio::all();
+            return view('marchants.create', compact('clientes', 'productos'));
         }
-    }
+    
+        public function store(Request $request)
+        {
+            // Validación de datos
+            $validatedData = $request->validate([
+                'customer_id' => 'required',
+                'product_id' => 'required',
+                'price' => 'required|numeric',
+            ]);
+        
+
+            // Separar el valor del cliente en clave y nombre
+            $customerData = explode('|', $validatedData['customer_id']);
+            $CVE_CTE = $customerData[0];
+            $CLIENTE_LP = $customerData[1];
+
+            $productData = explode('|', $validatedData['product_id']);
+            $product_id = $productData[0];
+            $product_name = $productData[1];
+        
+            // Crear una nueva instancia de Merchant
+            $marchant = new Marchant();
+        
+            // Asignar los datos validados a las propiedades del objeto Merchant
+            $marchant->cliente_id = $CVE_CTE;
+            $marchant->cliente_name = $CLIENTE_LP;
+            $marchant->producto_id = $product_id;
+            $marchant->producto_name = $product_name;
+            $marchant->precio = $validatedData['price'];
+        
+            // Guardar el objeto Merchant en la base de datos
+            $marchant->save();
+        
+            // Redireccionar con un mensaje de éxito
+            return redirect()->route('marchants.index')->with('success', 'Nuevo precio agregado correctamente');
+        }
+        
+
     public function edit($id)
     {
-        $marchant = User::findOrFail($id);
-        $data['menu'] = "marchant";
+        $marchants = Marchant::findOrFail($id);
+        $data['menu'] = "marchants";
         $data['menu_sub'] = "";
-        $data['marchant'] = $marchant;
+        $data['marchants'] = $marchants;
 
-        return view('marchants.edit', $data);
-       // return view('marchants.edit', compact('merchant'));
+        return view('customers.edit', $data);
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'required|min:6|confirmed',
+        $marchants = Marchant::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'customer_id' => 'required',
+            'product_id' => 'required',
+            'price' => 'required|numeric',
         ]);
+    
+        // Separar el valor del cliente en clave y nombre
+        $customerData = explode('|', $validatedData['customer_id']);
+        $CVE_CTE = $customerData[0];
+        $CLIENTE_LP = $customerData[1];
 
+        $productData = explode('|', $validatedData['product_id']);
+        $product_id = $productData[0];
+        $product_name = $productData[1];
+    
+        // Crear una nueva instancia de Merchant
+        $marchant = new Marchant();
+    
+        // Asignar los datos validados a las propiedades del objeto Merchant
+        $marchant->cliente_id = $CVE_CTE;
+        $marchant->cliente_name = $CLIENTE_LP;
+        $marchant->producto_id = $product_id;
+        $marchant->producto_name = $product_name;
+        $marchant->precio = $validatedData['price'];
 
-        try {
-            $merchant = User::findOrFail($id);
-            $merchant->update($request->all());
-            return redirect()->route('marchants.index')->with('success', 'Marchant updated successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Something went wrong. Please try again.']);
-        }
-
+        $marchant->save();
+        
+        // Redireccionar con un mensaje de éxito
+        return redirect()->route('marchants.index')->with('success', 'Nuevo precio agregado correctamente');
 
     }
 
-    public function destroy($id)
+    public function show($cliente_id)
     {
-        $merchant = User::findOrFail($id);
-        $merchant->delete();
-
-        return redirect()->route('marchants.index')->with('success', 'Marchant deleted successfully');
+        // Depuración: Verifica el ID del cliente
+        \Log::info("Cliente ID recibido: " . $cliente_id);
+    
+        // Cambiar el nombre de la columna según la columna correcta en la tabla 'precios'
+        $precios = Marchant::where('cliente_id', $cliente_id)->get(); // Usando el nombre correcto de la columna
+    
+        if ($precios->isEmpty()) {
+            \Log::info("Cliente no encontrado: " . $cliente_id);
+            return redirect()->route('marchants.index')->with('error', 'Cliente no encontrado.');
+        }
+    
+        return view('marchants.show', ['precios' => $precios]);
     }
+    
 }
-
-
-
-?>

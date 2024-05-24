@@ -3,25 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
-use App\Product;
-use App\QBDataService;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
+
+
 
 class CustomerController extends Controller
 {
 
     public function index()
     {
-        $user = Auth::user();
-        $user_id = $user->id;
-        $setting = $user->setting;
-        $realmId=$setting['QBORealmID'];
-        $data = [];
-        $customers = Customer::where('realm_id',$realmId)->orderBy('id', 'DESC')->get();
+        $customers = Customer::orderBy('id', 'DESC')->get();
+
         $data['menu'] = "settings";
         $data['menu_sub'] = "";
         $data['customers'] = $customers;
@@ -35,91 +27,10 @@ class CustomerController extends Controller
         $data = [];
         $data['menu'] = "settings";
         $data['menu_sub'] = "";
+        $customers = Customer::all();
 
         return view('customers.create', $data);
     }
-
-
-
-    public function store(Request $request)
-    {
-        $user = Auth::user();
-        $user_id = $user->id;
-         $setting = $user->setting;
-         $realmId=$setting['QBORealmID'];
-       // dd($realmId);
-
-        try {
-            DB::beginTransaction();
-            $dataService = QBDataService::init();
-
-            $customerData = [
-                'PrimaryEmailAddr' => [
-                    'Address' => $request->input('email'),
-                ],
-                'DisplayName' => $request->input('name'),
-                'PrimaryPhone' => [
-                    'FreeFormNumber' => $request->input('phone'),
-                ],
-                'BillAddr' => [
-                    'CountrySubDivisionCode' => $request->input('state'),
-                    'City' => $request->input('city'),
-                    'PostalCode' => $request->input('zip'),
-                    'Line1' => $request->input('address'),
-                    'Country' => $request->input('country')
-                ],
-               // 'Id'=>date('Ymdhs'),
-                'SyncToken'=>1
-
-            ];
-
-
-          // $quickbooksResponse = $this->createOrUpdateQBCustomers($customerData);
-            $quickbooksResponse = \QuickBooksOnline\API\Facades\Customer::create($customerData);
-
-            $resultObj = $dataService->Add($quickbooksResponse);
-            //echo '<pre>';print_r($resultObj);exit();
-            if ($resultObj) {
-
-                $customerArray = [
-                    'quickbooks_id' => $resultObj->Id,
-                    'SyncToken' => $resultObj->SyncToken,
-                    'name' => $resultObj->DisplayName,
-                    'email' => $resultObj->PrimaryEmailAddr->Address ?? null,
-                    'phone' => $resultObj->PrimaryPhone->FreeFormNumber?? null,
-                    'address' => $resultObj->BillAddr->Line1 ?? null,
-                    'city' => $resultObj->BillAddr->City?? null,
-                    'country' => $resultObj->BillAddr->Country ?? null,
-                    'state' => $resultObj->BillAddr->CountrySubDivisionCode ?? null,
-                    'zip' => $resultObj->BillAddr->PostalCode ?? null,
-                    'realm_id' => $realmId??null,
-                    'createdby' => $user_id,
-                    'updatedby' => $user_id,
-                ];
-               // echo '<pre>';print_r($realmId);exit();
-
-              //  dd($customerArray);
-             $data=   Customer::create($customerArray);
-
-
-
-                DB::commit();
-
-                return redirect()->route('customers.index')->with('success', 'Customer created successfully');
-            } else {
-                DB::rollBack();
-                return redirect()->route('customers.create')->with('error', 'Something went wrong!');
-            }
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return redirect()->route('customers.create')->with('error', 'Database error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('customers.create')->with('error', 'Something went wrong: ' . $e->getMessage());
-        }
-    }
-
-
 
     public function edit($id)
     {
@@ -130,93 +41,66 @@ class CustomerController extends Controller
 
         return view('customers.edit', $data);
     }
-
+    
     public function update(Request $request, $id)
     {
-
-        $user = Auth::user();
-        $user_id = $user->id;
-        $setting = $user->setting;
-        $realmId=$setting['QBORealmID'];
-        // dd($realmId);
-        try {
-            DB::beginTransaction();
-           $dataService = QBDataService::init();
-
-            // Your existing logic to update in the local database
-            $customer = Customer::findOrFail($id);
-
-            $syncToken = $customer->SyncToken;
-
-            $data = [
-//                'Id' => $customer->quickbooks_id,
-                'DisplayName' => $request->input('name'),
-                'PrimaryEmailAddr' => [
-                    'Address' => $request->input('email'),
-                ],
-                'PrimaryPhone' => [
-                    'FreeFormNumber' => $request->input('phone'),
-                ],
-                'BillAddr' => [
-                    'Line1' => $request->input('address'),
-                    'City' => $request->input('city'),
-                    'Country' => $request->input('country'),
-                    'CountrySubDivisionCode' => $request->input('state'),
-                    'PostalCode' => $request->input('zip'),
-                ],
-                'SyncToken' => $syncToken,
-            ];
-
-            $customerId=$customer->quickbooks_id;
-           $customerToUpdate = $dataService->Query("SELECT * FROM Customer WHERE id='$customerId'");
-            $theCustomer='';
-            if(!empty($customerToUpdate) && sizeof($customerToUpdate) == 1){
-                $theCustomer = current($customerToUpdate);
-            }
-
-            $quickbooksResponse = \QuickBooksOnline\API\Facades\Customer::update($theCustomer,$data);
-
-            if ($quickbooksResponse) {
-                $customerArray = [
-                    'id'=>$id,
-                    'quickbooks_id' => $quickbooksResponse->Id,
-                    'SyncToken' => $quickbooksResponse->SyncToken,
-                    'name' => $quickbooksResponse->DisplayName,
-                    'email' => $quickbooksResponse->PrimaryEmailAddr->Address ?? null,
-                    'phone' => $quickbooksResponse->PrimaryPhone->FreeFormNumber?? null,
-                    'address' => $quickbooksResponse->BillAddr->Line1 ?? null,
-                    'city' => $quickbooksResponse->BillAddr->City?? null,
-                    'country' => $quickbooksResponse->BillAddr->Country ?? null,
-                    'state' => $quickbooksResponse->BillAddr->CountrySubDivisionCode ?? null,
-                    'zip' => $quickbooksResponse->BillAddr->PostalCode ?? null,
-                    'realm_id' =>$realmId ?? null,
-                    'createdby' => $user_id,
-                    'updatedby' => $user_id,
-                ];
-                $customer->update($customerArray);
-
-                DB::commit();
-
-                return redirect()->route('customers.index')->with('success', 'Customer updated successfully');
-            } else {
-                DB::rollBack();
-                return redirect()->route('customers.edit', ['id' => $id])->with('error', 'Something went wrong!');
-            }
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return redirect()->route('customers.edit', ['id' => $id])->with('error', 'Database error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('customers.edit', ['id' => $id])->with('error', 'Something went wrong: ' . $e->getMessage());
-        }
+        // Encuentra el cliente por su ID
+        $customer = Customer::findOrFail($id);
+        
+        // Actualiza los campos del cliente con los valores de la solicitud
+        $customer->CLIENTE_LP = $request->input('clp');
+        $customer->NOMBRE_COMERCIAL = $request->input('nc');
+        $customer->STATUS = $request->input('STATUS') ? 'Activo' : 'Inactivo';
+        $customer->RFC = $request->input('rfc');
+        $customer->RAZON_SOCIAL = $request->input('rs');
+        $customer->EMPRESA_VENDEDORA = $request->input('ev');
+        $customer->CODIGO_CUENTA_CONTABLE = $request->input('ccc');
+        $customer->CODIGO_CLIENTE_COMERCIAL = $request->input('cco'); // Asigna a otro campo
+        $customer->DENOMINACION_SERIAL = $request->input('ds');
+        $cve_cte = $request->input('ccc') . $request->input('cco') . $request->input('ds');
+        $customer->CVE_CTE = $cve_cte;
+        
+        // Guarda los cambios en la base de datos
+        $customer->save();
+    
+        // Redirige a la página de índice de clientes u otra página según necesites
+        return redirect()->route('customers.index')->with('success', 'Cliente actualizado correctamente');
     }
 
-    public function destroy($id)
+    public function store(Request $request)
     {
-        $customer = Customer::find($id);
-        $customer->delete();
+                // Validar los datos de entrada
+                $request->validate([
+                    'clp' => 'required|string|max:255',
+                    'nc' => 'nullable|string|max:255',
+                    'status' => 'nullable|boolean',
+                    'rfc' => 'nullable|string|max:255',
+                    'rs' => 'nullable|string|max:255',
+                    'ev' => 'nullable|string|max:255',
+                    'ccc' => 'nullable|string|max:255',
+                    'cco' => 'nullable|string|max:255',
+                    'ds' => 'nullable|string|max:255',
+                ]);
+        
+                // Crear una nueva instancia de Customer
+                $customer = new Customer();
+                $customer->CLIENTE_LP = $request->input('clp');
+                $customer->NOMBRE_COMERCIAL = $request->input('nc');
+                $customer->STATUS = $request->has('status') ? 'Inactivo' : 'Activo';
+                $customer->RFC = $request->input('rfc');
+                $customer->RAZON_SOCIAL = $request->input('rs');
+                $customer->EMPRESA_VENDEDORA = $request->input('ev');
+                $customer->CODIGO_CUENTA_CONTABLE = $request->input('ccc');
+                $customer->CODIGO_CLIENTE_COMERCIAL = $request->input('cco');
+                $customer->DENOMINACION_SERIAL = $request->input('ds');
+                $cve_cte = $request->input('ccc') . $request->input('cco') . $request->input('ds');
+                $customer->CVE_CTE = $cve_cte;
 
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully');
+                $customer->save();
+        
+                // Redirigir a la página de índice de clientes con un mensaje de éxito
+                return redirect()->route('customers.index')->with('success', 'Cliente creado correctamente');
+            }
     }
-
-}
+    
+    

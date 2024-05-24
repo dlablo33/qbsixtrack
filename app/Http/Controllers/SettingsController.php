@@ -2,136 +2,61 @@
 
 namespace App\Http\Controllers;
 
-
-use Illuminate\Http\Request;
 use App\Settings;
-use Illuminate\Support\Facades\Auth;
-use QuickBooksOnline\API\DataService\DataService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class SettingsController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+    // Método para mostrar todos los usuarios
     public function index()
     {
+        $usuarios = Settings::all();
+
         $data = [];
         $data['menu'] = "settings";
         $data['menu_sub'] = "";
-        $userId = Auth::user()->id;
+        $data['settings'] = $usuarios;
 
-        $settings = Settings::where('user_id', $userId)->first();
-//        $data['settings'] = auth()->user()->setting;
-        $data['settings'] = $settings;
-        $data['qbauth'] = $this->qbInvoke();
-        return view('settings.index', $data);
+        return view('cardknox.index', $data);
+
     }
 
-    public function cardknoxIndex()
+    public function cardknoxIndex() // Create the new method
     {
+        $usuarios = Settings::all();
+
         $data = [];
         $data['menu'] = "settings";
         $data['menu_sub'] = "";
-        $userId = Auth::user()->id;
+        $data['settings'] = $usuarios;
 
-        $settings = Settings::where('user_id', $userId)->first();
-//        $data['settings'] = auth()->user()->setting;
-        $data['settings'] = $settings;
-        $data['qbauth'] = $this->qbInvoke();
         return view('cardknox.index', $data);
     }
 
-
-    public function edit($id=null)
+    public function cardknoxEdit ($id)
     {
+        $Settings = Settings::findOrFail($id);
 
-        $settings=Settings::find($id);
-
-       // dd($settings);
         $data = [];
         $data['menu'] = "settings";
         $data['menu_sub'] = "";
-        $data['settings'] = $settings;
-        return view('settings.edit', $data);
-    }
-    public function cardknoxEdit($id=null)
-    {
-
-        $settings=Settings::find($id);
-
-       // dd($settings);
-        $data = [];
-        $data['menu'] = "settings";
-        $data['menu_sub'] = "";
-        $data['settings'] = $settings;
+        $data['settings'] = $Settings;
         return view('cardknox.edit', $data);
     }
 
-    public function store(Settings $settings, Request $request)
-    {
-        $user_id = Auth::user()->id;
+    public function update(Request $request,$id) {
+        $Settings = Settings::findOrFail($id);
+        
+        // Actualiza los campos del cliente con los valores de la solicitud
+        $Settings->name = $request->input('name');
+        $Settings->email = $request->input('email');
+        $Settings->tipo_usuario = $request->input('tipo_usuario');
 
-        // Update or create a record based on user_id
-        $settings->updateOrCreate(['user_id' => $user_id], [
-            'ClientID' => $request->input('ClientID'),
-            'ClientSecret' => $request->input('ClientSecret'),
-            'RedirectURI' => $request->input('RedirectURI'),
-            'scope' => $request->input('scope'),
-            'baseUrl' => $request->input('baseUrl'),
-            'QBORealmID' => $request->input('QBORealmID'),
-//            'transaction_key' => $request->input('transaction_key'),
-//            'ifield_key' => $request->input('ifield_key'),
+        $Settings->save();
+    
+        // Redirige a la página de índice de clientes u otra página según necesites
+        return redirect()->route('cardknox.index')->with('success', 'Cliente actualizado correctamente');
 
-        ]);
-
-        return redirect()->route('settings')->with('success', 'Updated successfully!');
-    }
-    public function cardknoxStore(Settings $settings, Request $request)
-    {
-        $user_id = Auth::user()->id;
-
-        // Update or create a record based on user_id
-        $settings->updateOrCreate(['user_id' => $user_id], [
-
-            'transaction_key' => $request->input('transaction_key'),
-            'ifield_key' => $request->input('ifield_key'),
-
-        ]);
-
-        return redirect()->route('cardknox')->with('success', 'Updated successfully!');
-    }
-    private function qbInvoke()
-    {
-        $setting = auth()->user()->setting;
-
-        if (!empty($setting['ClientID']) && !empty($setting['ClientSecret'])) {
-            $dataService = DataService::Configure(array(
-                'auth_mode' => 'oauth2',
-                'ClientID' => $setting['ClientID'],
-                'ClientSecret' =>  $setting['ClientSecret'],
-                'RedirectURI' => $setting['RedirectURI'],
-                'scope' => $setting['scope'],
-                'baseUrl' => $setting['baseUrl']
-            ));
-
-            $OAuth2LoginHelper = $dataService->getOAuth2LoginHelper();
-
-            //Get the Authorization URL from the SDK
-            return $OAuth2LoginHelper->getAuthorizationCodeURL();
-        }
-
-        return '#';
     }
 }

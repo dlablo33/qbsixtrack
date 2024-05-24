@@ -10,16 +10,23 @@
     "require": {
         "php": "^7.2.5|^8.0",
         "ext-json": "*",
+        "barryvdh/laravel-dompdf": "^2.2",
+        "dompdf/dompdf": "^2.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
+        "itstructure/laravel-rbac": "^2.0",
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^2.4",
+        "league/csv": "^9.8",
         "quickbooks/v3-php-sdk": "^5.4",
         "realrashid/sweet-alert": "^3.2",
+        "symfony/http-client": "^6.0",
+        "symfony/mailgun-mailer": "^6.0",
         "twilio/sdk": "^6.15",
-        "vlucas/phpdotenv": "^4.3"
+        "vlucas/phpdotenv": "^4.3",
+        "yiisoft/rbac": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

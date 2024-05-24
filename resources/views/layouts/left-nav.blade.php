@@ -53,56 +53,62 @@
                         </a>
                     </li>
 
-
-                    <!-- QB Settings -->
+               
+                    <!-- qb confi -->
+                    @if (Auth::user()->tipo_usuario == 1)  
                     <li class="nav-item has-treeview {{ $menu == 'settings' ? 'menu-is-opening menu-open' : '' }}">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cogs"></i>
-                            <p>
-                                QB Settings
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item ml-2">
-                                <a href="{{ route('settings') }}" class="nav-link">
-                                    <p>Quickbooks Settings</p>
-                                </a>
-                            </li>
+      <a href="#" class="nav-link">
+        <i class="nav-icon fas fa-cogs"></i>
+        <p>
+          QB Settings
+          <i class="fas fa-angle-left right"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item ml-2">
+          <a href="{{ route('settings') }}" class="nav-link">
+            <p>Quickbooks Settings</p>
+          </a>
+        </li>
 
-                            <li class="nav-item ml-2">
-                                <a href="{{ route('cardknox') }}" class="nav-link">
-                                    <p>Cardknox Settings</p>
-                                </a>
-                            </li>
-                            <li class="nav-item ml-2">
-                                <a href="{{ route('change.password') }}" class="nav-link">
-                                    <p>Change Password</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+        <li class="nav-item ml-2">
+          <a href="{{ route('cardknox') }}" class="nav-link">
+            <p>Usuarios</p>
+          </a>
+        </li>
+        <li class="nav-item ml-2">
+          <a href="{{ route('change.password') }}" class="nav-link">
+            <p>Change Password</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+  @endif
+
+                     
 
                     <!-- Customers Section -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
                             <p>
-                                Customers
+                                Clientes
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
                                 <a href="{{ route('customers.index') }}" class="nav-link">
-                                    <p>Customer List</p>
+                                    <p>Lista de Clientes</p>
                                 </a>
                             </li>
+                            @if (Auth::user()->tipo_usuario == 1)  
                             <li class="nav-item ml-2">
                                 <a href="{{ route('customers.create') }}" class="nav-link">
-                                    <p>Add Customer</p>
+                                    <p>Agregar Cliente</p>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
 
@@ -111,21 +117,23 @@
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-box"></i>
                             <p>
-                                Products
+                                Productos
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
                                 <a href="{{ route('products.index') }}" class="nav-link">
-                                    <p>Product List</p>
+                                    <p>Lista de productos</p>
                                 </a>
                             </li>
+                            @if (Auth::user()->tipo_usuario == 1)  
                             <li class="nav-item ml-2">
                                 <a href="{{ route('products.create') }}" class="nav-link">
-                                    <p>Add Product</p>
+                                    <p>Agregar Producto</p>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
 
@@ -139,38 +147,40 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                        @if (Auth::user()->tipo_usuario == 1)  
                             <li class="nav-item ml-2">
-                                <a href="{{ route('invoice.index') }}" class="nav-link">
-                                    <p>Create Invoice</p>
+                            <a href="{{ route('invoice.index') }}" class="nav-link">
+                                    <p>Lista Remisiones</p>
                                 </a>
                             </li>
+                            @endif
                             <li class="nav-item ml-2">
                                 <a href="{{ route('invoice.invoice-list') }}" class="nav-link">
-                                    <p>Manage Invoice</p>
+                                    <p>Lista Invoice</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    @if(Auth::user()->id == 1)
+                    @if(Auth::user()->id >= 1)
                         <!-- Merchant Section -->
                         <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-store"></i>
                                 <p>
-                                    Merchant
+                                    Precios
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item ml-2">
                                     <a href="{{ route('marchants.index') }}" class="nav-link">
-                                        <p>Merchant List</p>
+                                        <p>Lista de Precios</p>
                                     </a>
                                 </li>
                                 <li class="nav-item ml-2">
                                     <a href="{{ route('marchants.create') }}" class="nav-link">
-                                        <p>Add Merchant</p>
+                                        <p>Nuevo Precio</p>
                                     </a>
                                 </li>
                             </ul>

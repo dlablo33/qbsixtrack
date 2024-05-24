@@ -1,75 +1,36 @@
 @extends('layouts.master')
 
 @section('content')
-
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Cardknox Settings</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-              <li class="breadcrumb-item active">Cardknox</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+    <div class="container">
+        <h1>Listado de Usuarios</h1>
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Tipo de Usuario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($settings as $setting)
+                    <tr>
+                        <td>{{ $setting->name }}</td>
+                        <td>{{ $setting->email }}</td>
+                        <td>{{ $setting->tipo_usuario }}</td>
+                        <td>
+                            <a href="{{ route('cardknox.edit', $setting->id) }}" class="btn btn-primary btn-sm">Editar</a> <!-- Botón Editar -->
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-    <!-- /.content-header -->
-
-<!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-              <div class="container">
-                  <div class="row justify-content-center">
-                      <div class="col-md-6">
-                          <div class="card">
-                              <div class="card-header">
-                                  <h3 class="card-title">Cardknox Settings</h3>
-                              </div>
-                              <!-- /.card-header -->
-                              <div class="card-body">
-                                  @if($settings)
-                                      <p><strong>Transaction Key:</strong> {{ $settings['transaction_key'] }}</p>
-                                      <p><strong>Ifields Key:</strong> {{ $settings['ifield_key'] }}</p>
-
-                                      <div class="text-center mt-4">
-                                          @if(isset($settings['id']))
-                                              <a href="{{ route('cardknox.edit',['id' => $settings['id'] ])}}" class="btn btn-success ml-2">Edit</a>
-                                          @endif
-                                      </div>
-                                  @else
-
-
-                                      <div class="text-center mt-4">
-                                          <p>No cardknox settings data available.</p>
-                                          <a href="{{ route('cardknox.edit')}}" class="btn btn-success ml-2">Add</a>
-
-
-                                      </div>
-
-                                  @endif
-                              </div>
-                              <!-- /.card-body -->
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-
-              <!-- /.card -->
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-      </div>
-      <!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-
 @endsection
+
+
+

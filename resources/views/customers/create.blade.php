@@ -35,60 +35,75 @@
                             @include('qb-flash-message')
 
                             <div class="form-group row">
-                                <label for="name" class="col-sm-3 col-form-label">Customer Name</label>
+                                <label for="name" class="col-sm-3 col-form-label">Cliente LP</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter Customer Name" required="">
+                                    <input type="text" class="form-control" name="clp" id="clp" placeholder=" " required="">
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                <label for="email" class="col-sm-3 col-form-label">Nombre Comercial</label>
                                 <div class="col-sm-9">
-                                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                                    <input type="text" class="form-control" name="nc" id="nc" placeholder="">
+                                </div>
+                            </div>
+
+                           <!-- ===================================================================================================== --> 
+                           <div class="form-group row">
+                                <label for="STATUS" class="col-sm-3 col-form-label">Status</label>
+                                  <div class="col-sm-9">
+                                       <div class="custom-control custom-switch" >
+                                       <input type="checkbox" class="custom-control-input" id="STATUS" name="STATUS" checked>
+                                     <label class="custom-control-label" for="STATUS">Activo</label>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <!-- ===================================================================================================== -->
+
+                        <div class="form-group row">
+                                <label for="phone" class="col-sm-3 col-form-label">RFC</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="rfc" id="rfc" placeholder="">
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="phone" class="col-sm-3 col-form-label">Phone</label>
+                                <label for="address" class="col-sm-3 col-form-label">Razon Social</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter Phone">
+                                    <textarea class="form-control" id="rs" name="rs" placeholder=""></textarea>
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="address" class="col-sm-3 col-form-label">Address</label>
+                                <label for="city" class="col-sm-3 col-form-label">Empresa Vendedora</label>
                                 <div class="col-sm-9">
-                                    <textarea class="form-control" id="address" name="address" placeholder="Enter Address"></textarea>
+                                    <input type="text" class="form-control" name="ev" id="ev" placeholder="">
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="city" class="col-sm-3 col-form-label">Country</label>
+                                <label for="country" class="col-sm-3 col-form-label">Codigo Cliente Contable</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="country" id="country" placeholder="Enter Country">
+                                    <input type="text" class="form-control" name="ccc" id="ccc" placeholder="">
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="country" class="col-sm-3 col-form-label">City</label>
+                                <label for="state" class="col-sm-3 col-form-label">Codigo Cliente Comercial</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="city" id="city" placeholder="Enter City">
+                                    <input type="text" class="form-control" name="cco" id="cco" placeholder="">
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="state" class="col-sm-3 col-form-label">State</label>
+                                <label for="zip" class="col-sm-3 col-form-label">Denominacion Serial</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="state" id="state" placeholder="Enter State">
+                                    <input type="text" class="form-control" name="ds" id="ds" placeholder="">
                                 </div>
                             </div>
 
-                            <div class="form-group row">
-                                <label for="zip" class="col-sm-3 col-form-label">ZIP Code</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="zip" id="zip" placeholder="Enter ZIP Code">
-                                </div>
-                            </div>
+                            
 
                             <div class="form-group row">
                                 <div class="col-sm-12 text-center">

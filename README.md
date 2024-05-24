@@ -1,2 +1,15 @@
 # sixtrackqb
- aplicacion por modulos para importacion,creacion y lectura de facturas
+Aplicacion modular para el manejo de informacion 
+
+
+franwork->laravel
+
+lenguajes
+{
+    php;
+    javascript;
+    html;
+    css;
+
+
+}

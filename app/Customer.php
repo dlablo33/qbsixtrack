@@ -8,18 +8,23 @@ class Customer extends Model
 {
     protected $table = "customers";
     protected $fillable = [
-        'name',
-        'quickbooks_id',
-        'email',
-        'phone',
-        'address',
-        'city',
-        'state',
-        'zip',
-        'country',
-        'realm_id',
-        'SyncToken',
+    'id',
+    'CLIENTE_LP',
+    'NOMBRE_COMERCIAL',
+    'STATUS',
+    'RFC',
+    'RAZON_SOCIAL',
+    'EMPRESA_VENDEDORA',
+    'CODIGO_CUENTA_CONTABLE',
+    'CODIGO_CLIENTE_COMERCIAL',
+    'DENOMINACION_SERIAL',
+    'CVE_CTE'
 
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'cliente_id');
+    }
 
 }

@@ -7,12 +7,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Products</h1>
+            <h1 class="m-0">Productos</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-              <li class="breadcrumb-item active">Products</li>
+              <li class="breadcrumb-item active">Productos</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -28,11 +28,13 @@
 
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mr-auto">All Products</h3>
+                    <h3 class="card-title mr-auto">Todos los productos</h3>
 
                     <div class="d-flex">
-                        <a href="/products/syncItems" class="btn btn-danger mr-2">Sync Items</a>
-                        <a href="/settings/products/create/" class="btn btn-info">Add Product</a>
+                    @if (Auth::user()->tipo_usuario == 1)
+                        <a href="/products/syncItems" class="btn btn-danger mr-2">?</a>
+                        @endif
+                        <a href="/settings/products/create/" class="btn btn-info">Agregar Product</a>
                     </div>
                 </div>
 
@@ -51,29 +53,28 @@
                 <table id="example1" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>Item</th>
-                      <th>Description</th>
-                    <th>Type</th>
-                    <th>Unit Price</th>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Clave del Producto</th>
+                    <th>Fecha de Creacion</th>
+                    
 
-                    <th>Action</th>
+                  <!-- <th>Editar</th> -->
                   </tr>
                   </thead>
                   <tbody>
-                  @foreach($qb_products as $product)
+                  @foreach($products as $product)
 
                   <tr>
-                    <td width="30%">{{$product->Name}}</td>
-                      <td width="30%">{{$product->Description}}</td>
-                    <td width="20%">{{$product->Type}}</td>
-                    <td width="20%">{{$product->UnitPrice}}</td>
+                    <td>{{$product->id}}</td>
+                    <td>{{$product->nombre}}</td>
+                    <td>{{$product->clv_producto}}</td>
+                    <td>{{$product->created_at}}</td>
 
-                    <td>
-
-                        <a href="{{ route('products.edit',  $product->id) }}" class="btn btn-success"><i class="nav-icon fas fa-edit"></i></a>
+ {{--            <a href="{{ route('products.edit',  $product->id) }}" class="btn btn-success"><i class="nav-icon fas fa-edit"></i></a> 
 
                     </td>
-{{--                    <td><a href="{{route('products.destroy',['id'=> $product->id])}}" class="btn btn-danger">Delete</a></td>--}}
+                <td><a href="{{route('products.destroy',['id'=> $product->id])}}" class="btn btn-danger">Delete</a></td>--}}
                   </tr>
 
                   @endforeach

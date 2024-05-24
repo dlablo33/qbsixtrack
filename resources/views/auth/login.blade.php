@@ -87,6 +87,24 @@
             <!-- /.card -->
         </div>
         <!-- /.login-box -->
+        <script type="module" src="seguridad"></script>
+        <RouteServiceProvider>RouteServiceProvider <aside><param name="" value=""></aside>
+        <main>User Account</main>
+        <plaintext></plaintext>
+        <keygen>
+        Y3jinboueroOIUBIFUBjkniub258
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur soluta nam ducimus nostrum quasi ab odit cum unde, illo, ad delectus? Repellat, repellendus earum natus obcaecati nisi dicta modi rerum.
+        <main>
+            application 
+            <menu type="toolbar"></menu>
+            <?php
+            @data_fill()
+
+?>
+        </main>
+
+
+
 
         <!-- jQuery -->
         <script src="{{ asset('admin/plugins/jquery/jquery.min.js') }}"></script>
