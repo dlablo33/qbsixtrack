@@ -17,6 +17,10 @@ class Factura extends Model
         'producto_id',
         'fecha_create',
         'due_fecha',
+        'cantidad',
+        'bol',
+        'trailer',
+        'Numero_Factura',
         'total',
         'created_at',
         'update_at',
@@ -39,6 +43,15 @@ class Factura extends Model
         return $this->hasMany(Precio::class); // Assuming 'Item' is the related model
     }
 
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class);
+    }
 
+    public function montoPendiente()
+    {
+        $pagosTotales = $this->pagos->sum('monto');
+        return $this->total - $pagosTotales;
+    }
 
 }

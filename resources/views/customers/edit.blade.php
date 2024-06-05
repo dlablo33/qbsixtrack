@@ -7,13 +7,13 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Edit Customer</h1>
+                    <h1 class="m-0">Editar Cliente</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
-                        <li class="breadcrumb-item active">Edit Customer</li>
+                        <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Cliente</a></li>
+                        <li class="breadcrumb-item active">Editar Cliente</li>
                     </ol>
                 </div>
             </div>
@@ -26,7 +26,7 @@
                 <div class="col-lg-8">
                     <div class="card card-info">
                         <div class="card-header text-center">
-                            <h3 class="card-title">Edit Customer</h3>
+                            <h3 class="card-title">Editar Cliente</h3>
                         </div>
 
                         <form class="card-body" style="margin: 10px" action="{{ route('customers.update', ['id' => $customer->id]) }}" method="POST">
@@ -80,6 +80,13 @@
                             </div>
 
                             <div class="form-group row">
+                                <label for="email" class="col-sm-3 col-form-label">Correo Electronico</label>
+                                <div class="col-sm-9">
+                                    <input type="email" class="form-control" name="email" id="email" placeholder="" value="{{ $customer->email }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label for="state" class="col-sm-3 col-form-label">Codigo Cuenta Contable</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="ccc" id="ccc" placeholder="" value="{{ $customer->CODIGO_CUENTA_CONTABLE }}">
@@ -102,7 +109,7 @@
 
                             <div class="form-group row">
                                 <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn btn-info">Update</button>
+                                    <button type="submit" class="btn btn-info">Actualizar</button>
                                 </div>
                             </div>
                         </form>

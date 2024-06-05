@@ -20,6 +20,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^2.4",
         "league/csv": "^9.8",
+        "niklasravnsborg/laravel-pdf": "^1.5",
         "quickbooks/v3-php-sdk": "^5.4",
         "realrashid/sweet-alert": "^3.2",
         "symfony/http-client": "^6.0",

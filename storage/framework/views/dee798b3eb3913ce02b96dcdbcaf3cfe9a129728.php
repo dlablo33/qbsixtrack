@@ -1,6 +1,4 @@
-@extends('layouts.master')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 
     <div class="content-header">
@@ -11,7 +9,7 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
                         <li class="breadcrumb-item active">Clientes</li>
                     </ol>
                 </div><!-- /.col -->
@@ -25,25 +23,27 @@
                 <div class="col-lg-12">
                    
                     <div class="d-flex">
-                    @if (Auth::user()->tipo_usuario == 1) 
+                    <?php if(Auth::user()->tipo_usuario == 1): ?> 
                                 <a href="/customers/syncCustomers" class="btn btn-danger mr-2"></a>
-                                @endif
+                                <?php endif; ?>
                                 <a href="/customers/create" class="btn btn-info">Agregar Cliente</a>
                             </div>
 
                        
                         <div class="card-body">
-                            @include('qb-flash-message')
-                            @if(session('error'))
+                            <?php echo $__env->make('qb-flash-message', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                            <?php if(session('error')): ?>
                                 <div class="alert alert-danger">
-                                    {{ session('error') }}
+                                    <?php echo e(session('error')); ?>
+
                                 </div>
-                            @endif
-                            @if(session('success'))
+                            <?php endif; ?>
+                            <?php if(session('success')): ?>
                                 <div class="alert alert-success">
-                                    {{ session('success') }}
+                                    <?php echo e(session('success')); ?>
+
                                 </div>
-                            @endif
+                            <?php endif; ?>
                             <table  id="example1" class="table table-bordered table-striped">
                                 <thead>
                                 <tr>
@@ -58,23 +58,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($customers as $customer)
+                                <?php $__currentLoopData = $customers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $customer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td>{{ $customer->id }}</td>
-                                        <td>{{ $customer->CLIENTE_LP }}</td>
-                                        <td>{{ $customer->NOMBRE_COMERCIAL }}</td>
-                                        <td>{{ $customer->STATUS }}</td>
-                                        <td>{{ $customer->RFC }}</td>
-                                        <td>{{ $customer->EMPRESA_VENDEDORA }}</td>
-                                        <td>{{ $customer->CVE_CTE }}</td>
+                                        <td><?php echo e($customer->id); ?></td>
+                                        <td><?php echo e($customer->CLIENTE_LP); ?></td>
+                                        <td><?php echo e($customer->NOMBRE_COMERCIAL); ?></td>
+                                        <td><?php echo e($customer->STATUS); ?></td>
+                                        <td><?php echo e($customer->RFC); ?></td>
+                                        <td><?php echo e($customer->EMPRESA_VENDEDORA); ?></td>
+                                        <td><?php echo e($customer->CVE_CTE); ?></td>
                                         <td>
                                             <!-- Edit Button -->
-                                            <a href="{{ route('customers.edit', ['id' => $customer->id]) }}" class="btn btn-success">
+                                            <a href="<?php echo e(route('customers.edit', ['id' => $customer->id])); ?>" class="btn btn-success">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                         </td>
                                     </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
                         </div>
@@ -86,4 +86,5 @@
 
     <!-- /.content -->
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/customers/index.blade.php ENDPATH**/ ?>

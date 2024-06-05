@@ -80,7 +80,7 @@
         </li>
         <li class="nav-item ml-2">
           <a href="<?php echo e(route('change.password')); ?>" class="nav-link">
-            <p>Change Password</p>
+            <p>Cuentas por Cobrar</p>
           </a>
         </li>
       </ul>
@@ -161,6 +161,13 @@
                                     <p>Lista Invoice</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('invoice.petrolio')); ?>" class="nav-link">
+                                    <p>Lista Naptha</p>
+                                </a>
+                            </li>
+
                         </ul>
                     </li>
 
@@ -188,6 +195,29 @@
                             </ul>
                         </li>
                     <?php endif; ?>
+
+                    <!-- ====================================================================================================================== -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-file-invoice"></i>
+                            <p>
+                                Cuenta Por Cobrar
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                        <?php if(Auth::user()->tipo_usuario == 1): ?>  
+                            <li class="nav-item ml-2">
+                            <a href="<?php echo e(route('cuentas.index')); ?>" class="nav-link">
+                                    <p>Lista Cuentas</p>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+
+
+                        </ul>
+                    </li>
+                    <!-- ====================================================================================================================== -->
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->

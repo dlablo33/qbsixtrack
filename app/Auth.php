@@ -34,7 +34,7 @@ class Auth extends Model
         if ($user) {
             $setting = $user->setting;
         } else {
-            $setting = Settings::where('user_id', 1)->first()->toArray();
+            $setting = Settings::where('id', 1)->first()->toArray();
         }
 
 //        if (!$setting) {

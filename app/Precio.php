@@ -26,6 +26,17 @@ class Precio extends Model
         return $this->belongsTo(Product::class); // One price belongs to one product
     }
 
+    public function customer()
+    {
+        return $this->belongsTo(Precio::class, 'cliente_id');
+    }
+
+
+    public function items()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
 
 
 }

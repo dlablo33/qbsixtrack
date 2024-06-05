@@ -15,8 +15,8 @@ class QBDataService
             $qbAuth = $user->qbAuth;
             $setting = $user->setting;
         } else {
-            $setting = Settings::where('user_id', 1)->first()->toArray();
-            $qbAuth = Auth::where('user_id', 1)->first();
+            $setting = Settings::where('id', 1)->first()->toArray();
+            $qbAuth = Auth::where('id', 1)->first();
         }
 
 

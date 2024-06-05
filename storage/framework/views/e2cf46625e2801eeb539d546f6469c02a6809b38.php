@@ -45,16 +45,17 @@
             <div class="col-lg-12">
                 <div class="card card-info">
                     <div class="card-header text-center">
-                        <h3 class="card-title">Crear Remisa</h3>
+                        <h3 class="card-title">Crear </h3>
                     </div>
 
                     <form class="card-body" style="margin: 10px" action="<?php echo e(route('invoice.store')); ?>" method="POST">
                         <?php echo csrf_field(); ?>
+
                         <div class="form-group row">
                             <label for="customer_id" class="col-sm-3 col-form-label">Selecciona Cliente</label>
                             <div class="col-sm-9">
                                 <select class="form-control" name="customer_id" id="customer_id" required>
-                                    <option value="<?php echo e($precios->cliente_id); ?>">-- Selecciona Cliente --</option>
+                                    <option value="">-- Selecciona Cliente --</option>
                                     <?php
                                     $seenCustomers = []; // Array to store seen customer IDs
                                     foreach ($precios as $precio) {
@@ -67,6 +68,7 @@
                                 </select>
                             </div>
                         </div>
+
                         <div class="form-group row">
                             <label for="product_id" class="col-sm-3 col-form-label">Seleccion Producto</label>
                             <div class="col-sm-9">
@@ -85,14 +87,13 @@
                             </div>
                         </div>
 
-
                         <div class="form-group row">
-                            <label for="invoice_date" class="col-sm-3 col-form-label">Factura Date</label>
+                            <label for="invoice_date" class="col-sm-3 col-form-label">Fecha de Factura</label>
                             <div class="col-sm-3">
                                 <input type="date" class="form-control" id="invoice_date" name="invoice_date" value="<?php echo e(date('Y-m-d')); ?>">
                             </div>
 
-                            <label for="due_date" class="col-sm-3 col-form-label">Due Date</label>
+                            <label for="due_date" class="col-sm-3 col-form-label">Fecha de Vencimiento</label>
                             <div class="col-sm-3">
                                 <input type="date" class="form-control" id="due_date" name="due_date" value="<?php echo e(date('Y-m-d')); ?>">
                             </div>
@@ -100,19 +101,19 @@
 
                         <div class="form-group row mt-3">
                             <div class="col-sm-12 text-center">
-                        <button type="button" id="add_product_btn" class="btn btn-primary">Añadir Producto</button>
-                                </div>
-                                </div>
+                                <button type="button" id="add_product_btn" class="btn btn-primary">Añadir Producto</button>
+                            </div>
+                        </div>
 
                         <div class="table-responsive mb-4">
                             <table class="table table-bordered" id="product_table">
                                 <thead>
                                     <tr>
-                                        <th>Item Name</th>
-                                        <th>Unit Price</th>
-                                        <th>Quantity</th>
+                                        <th>Nombre del Producto</th>
+                                        <th>Precio Unitario</th>
+                                        <th>Cantidad</th>
                                         <th>Total</th>
-                                        <th>Action</th>
+                                        <th>Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody id="products_list"></tbody>
@@ -134,7 +135,7 @@
 
                         <div class="form-group row mt-3">
                             <div class="col-sm-12 text-center">
-                                <button type="submit" class="btn btn-info">Submit</button>
+                                <button type="submit" class="btn btn-info">Enviar</button>
                             </div>
                         </div>
                     </form>
@@ -203,12 +204,11 @@ document.addEventListener("DOMContentLoaded", function() {
         // Crear una nueva fila en la tabla con los detalles del producto
         var newRow = document.createElement('tr');
         newRow.innerHTML = `
-    <td>${productName}</td>
-    <td>${unitPrice}</td>
-    <td><input type="number" class="form-control quantity" name="quantity[]" value="1" min="0" step="0.01"></td>
-    <td class="total">${unitPrice}</td>
-    <td><button type="button" class="btn btn-danger btn-sm remove">Eliminar</button></td>
-
+            <td>${productName}</td>
+            <td>${unitPrice}</td>
+            <td><input type="number" class="form-control quantity" name="quantity[]" value="1" min="0" step="0.01"></td>
+            <td class="total">${unitPrice}</td>
+            <td><button type="button" class="btn btn-danger btn-sm remove">Eliminar</button></td>
         `;
 
         document.getElementById('products_list').appendChild(newRow);

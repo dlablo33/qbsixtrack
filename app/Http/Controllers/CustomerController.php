@@ -57,6 +57,7 @@ class CustomerController extends Controller
         $customer->CODIGO_CUENTA_CONTABLE = $request->input('ccc');
         $customer->CODIGO_CLIENTE_COMERCIAL = $request->input('cco'); // Asigna a otro campo
         $customer->DENOMINACION_SERIAL = $request->input('ds');
+        $customer->email = $request->input('email');
         $cve_cte = $request->input('ccc') . $request->input('cco') . $request->input('ds');
         $customer->CVE_CTE = $cve_cte;
         
@@ -93,6 +94,8 @@ class CustomerController extends Controller
                 $customer->CODIGO_CUENTA_CONTABLE = $request->input('ccc');
                 $customer->CODIGO_CLIENTE_COMERCIAL = $request->input('cco');
                 $customer->DENOMINACION_SERIAL = $request->input('ds');
+                $customer->email = $request->input('email');
+                $customer->saldo_a_favor = 0;
                 $cve_cte = $request->input('ccc') . $request->input('cco') . $request->input('ds');
                 $customer->CVE_CTE = $cve_cte;
 

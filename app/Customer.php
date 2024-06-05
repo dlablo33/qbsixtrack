@@ -18,7 +18,9 @@ class Customer extends Model
     'CODIGO_CUENTA_CONTABLE',
     'CODIGO_CLIENTE_COMERCIAL',
     'DENOMINACION_SERIAL',
-    'CVE_CTE'
+    'CVE_CTE',
+    'email',
+    'saldo_a_favor'
 
     ];
 

@@ -5,12 +5,13 @@ use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\PagoController;
 use App\Marchant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Sabberworm\CSS\Settings;
 
-Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
+Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,7 +28,7 @@ Route::get('/register', function () {
 Auth::routes();
 Route::get('/test', 'TestingController@index');
 
-Route::get('/change/password', 'ChangePasswordController@index')->middleware('auth')->name('change.password');
+Route::get('/cuentas/password', 'ChangePasswordController@index')->middleware('auth')->name('change.password');
 Route::post('/change/password/store', 'ChangePasswordController@store')->middleware('auth')->name('change.password.store');
 
 Route::get('/settings', 'SettingsController@index')->middleware('auth')->name('settings');
@@ -79,6 +80,9 @@ Route::get('/invoice', [InvoiceController::class, 'index'])->name('invoice.index
 Route::get('/invoices', [InvoiceController::class, 'invoiceList'])->name('invoice.invoice-list');
 Route::get('/invoices/edit/{id}', [InvoiceController::class, 'edit'])->name('invoice.edit-invoice');
 Route::put('/invoices/update/{id}', [InvoiceController::class, 'update'])->name('invoice.update');
+Route::get('/invoices/Petrollium', [InvoiceController::class, 'invoiceList2'])->name('invoice.petrolio');
+
+Route::get('/invoices/remicion/{id}', [InvoiceController::class, 'remi'])->name('invoice.remi');
 
 
 // Customer routes
@@ -154,8 +158,30 @@ Route::get('/precios/{cliente_id}/{product_id}', function ($cliente_id, $product
     }
   });
 
+
+  //Cuentas por cobrar
+  Route::get('/Cuentas/Index', 'PagoController@index')->name('cuentas.index');
+  Route::get('/Cuentas/index', [PagoController::class, 'index']);
+  Route::get('/clientes/{cliente_name}/detalles', [PagoController::class, 'show'])->name('cuentas.cnc-detalle');
+  Route::get('/facturas/{factura}/pagos/create', [PagoController::class, 'create'])->name('cuentas.create');
+Route::post('/pagos', [PagoController::class, 'store'])->name('cuentas.store');
+Route::post('/facturas/{factura}/pagar-completo', [PagoController::class, 'pagarCompleto'])->name('cuentas.pagarCompleto');
+Route::post('/usar-saldo/{factura}', 'PagoController@usarSaldo')->name('cuentas.usarSaldo');
+
+  
+
+
 Route::get('/get-products-by-customer/{cliente_id}', [InvoiceController::class, 'getProductsByCustomer']);
 Route::get('/get-prices-by-product-and-customer/{cliente_id}/{product_id}', [InvoiceController::class, 'getPricesByProductAndCustomer']);
+Route::get('/get-price-by-customer', 'InvoiceController@getPriceByCustomer')->name('getPriceByCustomer');
+Route::get('/getLastPriceByCustomer', [InvoiceController::class, 'getLastPriceByCustomer'])->name('getLastPriceByCustomer');
+Route::get('/getLastPriceByCustomer', 'InvoiceController@getLastPriceByCustomer'); 
+Route::get('/getLastPriceByCustomer', [InvoiceController::class, 'getLastPriceByCustomer'])->name('getLastPriceByCustomer');
+Route::get('/get-last-price/{customerId}', [InvoiceController::class, 'getLastPrice'])->name('getLastPrice');
+Route::post('/invoices/{invoice}/update-status', 'InvoiceController@updateStatus')->name('invoice.update.status');
+
+
+
 
 
 

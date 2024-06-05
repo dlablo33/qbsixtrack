@@ -1,6 +1,4 @@
-@extends('layouts.master')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -11,7 +9,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
+              <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
               <li class="breadcrumb-item active">Productos</li>
             </ol>
           </div><!-- /.col -->
@@ -31,23 +29,25 @@
                     <h3 class="card-title mr-auto">Todos los productos</h3>
 
                     <div class="d-flex">
-                    @if (Auth::user()->tipo_usuario == 1)
+                    <?php if(Auth::user()->tipo_usuario == 1): ?>
                         <a href="/products/syncItems" class="btn btn-danger mr-2">?</a>
-                        @endif
+                        <?php endif; ?>
                         <a href="/settings/products/create/" class="btn btn-info">Agregar Productos</a>
                     </div>
                 </div>
 
-                @if(session('error'))
+                <?php if(session('error')): ?>
                     <div class="alert alert-danger">
-                        {{ session('error') }}
+                        <?php echo e(session('error')); ?>
+
                     </div>
-                @endif
-                @if(session('success'))
+                <?php endif; ?>
+                <?php if(session('success')): ?>
                     <div class="alert alert-success">
-                        {{ session('success') }}
+                        <?php echo e(session('success')); ?>
+
                     </div>
-                @endif
+                <?php endif; ?>
               <div class="card-body">
               <!-- /.card-header -->
                 <table id="example1" class="table table-bordered table-striped">
@@ -63,21 +63,18 @@
                   </tr>
                   </thead>
                   <tbody>
-                  @foreach($products as $product)
+                  <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
                   <tr>
-                    <td>{{$product->id}}</td>
-                    <td>{{$product->nombre}}</td>
-                    <td>{{$product->clv_producto}}</td>
-                    <td>{{$product->created_at}}</td>
+                    <td><?php echo e($product->id); ?></td>
+                    <td><?php echo e($product->nombre); ?></td>
+                    <td><?php echo e($product->clv_producto); ?></td>
+                    <td><?php echo e($product->created_at); ?></td>
 
- {{--            <a href="{{ route('products.edit',  $product->id) }}" class="btn btn-success"><i class="nav-icon fas fa-edit"></i></a> 
-
-                    </td>
-                <td><a href="{{route('products.destroy',['id'=> $product->id])}}" class="btn btn-danger">Delete</a></td>--}}
+ 
                   </tr>
 
-                  @endforeach
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </tbody>
                   <tfoot>
 
@@ -115,4 +112,5 @@
 
 
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/products/index.blade.php ENDPATH**/ ?>

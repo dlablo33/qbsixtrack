@@ -32,7 +32,7 @@
         <td>{{ $invoice->total_amt }}</td>
         <td>
          
-        <a  href="{{ route('invoices.show', $invoice->NumeroFactura) }}">Ver detalles</a>
+        <a  href="{{ route('invoice.show', $invoice->NumeroFactura) }}">Ver detalles</a>
         
         </td>
         </tr>
