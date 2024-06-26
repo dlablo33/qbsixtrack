@@ -37,7 +37,7 @@ class PagoController extends Controller
         $saldoRestante = $factura->totalFacturas - $totalPagos;
 
         // Calcular saldo a favor
-        $cliente = Customer::where('CLIENTE_LP', $factura->cliente_name)->first();
+        $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
         $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
         return (object) [
@@ -53,8 +53,9 @@ class PagoController extends Controller
     $data['deudasPorCliente'] = $deudasPorCliente;
 
     return view('cuentas.index', $data);
-}
+    }
 
+//==============================================================================================================================================================================================
 
     public function facturasCliente($cliente)
     {
@@ -62,60 +63,77 @@ class PagoController extends Controller
         return view('invoice.index', compact('facturas', 'cliente_name'));
     }
 
+    //==============================================================================================================================================================================================
+
     public function show($cliente_name)
 {
     $facturas = Factura::where('cliente_name', $cliente_name)->get();
 
     //=================
-    $cliente = Customer::where('CLIENTE_LP', $cliente_name)->first();
+    $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
     $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
 
     return view('cuentas.cnc-detalle', compact('facturas', 'cliente_name','saldoAFavor'));
-}
+    }
 
-public function create($factura_id)
+    //==============================================================================================================================================================================================
+
+    public function create($factura_id)
 {
     $factura = Factura::findOrFail($factura_id);
     $cliente_name = $factura->cliente_name;
 
     // Obtener el saldo a favor del cliente
-    $cliente = Customer::where('CLIENTE_LP', $cliente_name)->first();
+    $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
     $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
     return view('cuentas.create', compact('factura', 'cliente_name', 'saldoAFavor'));
-}
+    }
 
-public function store(Request $request)
+    //==============================================================================================================================================================================================
+
+    public function store(Request $request)
 {
     $request->validate([
         'factura_id' => 'required|exists:fac_invoice,id',
         'monto' => 'required|numeric|min:0',
-        'referencia' => 'nullable|string|max:255',
+        'referencia' => 'required|string|max:255',
     ]);
 
     $factura = Factura::findOrFail($request->factura_id);
     $montoPendiente = $factura->montoPendiente();
     $montoPago = $request->monto;
 
-    if ($montoPago > $montoPendiente) {
-        // Pago completo con saldo a favor
+    if ($montoPago >= $montoPendiente) {
+        // Pago completo o con saldo a favor
         $this->registrarSaldoAFavor($factura, $montoPago, $montoPendiente, $request->referencia);
+
+        // Cambiar el estatus de la factura a 'Pagado'
+        $factura->estatus = 'Pagado';
+        $factura->save();
     } else {
-        // Pago parcial o completo sin saldo a favor
+        // Pago parcial sin saldo a favor
         Pago::create([
             'factura_id' => $factura->id,
             'monto' => $montoPago,
             'fecha_pago' => now(),
             'referencia' => $request->referencia,
         ]);
+
+        // Cambiar el estatus de la factura a 'Abonado'
+        $factura->estatus = 'Abonado';
+        $factura->save();
     }
 
     return redirect()->route('cuentas.cnc-detalle', ['cliente_name' => $factura->cliente_name])
         ->with('success', 'Pago registrado exitosamente.');
-}
+    }
 
-private function registrarSaldoAFavor(Factura $factura, $montoPago, $montoPendiente, $referencia)
+
+//==============================================================================================================================================================================================
+
+    private function registrarSaldoAFavor(Factura $factura, $montoPago, $montoPendiente, $referencia)
 {
     Pago::create([
         'factura_id' => $factura->id,
@@ -125,68 +143,90 @@ private function registrarSaldoAFavor(Factura $factura, $montoPago, $montoPendie
     ]);
 
     $saldoAFavor = $montoPago - $montoPendiente;
-    $cliente = Customer::where('CLIENTE_LP', $factura->cliente_name)->first();
+    $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
     $cliente->saldo_a_favor += $saldoAFavor;
     $cliente->save();
-}
-
-public function usarSaldo(Factura $factura)
-{
-    // Obtén el cliente asociado con la factura
-    $cliente = Customer::where('CLIENTE_LP', $factura->cliente_name)->first();
-
-    if (!$cliente) {
-        return redirect()->back()->with('error', 'Cliente no encontrado.');
     }
 
-    $saldoAFavor = $cliente->saldo_a_favor;
-    $montoPendiente = $factura->montoPendiente();
+    //==============================================================================================================================================================================================
 
-    if ($saldoAFavor > 0) {
-        if ($saldoAFavor >= $montoPendiente) {
-            // El saldo a favor es suficiente para cubrir la factura
-            $cliente->saldo_a_favor -= $montoPendiente;
-            $cliente->save();
-
-            Pago::create([
-                'factura_id' => $factura->id,
-                'monto' => $montoPendiente,
-                'fecha_pago' => now(),
-                'referencia' => 'Saldo a favor'
-            ]);
-
-            return redirect()->back()->with('success', 'Saldo a favor utilizado completamente para pagar la factura.');
-        } else {
-            // El saldo a favor es insuficiente para cubrir la factura
-            $montoCubierto = $saldoAFavor;
-            $cliente->saldo_a_favor = 0;
-            $cliente->save();
-
-            Pago::create([
-                'factura_id' => $factura->id,
-                'monto' => $montoCubierto,
-                'fecha_pago' => now(),
-                'referencia' => 'Saldo a favor'
-            ]);
-
-            return redirect()->back()->with('success', 'Parte del saldo a favor utilizado para cubrir parcialmente la factura.');
+    public function usarSaldo(Factura $factura)
+    {
+        // Obtén el cliente asociado con la factura
+        $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
+    
+        if (!$cliente) {
+            return redirect()->back()->with('error', 'Cliente no encontrado.');
         }
-    } else {
-        return redirect()->back()->with('error', 'No hay saldo a favor disponible.');
+    
+        $saldoAFavor = $cliente->saldo_a_favor;
+        $montoPendiente = $factura->montoPendiente();
+    
+        if ($saldoAFavor > 0) {
+            if ($saldoAFavor >= $montoPendiente) {
+                // El saldo a favor es suficiente para cubrir la factura
+                $cliente->saldo_a_favor -= $montoPendiente;
+                $cliente->save();
+    
+                Pago::create([
+                    'factura_id' => $factura->id,
+                    'monto' => $montoPendiente,
+                    'fecha_pago' => now(),
+                    'referencia' => 'Saldo a favor'
+                ]);
+
+                $factura = Factura::find($factura->id);
+    
+                // Cambiar el estatus de la factura a 'Abonado'
+                $factura->estatus = 'Pagado';
+                $factura->save();
+    
+                return redirect()->back()->with('success', 'Saldo a favor utilizado como abono para pagar completamente la factura.');
+            } else {
+                // El saldo a favor es insuficiente para cubrir la factura
+                $montoCubierto = $saldoAFavor;
+                $cliente->saldo_a_favor = 0;
+                $cliente->save();
+    
+                Pago::create([
+                    'factura_id' => $factura->id,
+                    'monto' => $montoCubierto,
+                    'fecha_pago' => now(),
+                    'referencia' => 'Saldo a favor'
+                ]);
+
+                $factura = Factura::find($factura->id);
+    
+                // Cambiar el estatus de la factura a 'Abonado'
+                $factura->estatus = 'Abonado';
+                $factura->save();
+    
+                return redirect()->back()->with('success', 'Parte del saldo a favor utilizado como abono para cubrir parcialmente la factura.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'No hay saldo a favor disponible.');
+        }
     }
-}
+
+    //==============================================================================================================================================================================================
 
     public function edit($id)
     {
     }
 
+    //==============================================================================================================================================================================================
+
     public function update(Request $request, $id)
     {
     }
 
+    //==============================================================================================================================================================================================
+
     public function destroy($id)
     {
     }
+
+    //==============================================================================================================================================================================================
 
     public function pagos($factura_id)
     {
@@ -195,10 +235,12 @@ public function usarSaldo(Factura $factura)
         return view('cuentas.index', compact('factura', 'pagos'));
     }
 
+    //==============================================================================================================================================================================================
+
     public function pagarCompleto(Request $request, Factura $factura)
     {
         $request->validate([
-            'referencia' => 'nullable|string|max:255', // Validación para el campo de referencia
+            'referencia' => 'required|string|max:255', // Validación para el campo de referencia
         ]);
     
         $montoPendiente = $factura->montoPendiente();
@@ -216,8 +258,20 @@ public function usarSaldo(Factura $factura)
         }
     
         Pago::create($data);
+
+        $factura = Factura::find($factura->id);
+        
+        if ($factura) {
+            // Verificar si el total pagado es igual al total de la factura
+            if ($factura->pagos->sum('monto') == $factura->total) {
+                // Cambiar el estatus de la factura a 'Pagado'
+                $factura->estatus = 'Pagado';
+                $factura->save();
+            }
+        }
     
         return redirect()->route('cuentas.cnc-detalle', ['cliente_name' => $factura->cliente_name])
             ->with('success', 'Deuda pagada completamente.');
     }
+
 }

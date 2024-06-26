@@ -17,6 +17,8 @@ class Marchant extends Model
         "precio",
         "created_at",
         "updated_at",
+        "semana",
+        "fecha_vigencia",
         ];
 
 }

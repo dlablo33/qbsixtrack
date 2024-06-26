@@ -24,8 +24,9 @@ class Factura extends Model
         'total',
         'created_at',
         'update_at',
+        'code_factura',
+        'estatus'
 
-        
     ];
 
     public function products()
@@ -48,10 +49,16 @@ class Factura extends Model
         return $this->hasMany(Pago::class);
     }
 
+
     public function montoPendiente()
     {
         $pagosTotales = $this->pagos->sum('monto');
         return $this->total - $pagosTotales;
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'cliente_id');
     }
 
 }

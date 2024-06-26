@@ -55,21 +55,21 @@
                         </a>
                     </li>
 
-               
+<!--=============================================================================================================================================================================================== -->               
                     <!-- qb confi -->
                     <?php if(Auth::user()->tipo_usuario == 1): ?>  
                     <li class="nav-item has-treeview <?php echo e($menu == 'settings' ? 'menu-is-opening menu-open' : ''); ?>">
       <a href="#" class="nav-link">
         <i class="nav-icon fas fa-cogs"></i>
         <p>
-          QB Settings
+          Configuracion
           <i class="fas fa-angle-left right"></i>
         </p>
       </a>
       <ul class="nav nav-treeview">
         <li class="nav-item ml-2">
           <a href="<?php echo e(route('settings')); ?>" class="nav-link">
-            <p>Quickbooks Settings</p>
+            <p>Proximamente</p>
           </a>
         </li>
 
@@ -80,15 +80,15 @@
         </li>
         <li class="nav-item ml-2">
           <a href="<?php echo e(route('change.password')); ?>" class="nav-link">
-            <p>Cuentas por Cobrar</p>
+            <p>Proximamente</p>
           </a>
         </li>
       </ul>
     </li>
   <?php endif; ?>
+<!--=============================================================================================================================================================================================== -->               
 
-                     
-
+<!--=============================================================================================================================================================================================== -->               
                     <!-- Customers Section -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -113,20 +113,22 @@
                             <?php endif; ?>
                         </ul>
                     </li>
+<!--=============================================================================================================================================================================================== -->               
 
-                    <!-- Products Section -->
+<!--=============================================================================================================================================================================================== -->               
+<!-- Products Section -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-box"></i>
                             <p>
-                                Productos
+                                Productos Y Servicios
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
                                 <a href="<?php echo e(route('products.index')); ?>" class="nav-link">
-                                    <p>Lista de productos</p>
+                                    <p>Lista de productos </p>
                                 </a>
                             </li>
                             <?php if(Auth::user()->tipo_usuario == 1): ?>  
@@ -138,13 +140,52 @@
                             <?php endif; ?>
                         </ul>
                     </li>
+ <!--=============================================================================================================================================================================================== -->               
+
+<!--=============================================================================================================================================================================================== -->               
 
                     <!-- Payment Section -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-money-check-alt"></i>
                             <p>
-                                Invoices
+                                Compras
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('invoice.invoice-list')); ?>" class="nav-link">
+                                    <p>Invoice</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item ml-2">
+                                <a href="" class="nav-link">
+                                    <p>Agente Aduanal</p>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('invoice.mole2')); ?>" class="nav-link">
+                                    <p>Molecula 2</p>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('invoice.mole3')); ?>" class="nav-link">
+                                    <p>Molecula 3</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    
+<!--=============================================================================================================================================================================================== -->               
+
+                        <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-truck"></i>
+                            <p>
+                                Comercial
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -152,25 +193,49 @@
                         <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
                             <a href="<?php echo e(route('invoice.index')); ?>" class="nav-link">
-                                    <p>Lista Remisiones</p>
+                                    <p>Remisiones Y Facturas</p>
                                 </a>
                             </li>
                             <?php endif; ?>
-                            <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('invoice.invoice-list')); ?>" class="nav-link">
-                                    <p>Lista Invoice</p>
-                                </a>
-                            </li>
 
+                            <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('invoice.petrolio')); ?>" class="nav-link">
-                                    <p>Lista Naptha</p>
+                            <a href="<?php echo e(route('cuentas.index')); ?>" class="nav-link">
+                                    <p>Cartera De Clientes</p>
                                 </a>
                             </li>
+                            <?php endif; ?>
 
                         </ul>
                     </li>
+<!--=============================================================================================================================================================================================== -->               
+                        
+                        <?php if(Auth::user()->id >= 1): ?>
+                        <!-- Merchant Section -->
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-file"></i>
+                                <p>
+                                    Traking
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('invoice.petrolio')); ?>" class="nav-link">
+                                    <p>Traking</p>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('bol.index')); ?>" class="nav-link">
+                                    <p>Deuda</p>
+                                </a>
+                            </li>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
 
+<!--=============================================================================================================================================================================================== -->               
                     <?php if(Auth::user()->id >= 1): ?>
                         <!-- Merchant Section -->
                         <li class="nav-item has-treeview">
@@ -192,24 +257,54 @@
                                         <p>Nuevo Precio</p>
                                     </a>
                                 </li>
+                                <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('transporte.index')); ?>" class="nav-link">
+                                    <p>Tarifa Trasporte</p>
+                                </a>
+                            </li>
                             </ul>
                         </li>
                     <?php endif; ?>
-
-                    <!-- ====================================================================================================================== -->
-                    <li class="nav-item has-treeview">
+<!--=============================================================================================================================================================================================== -->               
+<li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-invoice"></i>
                             <p>
-                                Cuenta Por Cobrar
+                                Administracion
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                         <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
-                            <a href="<?php echo e(route('cuentas.index')); ?>" class="nav-link">
-                                    <p>Lista Cuentas</p>
+                            <a href="" class="nav-link">
+                                    <p>Bancos</p>
+                                </a>
+                            </li>
+                            <?php endif; ?>
+
+
+                        </ul>
+                    </li>
+<!-- ============================================================================================================================================================================================ -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-file-invoice"></i>
+                            <p>
+                                Div Operaciones
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                        <?php if(Auth::user()->tipo_usuario == 1): ?>  
+                            <li class="nav-item ml-2">
+                            <a href="" class="nav-link">
+                                    <p>Logistica</p>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                            <a href="" class="nav-link">
+                                    <p>Bluewing</p>
                                 </a>
                             </li>
                             <?php endif; ?>

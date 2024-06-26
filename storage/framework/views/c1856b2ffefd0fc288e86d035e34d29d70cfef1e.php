@@ -2,7 +2,7 @@
 
 <?php $__env->startSection('content'); ?>
 <div style="display: flex; justify-content: space-between;">
-  <h1 style="margin: 0;">Petrollium</h1>
+  <h1 style="margin: 0;">Traking</h1>
   <div class="download-button-container">
   </div>
 </div>
@@ -15,9 +15,8 @@
       <th>bol</th>
       <th>Trailer</th>
       <th>Servicio</th>
-      <th>Estatus</th>
-      <th>Date</th>
-      <th>Amount</th>
+      <th>Fecha</th>
+      <th>Total</th>
       <th>Acciones</th>
     </tr>
   </thead>
@@ -29,25 +28,10 @@
         <td><?php echo e($invoice->bol); ?></td>
         <td><?php echo e($invoice->Trailer); ?></td>
         <td><?php echo e($invoice->item_names); ?></td>
-        <td>
-          <form action="<?php echo e(route('invoice.update.status', $invoice->id)); ?>" method="POST">
-            <?php echo csrf_field(); ?>
-            <?php if($invoice->estatus == 'Pendiente'): ?>
-              <select name="estatus">
-                <option value="Pendiente">Pendiente</option>
-                <option value="Completado">Completado</option>
-              </select>
-              <button type="submit">Actualizar</button>
-            <?php else: ?>
-              <?php echo e($invoice->estatus); ?>
-
-            <?php endif; ?>
-          </form>
-        </td>
         <td><?php echo e($invoice->last_updated_time); ?></td>
-        <td><?php echo e($invoice->total_amt); ?></td>
+        <td>$<?php echo e(number_format(number_format($invoice->total_amt, 2, '.', ''), 0, ',', ',')); ?></td>
         <td>
-          <a href="<?php echo e(route('invoice.remi', $invoice->NumeroFactura)); ?>">Crear Remicion</a>
+          <a href="<?php echo e(route('invoice.remi', $invoice->NumeroFactura)); ?>">Crear Factura</a>
         </td>
       </tr>
       <?php endif; ?>
@@ -66,7 +50,4 @@
 <?php endif; ?>
 
 <?php $__env->stopSection(); ?>
-
-
-
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/invoice/petrolio.blade.php ENDPATH**/ ?>

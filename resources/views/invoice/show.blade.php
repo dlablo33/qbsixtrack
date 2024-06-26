@@ -171,12 +171,16 @@
           <tr>
             <td>{{ $Item->item_names }}</td>
             <td>{{ $Item->item_account_name }}</td>
+            @if($Item->item_names != null)
+            <td>{{ number_format($Item->quantity, 2, '.', ',') }}</td>
+            @else
             <td>{{ $Item->quantity }}</td>
+            @endif
             <td>{{ $Item->unit_price }}</td>
             @if($Item->item_names != null)
-              <td>{{ number_format($Item->quantity * $Item->unit_price, 2, '.', '') }}</td>
+              <td>${{ number_format($Item->quantity * $Item->unit_price, 2, '.', '') }}</td>
             @else
-              <td>{{ $Item->total_amt }}</td>
+              <td>${{ $Item->total_amt }}</td>
             @endif
             <td>{{ $Item->currency_value }}</td>
           </tr>

@@ -29,10 +29,11 @@
 
         <div class="form-group">
             <label for="referencia">Referencia:</label>
-            <input type="text" name="referencia" class="form-control">
+            <input type="text" name="referencia" class="form-control" required>
         </div>
 
         <button type="submit" class="btn btn-primary">Registrar Pago</button>
         <a href="{{ url()->previous() }}" class="btn btn-secondary">Regresar</a>
     </form>
 @endsection
+

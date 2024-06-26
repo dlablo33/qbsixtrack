@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Invoice;
 use App\Item;
-use App\Precio;
+use PDF; 
 use App\Marchant;
 use Illuminate\Support\Facades\Response;
 use League\Csv\Writer;
 use App\Factura;
 use Illuminate\Http\Request;
+use Dompdf\Dompdf;
+use App\Mail\InvoiceMail;
+use Illuminate\Support\Facades\Mail;
+use ZipArchive;
+use Carbon\Carbon;
+use App\Tarifa;
 
 class InvoiceController extends Controller
 {
@@ -25,7 +31,7 @@ class InvoiceController extends Controller
         return view('invoice.index', $data);
     }
 
-    // ========================================================================================================================================================================
+    // =======================================================================================================================================================================================
     public function create()
     {
 
@@ -41,31 +47,30 @@ class InvoiceController extends Controller
         return view('invoice.create', compact('precios', 'facturas'),$data);
     }
 
-    // ========================================================================================================================================================================
+    // =======================================================================================================================================================================================
     
     public function store(Request $request)
-    {
-    // Validar los datos del formulario
+{
     $request->validate([
+        'customer_id' => 'required',
+        'product_id' => 'required',
+        'price_id' => 'required',
+
     ]);
 
-    $precio = Marchant::where('cliente_id', $request->input('customer_id'))
-    ->where('producto_id', $request->input('product_id'))
-    ->first();
+    // Obtener el precio seleccionado
+    $price = Marchant::find($request->input('price_id'));
 
-if (!$precio) {
-return redirect()->back()->withErrors(['price_id' => 'Precio no encontrado.']);
-}
-
-$cliente_name = $precio->cliente_name;
-$producto_name = $precio->producto_name;
+    if (!$price) {
+        return redirect()->back()->withErrors(['price_id' => 'Precio no encontrado.']);
+    }
 
     // Crear una nueva instancia de Factura y guardar los datos
     $factura = new Factura();
     $factura->cliente_id = $request->input('customer_id');
-    $factura->cliente_name = $cliente_name;
+    $factura->cliente_name = $price->cliente_name;
     $factura->producto_id = $request->input('product_id');
-    $factura->producto_name = $producto_name;
+    $factura->producto_name = $price->producto_name;
     $factura->fecha_create = $request->input('invoice_date');
     $factura->due_fecha = $request->input('due_date');
     $factura->cantidad = $request->input('quantity'); 
@@ -73,15 +78,22 @@ $producto_name = $precio->producto_name;
     $factura->Numero_Factura = $request->input('numeroFactura');
     $factura->trailer = $request->input('trailer');
     $factura->total = $request->input('total_before_discount');
-    
+
+    // Solo asignar num_fac si está presente en la solicitud
+    if ($request->has('num_fac')) {
+        $factura->code_factura = $request->input('num_fac');
+    }
+
     // Guardar la factura en la base de datos
     $factura->save();
 
+    // Actualizar la instancia de Invoice relacionada con esta factura
+
     // Redireccionar con un mensaje de éxito
     return redirect()->route('invoice.index')->with('success', 'Factura creada exitosamente.');
- }
-    
-    // ========================================================================================================================================================================
+    }
+
+    // =========================================================================================================================================================================================
     private function generateInvoiceNumber()
     {
         $latestInvoice = Factura::orderBy('created_at', 'desc')->first();
@@ -93,13 +105,15 @@ $producto_name = $precio->producto_name;
         return 'INV-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
     
-    // ========================================================================================================================================================================
+    // =========================================================================================================================================================================================
     public function getProductsByCustomer($cliente_id)
     {
         $productos = Marchant::where('cliente_id', $cliente_id)->distinct()->get(['producto_id', 'producto_name']);
         return response()->json($productos);
     }
     
+// =============================================================================================================================================================================================
+
     public function getPricesByProductAndCustomer($cliente_id, $producto_id)
     {
         $precios = Marchant::where('cliente_id', $cliente_id)
@@ -109,14 +123,14 @@ $producto_name = $precio->producto_name;
     }
 
 // =============================================================================================================================================================================================
-                        public function getPriceByCustomer($cliente_id)
-                         {
-                               $precio = Marchant::where('cliente_id', $cliente_id)
-                                 ->orderBy('updated_at', 'desc')
-                                  ->first();
+    public function getPriceByCustomer($cliente_id)
+     {
+        $precio = Marchant::where('cliente_id', $cliente_id)
+        ->orderBy('updated_at', 'desc')
+         ->first();
     
-                                 return response()->json($precio->precio);
-                        }
+        return response()->json($precio->precio);
+    }
 
 // =============================================================================================================================================================================================
 
@@ -133,7 +147,8 @@ $producto_name = $precio->producto_name;
     }
 
 // =============================================================================================================================================================================================
-                    public function getLastPrice($customerId)
+   
+    public function getLastPrice($customerId)
                     {
                         $lastPrice = \DB::table('precios')
                         ->where('cliente_id', $customerId)
@@ -141,7 +156,7 @@ $producto_name = $precio->producto_name;
                         ->first();
 
                         return response()->json($lastPrice);
-                    }
+    }
     
 // =============================================================================================================================================================================================
 
@@ -159,7 +174,8 @@ $producto_name = $precio->producto_name;
     }
 
 // =============================================================================================================================================================================================
-            public function invoiceList2()
+   
+    public function invoiceList2()
             {
                 $clientes = Marchant::all();
 
@@ -175,36 +191,34 @@ $producto_name = $precio->producto_name;
 
                 return view('invoice.petrolio', $data);
                 
-            }
+    }
             
 // =============================================================================================================================================================================================
-            public function show($NumeroFactura)
+    public function show($NumeroFactura)
             {
                 $items = Item::where('NumeroFactura', $NumeroFactura)->get();
                 return view('invoice.show', ['items' => $items]);
-            }
+    }
 
 // =============================================================================================================================================================================================
-
-            
-            public function remi($NumeroFactura)
+   
+    public function remi($NumeroFactura)
             {
                 $clientes = Marchant::all();
                 $items = Item::where('NumeroFactura', $NumeroFactura)->get();
                 return view('invoice.remi', ['items' => $items, 'clientes' => $clientes]);
-            }
+    }
 
 // =============================================================================================================================================================================================
 
-
-            public function items()
+    public function items()
             {
                 return $this->hasMany(Item::class);
-            }
+    }
 
 // =============================================================================================================================================================================================
     
-            public function download()
+    public function download()
                 {
                     $invoices = Invoice::all();
 
@@ -234,21 +248,253 @@ $producto_name = $precio->producto_name;
     } 
     
 // =============================================================================================================================================================================================
-public function updateStatus(Request $request, Invoice $invoice)
-    {
-        $invoice->estatus = $request->estatus;
-        $invoice->save();
-    
-        session()->flash('status', 'Invoice status updated successfully!');
-        return redirect()->route('invoices.index'); 
+    public function updateStatus(Request $request, $id)
+{
+    $invoice = Invoice::findOrFail($id);
+    $invoice->estatus = $request->input('estatus');
+    $invoice->save();
+
+    return redirect()->back()->with('status', 'Estatus de la factura actualizado correctamente.');
     }
 
 // =============================================================================================================================================================================================
 
-public function remi2($id)
+    public function remi2($id)
 {
     $factura = Factura::find($id);
     return view('factura.remi-pdf', compact('factura'));
-}
-
     }
+// =============================================================================================================================================================================================
+
+
+    public function showPdf($id)
+{
+        $factura = Factura::with('customer')->findOrFail($id);
+
+        // Preparar los datos para la vista
+        $data = [];
+        $data['menu'] = "remisiones";
+        $data['menu_sub'] = "";
+        $data['factura'] = $factura;
+
+        // Crear una instancia de Dompdf
+        $dompdf = new Dompdf();
+
+        // Cargar la vista con los datos necesarios
+        $html = view('invoice.remi-pdf', $data)->render();
+
+        // Generar el PDF
+        $dompdf->loadHtml($html);
+
+        // Renderizar el PDF
+        $dompdf->render();
+
+        // Obtener el contenido del PDF
+        $pdfContent = $dompdf->output();
+
+        // Directorio donde se almacenará el archivo PDF
+        $pdfDirectory = storage_path('app/temp');
+
+        // Verificar si el directorio existe, si no, crearlo
+        if (!file_exists($pdfDirectory)) {
+            mkdir($pdfDirectory, 0755, true);
+        }
+
+        // Nombre y ruta completa del archivo PDF
+        $pdfPath = $pdfDirectory . '/remision.pdf';
+
+        // Guardar el PDF en el directorio
+        file_put_contents($pdfPath, $pdfContent);
+
+        // Descargar el PDF
+        return response()->download($pdfPath, 'remision.pdf')->deleteFileAfterSend(true);
+    }
+
+// =============================================================================================================================================================================================
+
+    public function sendPdf(Request $request, $id)
+{
+    // Validar la entrada
+    $request->validate([
+        'email' => 'required|email'
+    ]);
+
+    // Encontrar la factura
+    $factura = Factura::find($id);
+
+    // Verificar si la factura existe
+    if (!$factura) {
+        return redirect()->back()->with('error', 'Factura no encontrada.');
+    }
+
+    // Generar el PDF
+    $pdf = PDF::loadView('invoice.remi-pdf', compact('factura'));
+
+    // Enviar el correo
+    Mail::to($request->email)->send(new InvoiceMail($factura, $pdf));
+
+    return redirect()->back()->with('success', 'Correo enviado exitosamente.');
+    }
+
+// =============================================================================================================================================================================================
+
+    public function linkInvoice(Request $request, $id)
+{
+    $request->validate([
+        // Puedes agregar reglas de validación adicionales según sea necesario
+    ]);
+
+    // Encuentra la factura por su ID
+    $factura = Factura::findOrFail($id);
+
+    // Verifica si la factura ya tiene un número de factura vinculado
+    if ($factura->code_factura !== null) {
+        return redirect()->back()->withErrors(['message' => 'Esta remisión ya está enlazada a una factura.']);
+    }
+
+    // Asigna el número de factura a la remisión y guárdala en la base de datos
+    $factura->code_factura = $request->input('invoice_number');
+    $factura->save();
+
+    // Redirecciona de vuelta con un mensaje de éxito
+    return redirect()->back()->with('success', 'La remisión se enlazó correctamente a la factura.');
+    }
+
+// =============================================================================================================================================================================================
+
+    public function deleteInvoice($id)
+{
+    // Encuentra la remisión por su ID
+    $factura = Factura::findOrFail($id);
+
+    // Elimina la remisión de la base de datos
+    $factura->delete();
+
+    // Redirecciona de vuelta con un mensaje de éxito
+    return redirect()->back()->with('success', 'La remisión se eliminó correctamente.');
+    }
+
+// =============================================================================================================================================================================================
+
+    public function store2(Request $request)
+{
+    // Validar los datos del formulario
+    $validatedData = $request->validate([
+        'customer_id' => 'required',
+        'product_id' => 'required',
+        'price_id' => 'required',
+    ]);
+    $price = Marchant::find($request->input('price_id'));
+
+    if (!$price) {
+        return redirect()->back()->withErrors(['price_id' => 'Precio no encontrado.']);
+    }
+
+    // Crea una nueva factura con los datos del formulario
+    $factura = new Factura();
+    $factura->cliente_id = $request->input('customer_id');
+    $factura->cliente_name = $price->cliente_name;
+    $factura->producto_id = $request->input('product_id');
+    $factura->producto_name = $price->producto_name;
+    $factura->cantidad = implode('.', $request->input('quantity'));
+    $factura->bol = $request->input('bol');
+    $factura->trailer = $request->input('trailer');
+    $factura->fecha_create = $request->input('invoice_date');
+    $factura->due_fecha = $request->input('due_date');
+    $factura->total = $request->total_before_discount;
+    $factura->Numero_Factura = $request->input('invoice_number'); // Ajusta esto según tus necesidades
+    $factura->save();
+
+
+    if ($request->has('num_fac')) {
+        $factura->code_factura = $request->input('num_fac');
+    }
+
+    // Redirecciona a una página de éxito o realiza otra acción según tus necesidades
+    return redirect()->route('invoice.index')->with('success', '¡La factura se ha creado correctamente!');
+    }
+
+// =============================================================================================================================================================================================
+
+    public function karen(Request $request)
+{
+    // Capturar la fecha desde el request
+    $fecha = $request->input('date');
+
+    // Convertir la fecha de YYYY-MM-DD a DD-MM-YY
+    $fechaConvertida = Carbon::createFromFormat('Y-m-d', $fecha)->format('d-m-y');
+
+    // Obtener todos los invoices de la fecha especificada
+    $invoices = Item::whereRaw("DATE_FORMAT(last_updated_time, '%d-%m-%y') = ?", [$fechaConvertida])->get();
+
+    // Verificar si se encontraron invoices
+    if ($invoices->isEmpty()) {
+        return response()->json(['message' => 'No hay invoices para la fecha especificada.'], 404);
+    }
+
+    // Generar y guardar los PDF para cada invoice encontrado
+    foreach ($invoices as $invoice) {
+        $pdf = PDF::loadView('invoice.pdf-template', compact('invoice'))->setOptions(['defaultFont' => 'sans-serif']);
+        $pdf->save(storage_path('app/public/invoices/factura_' . $invoice->id . '.pdf'));
+    }
+
+    // Comprimir y descargar la carpeta con todos los PDF generados
+    return $this->zipAndDownloadInvoices($invoices, $fechaConvertida);
+    }
+
+// =============================================================================================================================================================================================
+
+    private function zipAndDownloadInvoices($invoices, $fecha)
+    {
+    try {
+        $zipFileName = 'invoices_' . $fecha . '.zip';
+        $zip = new ZipArchive;
+        $zip->open(storage_path('app/public/' . $zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        foreach ($invoices as $invoice) {
+            $pdfFilePath = storage_path('app/public/invoices/factura_' . $invoice->id . '.pdf');
+            $zip->addFile($pdfFilePath, 'factura_' . $invoice->id . '.pdf');
+        }
+
+        $zip->close();
+
+        // Descargar el archivo ZIP generado
+        return response()->download(storage_path('app/public/' . $zipFileName))->deleteFileAfterSend(true);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error al comprimir los invoices en ZIP: ' . $e->getMessage()], 500);
+    }
+    }
+
+    // =============================================================================================================================================================================================
+
+    public function invoiceList3()
+    {
+        $invoices = Invoice::whereIn('item_names', ['TRANSPORTATION FEE,SERVICE FEE,WEIGHT CONTROL'])
+            ->orderBy('last_updated_time', 'DESC')
+            ->get();
+
+        $data = [];
+        $data['menu'] = "pagos2";
+        $data['menu_sub'] = "";
+        $data['invoices'] = $invoices;
+
+        return view('invoice.mole2', $data);
+    }
+
+    // =============================================================================================================================================================================================
+
+    public function invoiceList4()
+    {
+        $invoices = Invoice::whereIn('item_names', ['OPERATION ADJUSTED'])
+            ->orderBy('last_updated_time', 'DESC')
+            ->get();
+
+        $data = [];
+        $data['menu'] = "pagos2";
+        $data['menu_sub'] = "";
+        $data['invoices'] = $invoices;
+
+        return view('invoice.mole2', $data);
+    }
+
+}

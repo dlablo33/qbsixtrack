@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Factura;
+use App\Pago;
 
 class DashboardController extends Controller
 {
@@ -21,8 +23,10 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
-    {
-        return view('dashboard');
-    }
+
+     public function index()
+     {
+         return view('dashboard');
+     }
+
 }

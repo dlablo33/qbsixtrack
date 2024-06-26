@@ -29,12 +29,13 @@
 
         <div class="form-group">
             <label for="referencia">Referencia:</label>
-            <input type="text" name="referencia" class="form-control">
+            <input type="text" name="referencia" class="form-control" required>
         </div>
 
         <button type="submit" class="btn btn-primary">Registrar Pago</button>
         <a href="<?php echo e(url()->previous()); ?>" class="btn btn-secondary">Regresar</a>
     </form>
 <?php $__env->stopSection(); ?>
+
 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/cuentas/create.blade.php ENDPATH**/ ?>

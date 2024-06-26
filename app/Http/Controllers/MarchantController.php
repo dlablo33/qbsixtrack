@@ -7,6 +7,7 @@ use App\Marchant;
 use App\Precio;
 use App\Customer;
 use App\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 
@@ -41,29 +42,38 @@ class MarchantController extends Controller
                 'customer_id' => 'required',
                 'product_id' => 'required',
                 'price' => 'required|numeric',
+                'fecha_vigencia' => 'required|date'  // Asegurando que fecha_vigencia esté presente y sea una fecha válida
             ]);
         
-
             // Separar el valor del cliente en clave y nombre
             $customerData = explode('|', $validatedData['customer_id']);
             $CVE_CTE = $customerData[0];
-            $CLIENTE_LP = $customerData[1];
-
+            $NOMBRE_COMERCIAL = $customerData[1];
+        
             $productData = explode('|', $validatedData['product_id']);
             $product_id = $productData[0];
             $product_name = $productData[1];
         
-            // Crear una nueva instancia de Merchant
+            // Parsear la fecha de vigencia
+            $fechaVigencia = Carbon::parse($validatedData['fecha_vigencia']);
+        
+            // Obtener el número de semana basado en la fecha de vigencia
+            $numeroSemana = $fechaVigencia->weekOfYear;
+        
+        
+            // Crear una nueva instancia de Marchant
             $marchant = new Marchant();
         
-            // Asignar los datos validados a las propiedades del objeto Merchant
+            // Asignar los datos validados a las propiedades del objeto Marchant
             $marchant->cliente_id = $CVE_CTE;
-            $marchant->cliente_name = $CLIENTE_LP;
+            $marchant->cliente_name = $NOMBRE_COMERCIAL;
             $marchant->producto_id = $product_id;
             $marchant->producto_name = $product_name;
             $marchant->precio = $validatedData['price'];
+            $marchant->semana = $numeroSemana;
+            $marchant->fecha_vigencia = $fechaVigencia;
         
-            // Guardar el objeto Merchant en la base de datos
+            // Guardar el objeto Marchant en la base de datos
             $marchant->save();
         
             // Redireccionar con un mensaje de éxito
@@ -94,18 +104,17 @@ class MarchantController extends Controller
         // Separar el valor del cliente en clave y nombre
         $customerData = explode('|', $validatedData['customer_id']);
         $CVE_CTE = $customerData[0];
-        $CLIENTE_LP = $customerData[1];
+        $NOMBRE_COMERCIAL = $customerData[1];
 
         $productData = explode('|', $validatedData['product_id']);
         $product_id = $productData[0];
         $product_name = $productData[1];
     
-        // Crear una nueva instancia de Merchant
         $marchant = new Marchant();
     
         // Asignar los datos validados a las propiedades del objeto Merchant
         $marchant->cliente_id = $CVE_CTE;
-        $marchant->cliente_name = $CLIENTE_LP;
+        $marchant->cliente_name = $NOMBRE_COMERCIAL;
         $marchant->producto_id = $product_id;
         $marchant->producto_name = $product_name;
         $marchant->precio = $validatedData['price'];

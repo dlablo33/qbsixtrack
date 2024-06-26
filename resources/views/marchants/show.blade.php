@@ -61,6 +61,8 @@
                         <th>Producto</th>
                         <th>Precio</th>
                         <th>Fecha de Actualizacion</th>
+                        <th>Fecha de Vigencia</th>
+                        <th>Semana</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,6 +73,8 @@
                             <td>{{ $precio->producto_name }}</td>
                             <td>{{ $precio->precio }}</td>
                             <td>{{ $precio->updated_at }}</td>
+                            <td>{{ $precio->fecha_vigencia }}</td>
+                            <td>{{ $precio->semana }}</td>
                         </tr>
                     @endforeach
                 </tbody>

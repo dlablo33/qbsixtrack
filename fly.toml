@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for stenergy-aaf on 2024-05-31T12:30:19-06:00
+# fly.toml app configuration file generated for sixtrackqb on 2024-06-13T15:52:30-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'stenergy-aaf'
+app = 'stenergy'
 primary_region = 'dfw'
 console_command = 'php /var/www/html/artisan tinker'
 
@@ -13,8 +13,8 @@ console_command = 'php /var/www/html/artisan tinker'
     PHP_VERSION = '8.0'
 
 [env]
-  APP_ENV = 'production'
-  APP_URL = 'https://stenergy-aaf.fly.dev'
+  APP_ENV = 'development'
+  APP_KEY = "base64:ImMKEt/gxhzB7jzvaWqnXbcDtnsPWT8B1L8ItdLzaWw="
   LOG_CHANNEL = 'stderr'
   LOG_LEVEL = 'info'
   LOG_STDERR_FORMATTER = 'Monolog\Formatter\JsonFormatter'
@@ -30,6 +30,6 @@ console_command = 'php /var/www/html/artisan tinker'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '2gb'
   cpu_kind = 'shared'
   cpus = 1

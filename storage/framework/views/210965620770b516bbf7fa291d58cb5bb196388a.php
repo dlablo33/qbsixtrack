@@ -19,7 +19,7 @@
                 <td><?php echo e(number_format($cliente->saldoRestante, 2, '.', '')); ?></td>
                 <td><?php echo e(number_format($cliente->saldoAFavor, 2, '.', '')); ?></td>
                 <td>
-                    <a href="<?php echo e(route('cuentas.cnc-detalle', ['cliente_name' => $cliente->cliente_name])); ?>" class="btn btn-primary">Ver detalles</a>
+                    <a href="<?php echo e(route('cuentas.cnc-detalle', ['cliente_name' => $cliente->cliente_name])); ?>" class="btn btn-primary">Estados de cuentas</a>
                 </td>
             </tr>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

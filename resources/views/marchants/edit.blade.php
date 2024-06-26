@@ -15,7 +15,7 @@
                                 <label for="customer_id">Customer:</label>
                                 <select name="customer_id" id="customer_id" class="form-control">
                                     @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->CVE_CTE . '|' . $cliente->CLIENTE_LP }}">{{ $cliente->CLIENTE_LP }}</option>
+                                    <option value="{{ $cliente->CVE_CTE . '|' . $cliente->NOMBRE_COMERCIAL }}">{{ $cliente->NOMBRE_COMERCIAL }}</option>
                                            @endforeach
                                 </select>
                             </div>

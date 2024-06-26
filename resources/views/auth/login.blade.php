@@ -63,9 +63,6 @@
                             </div>
                             <!-- /.col -->
                             <div class="col-4">
-                                <a href="{{ Route('/register')}}">Registrate</a>
-                            </div>
-                            <div class="col-4">
                                 <button type="submit" class="btn btn-primary btn-block">{{ __('Ingresa') }}</button>
                             </div>
                             <!-- /.col -->

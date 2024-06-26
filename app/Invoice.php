@@ -33,4 +33,9 @@ class Invoice extends Model
         {
             return $this->belongsToMany(Item::class, 'app_Item'); // Assuming a pivot table named 'invoice_item'
         }
+
+        public function client()
+        {
+            return $this->belongsTo(Marchant::class, 'id'); // Asegúrate de que 'client_id' es la clave foránea correcta.
+        }
     }

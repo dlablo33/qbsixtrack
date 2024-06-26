@@ -1,36 +1,42 @@
 <?php $__env->startSection('content'); ?>
 <div style="display: flex; justify-content: space-between;">
-  <h1>Remisiones</h1>
+  <h1 class="title">Factura Y Remisiones</h1>
   <div class="download-button-container">
     <form action="<?php echo e(route('invoice.create')); ?>" method="GET">
       <?php echo csrf_field(); ?>
-      <button type="submit" class="btn btn-primary download-button">Crear Remision</button>
+      <button type="submit" class="btn btn-primary download-button">Añadir nueva</button>
     </form>
   </div>
 </div>
 
+<!-- Modal -->
 <?php if(count($facturas) > 0): ?>
   <table class="table table-striped">
     <thead>
       <tr>
         <th>ID</th>
+        <th>Codigo Facturacion</th>
         <th>Cliente ID</th>
         <th>Nombre Cliente</th>
         <th>Nombre Producto</th>
         <th>Producto ID</th>
-        <th>Numero de Factura</th>
+        <th>Numero de Invoice</th>
         <th>Bol</th>
         <th>Trailer</th>
+        <th>Estatus</th>
         <th>Cantidad</th>
         <th>Total</th>
         <th>Fecha Creación</th>
         <th>Fecha Vencimiento</th>
-        <th></th> </tr>
+        <th>Accion</th>
+        <th></th>
+      </tr>
     </thead>
     <tbody>
       <?php $__currentLoopData = $facturas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $factura): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <tr>
           <td><?php echo e($factura->id); ?></td>
+          <td><?php echo e($factura->code_factura); ?></td>
           <td><?php echo e($factura->cliente_id); ?></td>
           <td><?php echo e($factura->cliente_name); ?></td>
           <td><?php echo e($factura->producto_name); ?></td>
@@ -38,16 +44,48 @@
           <td><?php echo e($factura->Numero_Factura); ?></td>
           <td><?php echo e($factura->bol); ?></td>
           <td><?php echo e($factura->trailer); ?></td>
-          <td><?php echo e($factura->cantidad); ?></td>
-          <td><?php echo e($factura->total); ?></td>
+          <td><?php echo e($factura->estatus); ?></td>
+          <td><?php echo e(number_format($factura->cantidad, 2, '.', ',')); ?></td>
+          <td>$<?php echo e(number_format(number_format($factura->total, 2, '.', ''), 0, ',', ',')); ?></td>
           <td><?php echo e($factura->fecha_create); ?></td>
           <td><?php echo e($factura->due_fecha); ?></td>
           <td>
-            <td><a href="" class="btn btn-sm btn-info">Ver PDF</a></td>
-            
-           <td><a href="" class="btn btn-sm btn-info">Enviar PDF</a></td>
+            <a href="<?php echo e(route('invoice.showPdf', ['id' => $factura->id])); ?>" class="btn btn-sm btn-info">Ver PDF</a>
+            <a href="" class="btn btn-sm btn-info" data-toggle="modal" data-target="#sendEmailModal-<?php echo e($factura->id); ?>">Enviar PDF</a>
+            <?php if($factura->code_factura == null): ?>
+              <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkInvoiceModal-<?php echo e($factura->id); ?>">Enlazar Factura</button>
+            <?php endif; ?>
+            <form action="<?php echo e(route('invoice.delete', ['id' => $factura->id])); ?>" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta remisión?')">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('DELETE'); ?>
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
           </td>
         </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="linkInvoiceModal-<?php echo e($factura->id); ?>" tabindex="-1" role="dialog" aria-labelledby="linkInvoiceModalLabel-<?php echo e($factura->id); ?>" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="linkInvoiceModalLabel-<?php echo e($factura->id); ?>">Enlazar Factura</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form action="<?php echo e(route('invoice.link', ['id' => $factura->id])); ?>" method="POST">
+                  <?php echo csrf_field(); ?>
+                  <div class="form-group">
+                    <label for="invoice_number">Número de Factura</label>
+                    <input type="text" name="invoice_number" class="form-control" id="invoice_number" placeholder="Ingrese el número de factura">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Enlazar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </tbody>
   </table>
@@ -56,4 +94,8 @@
 <?php endif; ?>
 
 <?php $__env->stopSection(); ?>
+
+
+
+
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/invoice/index.blade.php ENDPATH**/ ?>

@@ -36,7 +36,7 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'mail.stenergy-aaf.fly.dev'),
+            'host' => env('MAIL_HOST', 'mail.stenergyapp.com'),
             'port' => env('MAIL_PORT', 587),
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
@@ -74,8 +74,9 @@ return [
 
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'csaucedo@aaf.mx'),
-        'name' => env('MAIL_FROM_NAME', 'STenergy'),
+        'address' => env('MAIL_FROM_ADDRESS', 'info@stenergyapp.com'),
+        'name' => env('MAIL_FROM_NAME', 'Cesar'),
+    
     ],
 
     /*

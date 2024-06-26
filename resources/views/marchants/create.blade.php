@@ -8,14 +8,14 @@
                     <div class="card-header">Actualiza el precio</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{ route('marchants.store') }}">
+                        <form method="POST" action="{{ route('marchants.store') }}" id="priceUpdateForm">
                             @csrf
 
                             <div class="form-group">
                                 <label for="customer_id">Customer:</label>
                                 <select name="customer_id" id="customer_id" class="form-control">
                                     @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->CVE_CTE . '|' . $cliente->CLIENTE_LP }}">{{ $cliente->CLIENTE_LP }}</option>
+                                        <option value="{{ $cliente->CVE_CTE . '|' . $cliente->NOMBRE_COMERCIAL }}">{{ $cliente->NOMBRE_COMERCIAL }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -32,7 +32,12 @@
                             <div class="form-group">
                                 <label for="price">Price:</label>
                                 <input type="text" name="price" id="price" class="form-control">
-                            </div>        
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fecha_vigencia">Fecha de Vigencia:</label>
+                                <input type="date" name="fecha_vigencia" id="fecha_vigencia" class="form-control">
+                            </div>
 
                             <button type="submit" class="btn btn-primary">Actualizacion</button>
                             <a href="{{ route('marchants.index') }}" class="btn btn-primary">Regresar</a>
@@ -42,4 +47,18 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('priceUpdateForm').addEventListener('submit', function(event) {
+            var fechaVigencia = new Date(document.getElementById('fecha_vigencia').value);
+            var hoy = new Date();
+
+            hoy.setHours(0, 0, 0, 0);  // Ignora la hora para la comparación de fechas
+
+            if (fechaVigencia <= hoy) {
+                alert('La fecha de vigencia debe ser posterior a la fecha de hoy.');
+                event.preventDefault();
+            }
+        });
+    </script>
 @endsection
