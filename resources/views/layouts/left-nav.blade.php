@@ -266,7 +266,7 @@
 <!--=============================================================================================================================================================================================== -->               
 <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-file-invoice"></i>
+                        <i class="nav-icon fas fa-cash-register"></i>
                             <p>
                                 Administracion
                                 <i class="fas fa-angle-left right"></i>
@@ -301,7 +301,7 @@
                                 </a>
                             </li>
                             <li class="nav-item ml-2">
-                            <a href="" class="nav-link">
+                            <a href="{{ Route('bluewi.index')}}" class="nav-link">
                                     <p>Bluewing</p>
                                 </a>
                             </li>

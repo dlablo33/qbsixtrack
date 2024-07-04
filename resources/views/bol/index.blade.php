@@ -59,7 +59,7 @@
                                             <td>
                                                 @foreach ($groupedInvoices as $invoice)
                                                     @if ($invoice->item_names == 'TRANSPORTATION FEE,SERVICE FEE,WEIGHT CONTROL')
-                                                    Numero de Factura: {{ $invoice->NumeroFactura }}<br>
+                                                    Numero de Factura:{{ $invoice->NumeroFactura }}<br>
                                                         ${{ $invoice->total_amt }}<br>
                                                     @endif
                                                 @endforeach
@@ -73,16 +73,52 @@
                                                 @endforeach
                                             </td>
                                             <td>
-
+                                                @php
+                                                    $bolDetail = $groupedInvoices->first();
+                                                @endphp
+                                                @if ($bolDetail->cliente_id != null)
+                                                    {{ $bolDetail->cliente->NOMBRE_COMERCIAL }}
+                                                @else
+                                                    <form action="{{ route('bol.updateCliente', $bol) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <select name="cliente_id" class="form-control">
+                                                            <option value="">Seleccione un cliente</option>
+                                                            @foreach ($clientes as $cliente)
+                                                                <option value="{{ $cliente->id }}">{{ $cliente->NOMBRE_COMERCIAL }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Asignar</button>
+                                                    </form>
+                                                @endif
                                             </td>
                                             <td>
-
+                                                <form action="{{ route('bol.updateTransporte', $bol) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <select name="transporte_id" class="form-control">
+                                                        <option value="">Seleccione un transporte</option>
+                                                        @foreach ($transportes as $transporte)
+                                                            <option value="{{ $transporte->id }}">{{ $transporte->transportista_nombre }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="submit" class="btn btn-primary btn-sm mt-2">Asignar</button>
+                                                </form>
                                             </td>
                                             <td>
-
+                                                @php
+                                                    $transportistaId = $bolDetail->transporte_id;
+                                                    $destinoId = $bolDetail->destino_id;
+                                                    $tarifa = $transportes->where('transportista_id', $transportistaId)->where('destino_id', $destinoId)->first();
+                                                    $totalTransporte = $tarifa ? $tarifa->iva : 0;
+                                                @endphp
+                                                ${{ $totalTransporte }}
                                             </td>
                                             <td>
-
+                                                @php
+                                                    $totalFinal = $groupedInvoices->sum('total_amt') + $totalTransporte;
+                                                @endphp
+                                                ${{ $totalFinal }}
                                             </td>
                                         </tr>
                                     @endforeach

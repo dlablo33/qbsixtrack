@@ -63,7 +63,6 @@ class BolController extends Controller
                 $facturaId3 = $invoice->id;
                 $totalFactura3 = $invoice->total_amt;
             }
-    
             $trailer = $invoice->Trailer;
         }
     
@@ -117,7 +116,7 @@ class BolController extends Controller
         
         return view('bol.pair', compact('bols', 'clientes', 'transportes'));
     }
-
+    
     public function pair(Request $request)
     {
         $request->validate([

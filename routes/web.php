@@ -7,11 +7,14 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\BluewiImportController;
+use App\Http\Controllers\BluewiController;
 use App\Marchant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransporteController;
 use App\Http\Controllers\BolController;
+use App\Http\Controllers\LogisticaController;
 use Sabberworm\CSS\Settings;
 
 // ==============================================================================================================================================================================================
@@ -198,7 +201,7 @@ Route::delete('/invoice/delete/{id}', 'InvoiceController@deleteInvoice')->name('
 // ==============================================================================================================================================================================================
 
 Route::get('/dashboard', function () {
-  return view('dashboard'); // Replace 'dashboard' with your actual view name if different
+  return view('dashboard');
 });
 
 // ==============================================================================================================================================================================================
@@ -222,3 +225,13 @@ Route::get('/bols/pair', [BolController::class, 'showPairForm'])->name('bol.pair
 Route::post('/bols/pair', [BolController::class, 'pair'])->name('bol.pair');
 Route::put('/invoices/{bol}/cliente', [BolController::class, 'updateCliente'])->name('bol.updateCliente');
 Route::put('/invoices/{bol}/transporte', [BolController::class, 'updateTransporte'])->name('bol.updateTransporte');
+// ==============================================================================================================================================================================================R¿
+
+Route::get('/logistica',[LogisticaController::class, 'index'])->name('logistica.index');
+
+// ==============================================================================================================================================================================================R¿
+
+Route::get('/bluewi', [BluewiController::class, 'index'])->name('bluewi.index');
+Route::get('/bluewi/upload', [BluewiController::class, 'showUploadForm'])->name('bluewi.upload.form');
+Route::post('/bluewi/upload', [BluewiController::class, 'upload'])->name('bluewi.upload.xlsx');
+Route::get('/bluewi/compare-bol', 'BluewiController@compareBol')->name('bluewi.compare.bol');

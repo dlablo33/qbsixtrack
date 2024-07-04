@@ -15,7 +15,6 @@ use App\Mail\InvoiceMail;
 use Illuminate\Support\Facades\Mail;
 use ZipArchive;
 use Carbon\Carbon;
-use App\Tarifa;
 
 class InvoiceController extends Controller
 {
@@ -417,7 +416,7 @@ class InvoiceController extends Controller
 // =============================================================================================================================================================================================
 
     public function karen(Request $request)
-{
+    {
     // Capturar la fecha desde el request
     $fecha = $request->input('date');
 
