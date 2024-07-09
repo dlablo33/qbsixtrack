@@ -26,7 +26,7 @@
         .btn-primary {
             background-color: #007bff;
             color: #fff;
-            padding: 8px 16px;
+            padding: 4px 8px; /* Tamaño del botón reducido */
             text-decoration: none;
             display: inline-block;
             border-radius: 4px;
@@ -38,24 +38,78 @@
 
         /* Estilo para el filtro */
         .filter-form {
+            display: flex;
+            align-items: center;
             margin-bottom: 20px;
+        }
+
+        .toggle-checkbox {
+            display: none;
+        }
+
+        .toggle-checkbox + label {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .toggle-checkbox + label:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .toggle-checkbox + label:after {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 0;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-checkbox:checked + label:before {
+            background-color: #4CAF50;
+        }
+
+        .toggle-checkbox:checked + label:after {
+            transform: translateX(20px);
+        }
+
+        .apply-filter-btn {
+            margin-left: 10px;
+            padding: 4px 8px; /* Tamaño del botón reducido */
+        }
+
+        .filter-label {
+            margin-right: 10px;
+            font-weight: bold;
         }
     </style>
 
     <div class="container">
         <h1>Listado de Bluewing</h1>
-        <div class="text-right mb-3">
+        <div class="mb-3 d-flex justify-content-end">
             <a href="<?php echo e(route('bluewi.upload.form')); ?>" class="btn btn-primary">Subir archivo</a>
-        </div>
-        <div class="text-right mb-3">
-            <a href="<?php echo e(route('bluewi.compare.bol')); ?>" class="btn btn-primary">Comparar con Invoice</a>
+            <a href="<?php echo e(route('bluewi.compare.bol')); ?>" class="btn btn-primary ml-2">Comparar con Invoice</a>
         </div>
 
         <form action="<?php echo e(route('bluewi.index')); ?>" method="GET" class="filter-form">
-            <div class="form-group">
-                <label for="filter">Bol no creados</label>
-                <input type="checkbox" id="filter" name="filter" value="1" <?php echo e(request('filter') ? 'checked' : ''); ?>>
-                <button type="submit" class="btn btn-primary">Aplicar filtro</button>
+            <div class="form-group d-flex align-items-center">
+                <label for="filter" class="filter-label">Ordenes sin BOL</label>
+                <input type="checkbox" id="filter" name="filter" value="1" <?php echo e(request('filter') ? 'checked' : ''); ?> class="toggle-checkbox">
+                <label for="filter"></label>
+                <button type="submit" class="btn btn-primary apply-filter-btn ml-2">Aplicar</button>
             </div>
         </form>
 
@@ -89,9 +143,9 @@
                 </thead>
                 <tbody>
                     <?php $__currentLoopData = $bluewi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <tr class="<?php echo e(!isset($row->bol_number) || trim($row->bol_number) === '' ? 'row-highlight' : ''); ?>">
+                        <tr class="<?php echo e(empty($row->bol_number) ? 'row-highlight' : ''); ?>">
                             <td><?php echo e($row->order_number); ?></td>
-                            <td><?php echo e($row->bol_number != null ? ($row->bol_number) : ''); ?></td>
+                            <td><?php echo e($row->bol_number); ?></td>
                             <td><?php echo e($row->bol_version); ?></td>
                             <td><?php echo e($row->order_type); ?></td>
                             <td><?php echo e($row->status); ?></td>
@@ -123,7 +177,22 @@
 
         </div>
     </div>
-<?php $__env->stopSection(); ?>
 
+    <?php $__env->startSection('scripts'); ?>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterCheckbox = document.getElementById('filter');
+            const filterButton = document.querySelector('.apply-filter-btn');
+
+            filterCheckbox.addEventListener('change', function () {
+                filterButton.disabled = !filterCheckbox.checked;
+            });
+
+            // Al cargar la página, asegurarse de que el botón esté en el estado correcto
+            filterButton.disabled = !filterCheckbox.checked;
+        });
+        </script>
+    <?php $__env->stopSection(); ?>
+<?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/bluewi/index.blade.php ENDPATH**/ ?>

@@ -235,3 +235,10 @@ Route::get('/bluewi', [BluewiController::class, 'index'])->name('bluewi.index');
 Route::get('/bluewi/upload', [BluewiController::class, 'showUploadForm'])->name('bluewi.upload.form');
 Route::post('/bluewi/upload', [BluewiController::class, 'upload'])->name('bluewi.upload.xlsx');
 Route::get('/bluewi/compare-bol', 'BluewiController@compareBol')->name('bluewi.compare.bol');
+
+// ==============================================================================================================================================================================================R¿
+
+Route::get('/Logistica', [LogisticaController::class, 'index'])->name('logistica.index');
+Route::get('/transfer-data', [LogisticaController::class, 'transferData'])->name('logistica.transferData');
+Route::get('/logistica/formulario-asignar-cliente', [LogisticaController::class, 'showForm'])->name('logistica.mostrar_formulario');
+Route::post('/logistica/asignar-cliente', [LogisticaController::class, 'asignarCliente'])->name('logistica.asignar_cliente');

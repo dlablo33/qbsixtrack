@@ -296,7 +296,7 @@
                         <ul class="nav nav-treeview">
                         @if (Auth::user()->tipo_usuario == 1)  
                             <li class="nav-item ml-2">
-                            <a href="" class="nav-link">
+                            <a href="{{Route('logistica.index')}}" class="nav-link">
                                     <p>Logistica</p>
                                 </a>
                             </li>

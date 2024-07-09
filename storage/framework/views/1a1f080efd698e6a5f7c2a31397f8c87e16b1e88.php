@@ -4,7 +4,7 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="container">
-        <h1>Registros no encontrados en Invoice</h1>
+        <h1>Invoices no Creados</h1>
 
         <?php if($notInInvoice->isEmpty()): ?>
             <p>No se encontraron registros en Bluewi que no estén en Invoice.</p>

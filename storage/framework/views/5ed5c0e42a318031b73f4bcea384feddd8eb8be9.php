@@ -298,7 +298,7 @@
                         <ul class="nav nav-treeview">
                         <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
-                            <a href="" class="nav-link">
+                            <a href="<?php echo e(Route('logistica.index')); ?>" class="nav-link">
                                     <p>Logistica</p>
                                 </a>
                             </li>
