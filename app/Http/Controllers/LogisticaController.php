@@ -9,7 +9,7 @@ use App\Customer;
 use App\Destino;
 use App\Transportista;
 use App\Marchant;
-
+use Carbon\Carbon; 
 
 class LogisticaController extends Controller
 {
@@ -19,7 +19,24 @@ class LogisticaController extends Controller
         $clientes = Customer::all();
         $transportistas = Transportista::all();
         $destinos = Destino::all();
-        
+        $precios = Marchant::all();
+
+        $precios = [];
+        foreach ($logis as $logi) {
+            $semana = Carbon::parse($logi->fecha)->weekOfYear;
+            // Buscar el cliente usando el ID del cliente en la tabla logistica
+            $cliente = Customer::find($logi->cliente);
+    
+            // Si se encuentra el cliente, usamos el CVE_CTE para buscar los precios
+            if ($cliente) {
+                $clienteCveCte = $cliente->CVE_CTE;
+                $precios[$logi->id] = Marchant::where('cliente_id', $clienteCveCte)
+                    ->where('semana', $semana)
+                    ->pluck('precio', 'id');
+            } else {
+                $precios[$logi->id] = collect();
+            }
+        }
 
         $data['menu'] = 'logistica';
         $data['submenu'] = '';
@@ -27,6 +44,7 @@ class LogisticaController extends Controller
         $data['clientes'] = $clientes;
         $data['transportistas'] = $transportistas;
         $data['destinos'] = $destinos;
+        $data['precios'] = $precios;
 
         return view('logistica.index', $data);
     }
@@ -48,18 +66,18 @@ class LogisticaController extends Controller
                 if (!$exists) {
                     Logistica::create([
                         'bol' => $record->bol_number,
-                        'order_number' => $record->order_number ?? '', // Ajusta según sea necesario
-                        'semana' => null, // Ajustar según sea necesario
-                        'fecha' => $record->bol_date, // Ajustar según sea necesario
-                        'linea' => $record->carrier ?? '', // Proporciona un valor predeterminado si está vacío
-                        'no_pipa' => $record->trailer ?? '', // Proporciona un valor predeterminado si está vacío
+                        'order_number' => $record->order_number ?? '', 
+                        'semana' => null, 
+                        'fecha' => $record->bol_date, 
+                        'linea' => $record->carrier ?? '', 
+                        'no_pipa' => $record->trailer ?? '', 
                         'cliente' => null,
                         'destino' => null,
                         'transportista_id' => null,
                         'destino_id' => null,
                         'status' => null,
-                        'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,// Proporciona un valor predeterminado si está vacío
-                        'cruce' => null, // Ajustar según sea necesario
+                        'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,
+                        'cruce' => null, 
                     ]);
                 }
             }
@@ -70,53 +88,54 @@ class LogisticaController extends Controller
 
     public function asignarCliente(Request $request)
     {
-    // Validar la solicitud
+        // Validar la solicitud
         $request->validate([
-        'cliente' => 'nullable|exists:customers,id',
-        'logistica_id' => 'required|exists:logistica,id',
-        'status' => 'required|in:pendiente,cargada,descargada',
-        'cruce' => 'required|in:verde,rojo',
+            'cliente' => 'nullable|exists:customers,id',
+            'logistica_id' => 'required|exists:logistica,id',
+            'status' => 'required|in:pendiente,cargada,descargada',
+            'cruce' => 'required|in:verde,rojo',
         ]);
 
         $logistica = Logistica::find($request->input('logistica_id'));
         if ($logistica) {
-        // Si el cliente ya está asignado, no permitir cambiarlo
-        if (!$logistica->cliente) {
-            $logistica->cliente = $request->input('cliente');
-            // Verificar si el nombre del cliente contiene "FOB"
-            $cliente = Customer::find($request->cliente);
-            if (strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
-                $logistica->destino_id = 5; // Asignar ID 5 para 'FOB'
-                $logistica->transportista_id = null;
-            } else {
+            // Si el cliente ya está asignado, no permitir cambiarlo
+            if (!$logistica->cliente) {
+                $logistica->cliente = $request->input('cliente');
+                // Verificar si el nombre del cliente contiene "FOB"
+                $cliente = Customer::find($request->cliente);
+                if (strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
+                    $logistica->destino_id = 5; // Asignar ID 5 para 'FOB'
+                    $logistica->transportista_id = null;
+                } else {
+                    $logistica->transportista_id = $request->transportista;
+                    $logistica->destino_id = $request->destino;
+                }
+            }
+
+            // Si el transportista ya está asignado, no permitir cambiarlo
+            if (!$logistica->transportista_id) {
                 $logistica->transportista_id = $request->transportista;
+            }
+
+            // Si el destino ya está asignado, no permitir cambiarlo
+            if (!$logistica->destino_id && strpos($cliente->NOMBRE_COMERCIAL, 'FOB') === false) {
                 $logistica->destino_id = $request->destino;
             }
+
+            $logistica->status = $request->input('status');
+            $logistica->cruce = $request->input('cruce');
+
+            // Asignar el precio basado en el cliente y la semana
+            $semana = Carbon::parse($logistica->fecha)->weekOfYear;
+            $precio = Marchant::where('cliente_id', $logistica->cliente)
+                            ->where('semana', $semana)
+                            ->first();
+            $logistica->precio = $precio ? $precio->precio : 0;
+
+            $logistica->save();
         }
 
-        // Si el transportista ya está asignado, no permitir cambiarlo
-        if (!$logistica->transportista_id) {
-            $logistica->transportista_id = $request->transportista;
-        }
-
-        // Si el destino ya está asignado, no permitir cambiarlo
-        if (!$logistica->destino_id && strpos($cliente->NOMBRE_COMERCIAL, 'FOB') === false) {
-            $logistica->destino_id = $request->destino;
-        }
-
-        $logistica->status = $request->input('status');
-        $logistica->cruce = $request->input('cruce');
-
-        $logistica->save();
-        }
-
-    // Redirigir con un mensaje de éxito
+        // Redirigir con un mensaje de éxito
         return redirect()->back()->with('success', 'Cliente y estado asignados exitosamente');
     }
-
-    public function p2p()
-    {
-
-    }
 }
-

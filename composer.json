@@ -22,6 +22,7 @@
         "league/csv": "^9.8",
         "maatwebsite/excel": "^1.1",
         "monolog/monolog": "^2.9",
+        "nesbot/carbon": "^2.72",
         "niklasravnsborg/laravel-pdf": "^1.5",
         "quickbooks/v3-php-sdk": "^5.4",
         "realrashid/sweet-alert": "^3.2",
