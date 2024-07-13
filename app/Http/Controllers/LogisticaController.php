@@ -19,25 +19,34 @@ class LogisticaController extends Controller
         $clientes = Customer::all();
         $transportistas = Transportista::all();
         $destinos = Destino::all();
-        $precios = Marchant::all();
-
+    
         $precios = [];
+        $totales = [];
+    
         foreach ($logis as $logi) {
             $semana = Carbon::parse($logi->fecha)->weekOfYear;
-            // Buscar el cliente usando el ID del cliente en la tabla logistica
             $cliente = Customer::find($logi->cliente);
     
-            // Si se encuentra el cliente, usamos el CVE_CTE para buscar los precios
             if ($cliente) {
                 $clienteCveCte = $cliente->CVE_CTE;
                 $precios[$logi->id] = Marchant::where('cliente_id', $clienteCveCte)
-                    ->where('semana', $semana)
+                    ->where('semana',">=", $semana)
                     ->pluck('precio', 'id');
+                
+                // Calcula el total solo si hay un precio asignado
+                if (isset($precios[$logi->id])) {
+                    $precioSeleccionado = $logi->precio ?? 0;
+                    $litros = $logi->litros;
+                    $totales[$logi->id] = $precioSeleccionado * $litros;
+                } else {
+                    $totales[$logi->id] = null;
+                }
             } else {
                 $precios[$logi->id] = collect();
+                $totales[$logi->id] = null;
             }
         }
-
+    
         $data['menu'] = 'logistica';
         $data['submenu'] = '';
         $data['logis'] = $logis;
@@ -45,7 +54,8 @@ class LogisticaController extends Controller
         $data['transportistas'] = $transportistas;
         $data['destinos'] = $destinos;
         $data['precios'] = $precios;
-
+        $data['totales'] = $totales;
+    
         return view('logistica.index', $data);
     }
 
@@ -95,15 +105,17 @@ class LogisticaController extends Controller
             'status' => 'required|in:pendiente,cargada,descargada',
             'cruce' => 'required|in:verde,rojo',
         ]);
-
+    
         $logistica = Logistica::find($request->input('logistica_id'));
         if ($logistica) {
+            // Obtener el cliente solo si está asignado en la solicitud
+            $cliente = $request->cliente ? Customer::find($request->cliente) : null;
+    
             // Si el cliente ya está asignado, no permitir cambiarlo
             if (!$logistica->cliente) {
                 $logistica->cliente = $request->input('cliente');
                 // Verificar si el nombre del cliente contiene "FOB"
-                $cliente = Customer::find($request->cliente);
-                if (strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
+                if ($cliente && strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
                     $logistica->destino_id = 5; // Asignar ID 5 para 'FOB'
                     $logistica->transportista_id = null;
                 } else {
@@ -111,31 +123,38 @@ class LogisticaController extends Controller
                     $logistica->destino_id = $request->destino;
                 }
             }
-
+    
             // Si el transportista ya está asignado, no permitir cambiarlo
             if (!$logistica->transportista_id) {
                 $logistica->transportista_id = $request->transportista;
             }
-
+    
             // Si el destino ya está asignado, no permitir cambiarlo
-            if (!$logistica->destino_id && strpos($cliente->NOMBRE_COMERCIAL, 'FOB') === false) {
+            if (!$logistica->destino_id && (!$cliente || strpos($cliente->NOMBRE_COMERCIAL, 'FOB') === false)) {
                 $logistica->destino_id = $request->destino;
             }
-
+    
             $logistica->status = $request->input('status');
             $logistica->cruce = $request->input('cruce');
-
+    
             // Asignar el precio basado en el cliente y la semana
             $semana = Carbon::parse($logistica->fecha)->weekOfYear;
+        $precio = $request->input('precio');
+        if ($precio === null) {
             $precio = Marchant::where('cliente_id', $logistica->cliente)
                             ->where('semana', $semana)
                             ->first();
             $logistica->precio = $precio ? $precio->precio : 0;
-
+        } else {
+            $logistica->precio = $precio;
+        }
+            
+    
             $logistica->save();
         }
-
+    
         // Redirigir con un mensaje de éxito
         return redirect()->back()->with('success', 'Cliente y estado asignados exitosamente');
     }
+    
 }

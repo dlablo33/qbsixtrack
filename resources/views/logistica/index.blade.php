@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('content')
-<div >
+<div>
     <h1>Logística</h1>
     @if (session('success'))
         <div class="alert alert-success">
@@ -26,7 +26,7 @@
                     <th>Linea</th>
                     <th>No Pipa</th>
                     <th>Cliente</th>
-                    <th>Destino</th>                    
+                    <th>Destino</th>
                     <th>Transportista</th>
                     <th class="width:20%">Estatus</th>
                     <th>Litros</th>
@@ -45,7 +45,6 @@
                         <td>{{ \Carbon\Carbon::parse($logi->fecha)->format('d-m-Y') }}</td>
                         <td>{{ $logi->linea }}</td>
                         <td>{{ $logi->no_pipa }}</td>
-
                         <!-- Logistica de clientes-->
                         <td>
                             <form action="{{ route('logistica.asignar_cliente') }}" method="POST">
@@ -58,8 +57,6 @@
                                     @endforeach
                                 </select>
                         </td>
-                        <!-- ============================================================================== -->
-
                         <!-- Logistica de destino -->
                         <td>
                             <select name="destino" class="form-control" {{ $logi->destino_id ? 'disabled' : '' }} {{ strpos(optional($logi->cliente)->NOMBRE_COMERCIAL, 'FOB') !== false ? 'disabled' : '' }}>
@@ -70,8 +67,7 @@
                                 <option value="FOB" {{ $logi->destino == 'FOB' ? 'selected' : '' }}>FOB</option>
                             </select>
                         </td>
-
-                        <!-- Logistica de Trasportes-->
+                        <!-- Logistica de Transportes-->
                         <td>
                             <select name="transportista" class="form-control" {{ $logi->transportista_id ? 'disabled' : '' }} {{ strpos(optional($logi->cliente)->NOMBRE_COMERCIAL, 'FOB') !== false ? 'disabled' : '' }}>
                                 <option value="">Selecciona un transportista</option>
@@ -80,7 +76,6 @@
                                 @endforeach
                             </select>
                         </td>
-
                         <!-- Logistica de Estatus -->
                         <td>
                             <select name="status" class="form-control">
@@ -89,10 +84,8 @@
                                 <option value="descargada" {{ $logi->status == 'descargada' ? 'selected' : '' }}>Descargada</option>
                             </select>
                         </td>
-
                         <!-- Logistica de litros-->
-                        <td>{{ $logi->litros }}</td>
-
+                        <td class="litros" id="litros-{{ $logi->id }}">{{ $logi->litros }}</td>
                         <!-- Logistica de Cruce-->
                         <td id="cruceCell">
                             <select id="cruceSelect" name="cruce" class="form-control">
@@ -100,21 +93,25 @@
                                 <option value="verde" {{ $logi->cruce == 'verde' ? 'selected' : '' }} data-color="green">Verde</option>
                             </select>
                         </td>
-
                         <!-- Logistica de Precio -->
                         <td>
                             @if ($logi->cliente)
-                                <select name="precio" class="form-control">
+                                <select name="precio" class="form-control precio-select" data-logi-id="{{ $logi->id }}" onchange="this.form.submit()">
+                                    <option value="">Selecciona un precio</option>
                                     @foreach ($precios[$logi->id] as $precioId => $precio)
-                                        <option value="{{ $precioId }}">{{ $precio }}</option>
+                                        <option value="{{ $precio }}" {{ $logi->precio == $precio ? 'selected' : '' }}>{{ $precio }}</option>
                                     @endforeach
                                 </select>
+                            @else
+                                {{ $logi->precio }}
                             @endif
                         </td>
-
-                        <!-- Logistica de Total -->
-                        <td></td>
-
+                        <!-- Total -->
+                        <td id="total-{{ $logi->id }}">
+                             @if (isset($totales[$logi->id]))
+                                 ${{ $totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : '' }}
+                            @endif
+                        </td>
                         <td>
                             <button type="submit" class="btn btn-primary">Guardar</button>
                             </form>
@@ -129,7 +126,6 @@
 
 @push('styles')
 <style>
-    
     .table-responsive {
         overflow-x: auto;
     }
@@ -142,54 +138,88 @@
     }
 
     .form-control option[data-color="green"] {
-    background-color: green;
-    color: white;
+        background-color: green;
+        color: white;
     }
 
     .form-control option[data-color="red"] {
-    background-color: red;
-    color: white;
+        background-color: red;
+        color: white;
     }
 
     td.green {
-    background-color: green;
-    color: white;
+        background-color: green;
+        color: white;
     }
 
     td.red {
-    background-color: red;
-    color: white;
+        background-color: red;
+        color: white;
     }
-
 </style>
 @endpush
 
 @push('script')
 <script>
-
     document.addEventListener('DOMContentLoaded', function () {
-    const select = document.getElementById('cruceSelect');
-    const cell = document.getElementById('cruceCell');
+        const precioSelects = document.querySelectorAll('.precio-select');
+
+        function calculateTotal(precioSelect) {
+    const logiId = precioSelect.getAttribute('data-logi-id');
+    const selectedPrice = parseFloat(precioSelect.value) || 0;
+    const litros = parseFloat(document.getElementById(`litros-${logiId}`).innerText) || 0;
     
-    function updateCellColor() {
-        const selectedOption = select.options[select.selectedIndex];
-        const color = selectedOption.getAttribute('data-color');
-        
-        // Quita las clases de color anteriores
-        cell.classList.remove('green', 'red');
-        
-        // Añade la clase de color según la opción seleccionada
-        if (color === 'green') {
-            cell.classList.add('green');
-        } else if (color === 'red') {
-            cell.classList.add('red');
-        }
+    console.log('Logi ID:', logiId);
+    console.log('Selected Price:', selectedPrice);
+    console.log('Litros:', litros);
+
+    const total = selectedPrice * litros;
+
+    console.log('Total:', total);
+
+    if (!isNaN(total) && total > 0) {
+        document.getElementById(`total-${logiId}`).innerText = total.toFixed(2);
+    } else {
+        document.getElementById(`total-${logiId}`).innerText = '';
     }
-    
-    select.addEventListener('change', updateCellColor);
-    updateCellColor(); // Inicializa el color al cargar la página
-});
+}
 
+
+        precioSelects.forEach(select => {
+            select.addEventListener('change', function () {
+                calculateTotal(select);
+            });
+
+            // Initial calculation
+            calculateTotal(select);
+        });
+
+        const cruceSelects = document.querySelectorAll('#cruceSelect');
+        cruceSelects.forEach(select => {
+            select.addEventListener('change', function () {
+                const cell = select.closest('#cruceCell');
+                const selectedOption = select.options[select.selectedIndex];
+                const color = selectedOption.getAttribute('data-color');
+
+                cell.classList.remove('green', 'red');
+                if (color === 'green') {
+                    cell.classList.add('green');
+                } else if (color === 'red') {
+                    cell.classList.add('red');
+                }
+            });
+
+            // Initial color setting
+            const cell = select.closest('#cruceCell');
+            const selectedOption = select.options[select.selectedIndex];
+            const color = selectedOption.getAttribute('data-color');
+            if (color === 'green') {
+                cell.classList.add('green');
+            } else if (color === 'red') {
+                cell.classList.add('red');
+            }
+        });
+    });
 </script>
-
 @endpush
+

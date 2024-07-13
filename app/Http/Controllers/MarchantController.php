@@ -42,7 +42,7 @@ class MarchantController extends Controller
                 'customer_id' => 'required',
                 'product_id' => 'required',
                 'price' => 'required|numeric',
-                'fecha_vigencia' => 'required|date'  // Asegurando que fecha_vigencia esté presente y sea una fecha válida
+                'fecha_vigencia' => 'required'  // Asegurando que fecha_vigencia esté presente y sea una fecha válida
             ]);
         
             // Separar el valor del cliente en clave y nombre
