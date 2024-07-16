@@ -16,114 +16,108 @@
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>BOL</th>
-                    <th>Order Number</th>
-                    <th>Semana</th>
-                    <th>Fecha</th>
-                    <th>Linea</th>
-                    <th>No Pipa</th>
-                    <th>Cliente</th>
-                    <th>Destino</th>
-                    <th>Transportista</th>
-                    <th class="width:20%">Estatus</th>
-                    <th>Litros</th>
-                    <th class="width:24%">Cruce</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php $__currentLoopData = $logis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $logi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <form action="<?php echo e(route('logistica.guardar_todos')); ?>" method="POST">
+        <?php echo csrf_field(); ?>
+        <button type="submit" class="btn btn-success mb-3">Guardar Todos los Cambios</button>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
                     <tr>
-                        <td><?php echo e($logi->bol); ?></td>
-                        <td><?php echo e($logi->order_number); ?></td>
-                        <td><?php echo e(\Carbon\Carbon::parse($logi->fecha)->weekOfYear); ?></td>
-                        <td><?php echo e(\Carbon\Carbon::parse($logi->fecha)->format('d-m-Y')); ?></td>
-                        <td><?php echo e($logi->linea); ?></td>
-                        <td><?php echo e($logi->no_pipa); ?></td>
-                        <!-- Logistica de clientes-->
-                        <td>
-                            <form action="<?php echo e(route('logistica.asignar_cliente')); ?>" method="POST">
-                                <?php echo csrf_field(); ?>
-                                <input type="hidden" name="logistica_id" value="<?php echo e($logi->id); ?>">
-                                <select name="cliente" class="form-control" <?php echo e($logi->cliente ? 'disabled' : ''); ?> onchange="this.form.submit()">
+                        <th>BOL</th>
+                        <th>Order Number</th>
+                        <th>Semana</th>
+                        <th>Fecha</th>
+                        <th>Linea</th>
+                        <th>No Pipa</th>
+                        <th>Cliente</th>
+                        <th>Destino</th>
+                        <th>Transportista</th>
+                        <th class="width:20%">Estatus</th>
+                        <th>Litros</th>
+                        <th class="width:24%">Cruce</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $__currentLoopData = $logis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $logi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr>
+                            <td><?php echo e($logi->bol); ?></td>
+                            <td><?php echo e($logi->order_number); ?></td>
+                            <td><?php echo e(\Carbon\Carbon::parse($logi->fecha)->weekOfYear); ?></td>
+                            <td><?php echo e(\Carbon\Carbon::parse($logi->fecha)->format('d-m-Y')); ?></td>
+                            <td><?php echo e($logi->linea); ?></td>
+                            <td><?php echo e($logi->no_pipa); ?></td>
+                            <td>
+                                <input type="hidden" name="logistica[<?php echo e($logi->id); ?>][id]" value="<?php echo e($logi->id); ?>">
+                                <select name="logistica[<?php echo e($logi->id); ?>][cliente]" class="form-control cliente-select" <?php echo e($logi->cliente ? 'disabled' : ''); ?>>
                                     <option value="">Selecciona un cliente</option>
                                     <?php $__currentLoopData = $clientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cliente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($cliente->id); ?>" <?php echo e($logi->cliente == $cliente->id ? 'selected' : ''); ?>><?php echo e($cliente->NOMBRE_COMERCIAL); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
-                        </td>
-                        <!-- Logistica de destino -->
-                        <td>
-                            <select name="destino" class="form-control" <?php echo e($logi->destino_id ? 'disabled' : ''); ?> <?php echo e(strpos(optional($logi->cliente)->NOMBRE_COMERCIAL, 'FOB') !== false ? 'disabled' : ''); ?>>
-                                <option value="">Selecciona un destino</option>
-                                <?php $__currentLoopData = $destinos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $destino): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($destino->id); ?>" <?php echo e($logi->destino_id == $destino->id ? 'selected' : ''); ?>><?php echo e($destino->nombre); ?></option>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                <option value="FOB" <?php echo e($logi->destino == 'FOB' ? 'selected' : ''); ?>>FOB</option>
-                            </select>
-                        </td>
-                        <!-- Logistica de Transportes-->
-                        <td>
-                            <select name="transportista" class="form-control" <?php echo e($logi->transportista_id ? 'disabled' : ''); ?> <?php echo e(strpos(optional($logi->cliente)->NOMBRE_COMERCIAL, 'FOB') !== false ? 'disabled' : ''); ?>>
-                                <option value="">Selecciona un transportista</option>
-                                <?php $__currentLoopData = $transportistas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transportista): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($transportista->id); ?>" <?php echo e($logi->transportista_id == $transportista->id ? 'selected' : ''); ?>><?php echo e($transportista->nombre); ?></option>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </select>
-                        </td>
-                        <!-- Logistica de Estatus -->
-                        <td>
-                            <select name="status" class="form-control">
-                                <option value="pendiente" <?php echo e($logi->status == 'pendiente' ? 'selected' : ''); ?>>Pendiente</option>
-                                <option value="cargada" <?php echo e($logi->status == 'cargada' ? 'selected' : ''); ?>>Cargada</option>
-                                <option value="descargada" <?php echo e($logi->status == 'descargada' ? 'selected' : ''); ?>>Descargada</option>
-                            </select>
-                        </td>
-                        <!-- Logistica de litros-->
-                        <td class="litros" id="litros-<?php echo e($logi->id); ?>"><?php echo e($logi->litros); ?></td>
-                        <!-- Logistica de Cruce-->
-                        <td id="cruceCell">
-                            <select id="cruceSelect" name="cruce" class="form-control">
-                                <option value="rojo" <?php echo e($logi->cruce == 'rojo' ? 'selected' : ''); ?> data-color="red">Rojo</option>
-                                <option value="verde" <?php echo e($logi->cruce == 'verde' ? 'selected' : ''); ?> data-color="green">Verde</option>
-                            </select>
-                        </td>
-                        <!-- Logistica de Precio -->
-                        <td>
-                            <?php if($logi->cliente): ?>
-                                <select name="precio" class="form-control precio-select" data-logi-id="<?php echo e($logi->id); ?>" onchange="this.form.submit()">
-                                    <option value="">Selecciona un precio</option>
-                                    <?php $__currentLoopData = $precios[$logi->id]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $precioId => $precio): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <option value="<?php echo e($precio); ?>" <?php echo e($logi->precio == $precio ? 'selected' : ''); ?>><?php echo e($precio); ?></option>
+                            </td>
+                            <td>
+                                <select name="logistica[<?php echo e($logi->id); ?>][destino]" class="form-control destino-select" <?php echo e($logi->destino_id ? 'disabled' : ''); ?>>
+                                    <option value="">Selecciona un destino</option>
+                                    <?php $__currentLoopData = $destinos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $destino): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($destino->id); ?>" <?php echo e($logi->destino_id == $destino->id ? 'selected' : ''); ?>><?php echo e($destino->nombre); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="5" <?php echo e($logi->destino_id == 5 ? 'selected' : ''); ?>>FOB</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="logistica[<?php echo e($logi->id); ?>][transportista]" class="form-control transportista-select" <?php echo e($logi->transportista_id ? 'disabled' : ''); ?>>
+                                    <option value="">Selecciona un transportista</option>
+                                    <?php $__currentLoopData = $transportistas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transportista): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($transportista->id); ?>" <?php echo e($logi->transportista_id == $transportista->id ? 'selected' : ''); ?>><?php echo e($transportista->nombre); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
-                            <?php else: ?>
-                                <?php echo e($logi->precio); ?>
+                            </td>
+                            <td class="status">
+                                <select name="logistica[<?php echo e($logi->id); ?>][status]" class="form-control status-select">
+                                    <option value="pendiente" <?php echo e($logi->status == 'pendiente' ? 'selected' : ''); ?>>Pendiente</option>
+                                    <option value="cargada" <?php echo e($logi->status == 'cargada' ? 'selected' : ''); ?>>Cargada</option>
+                                    <option value="descargada" <?php echo e($logi->status == 'descargada' ? 'selected' : ''); ?>>Descargada</option>
+                                </select>
+                            </td>
+                            <td class="litros" id="litros-<?php echo e($logi->id); ?>"><?php echo e($logi->litros); ?></td>
+                            <td class="cruce">
+                                <select name="logistica[<?php echo e($logi->id); ?>][cruce]" class="form-control cruce-select">
+                                    <option value="rojo" <?php echo e($logi->cruce == 'rojo' ? 'selected' : ''); ?>>Rojo</option>
+                                    <option value="verde" <?php echo e($logi->cruce == 'verde' ? 'selected' : ''); ?>>Verde</option>
+                                </select>
+                            </td>
+                            <td>
+                                <?php if($logi->cliente): ?>
+                                    <select name="logistica[<?php echo e($logi->id); ?>][precio]" class="form-control precio-select" data-logi-id="<?php echo e($logi->id); ?>">
+                                        <option value="">Selecciona un precio</option>
+                                        <?php $__currentLoopData = $precios[$logi->id]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $precioId => $precio): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($precio); ?>" <?php echo e($logi->precio == $precio ? 'selected' : ''); ?>><?php echo e($precio); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                <?php else: ?>
+                                    <?php echo e($logi->precio); ?>
 
-                            <?php endif; ?>
-                        </td>
-                        <!-- Total -->
-                        <td id="total-<?php echo e($logi->id); ?>">
-                             <?php if(isset($totales[$logi->id])): ?>
-                                 $<?php echo e($totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : ''); ?>
+                                <?php endif; ?>
+                            </td>
+                            <td id="total-<?php echo e($logi->id); ?>">
+                                <?php if(isset($totales[$logi->id])): ?>
+                                    $<?php echo e($totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : ''); ?>
 
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <button type="submit" class="btn btn-primary">Guardar</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </tbody>
-        </table>
-    </div>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </tbody>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Guardar Todos los Cambios</button>
+    </form>
 </div>
 <?php $__env->stopSection(); ?>
 
@@ -140,23 +134,28 @@
         background-color: transparent;
     }
 
-    .form-control option[data-color="green"] {
-        background-color: green;
-        color: white;
-    }
-
-    .form-control option[data-color="red"] {
+    .status.pendiente {
         background-color: red;
         color: white;
     }
 
-    td.green {
+    .status.cargada {
+        background-color: yellow;
+        color: black;
+    }
+
+    .status.descargada {
         background-color: green;
         color: white;
     }
 
-    td.red {
+    .cruce.rojo {
         background-color: red;
+        color: white;
+    }
+
+    .cruce.verde {
+        background-color: green;
         color: white;
     }
 </style>
@@ -168,63 +167,72 @@
         const precioSelects = document.querySelectorAll('.precio-select');
 
         function calculateTotal(precioSelect) {
-    const logiId = precioSelect.getAttribute('data-logi-id');
-    const selectedPrice = parseFloat(precioSelect.value) || 0;
-    const litros = parseFloat(document.getElementById(`litros-${logiId}`).innerText) || 0;
-    
-    console.log('Logi ID:', logiId);
-    console.log('Selected Price:', selectedPrice);
-    console.log('Litros:', litros);
+            const logiId = precioSelect.getAttribute('data-logi-id');
+            const selectedPrice = parseFloat(precioSelect.value) || 0;
+            const litros = parseFloat(document.getElementById(`litros-${logiId}`).innerText) || 0;
 
-    const total = selectedPrice * litros;
+            const total = selectedPrice * litros;
 
-    console.log('Total:', total);
-
-    if (!isNaN(total) && total > 0) {
-        document.getElementById(`total-${logiId}`).innerText = total.toFixed(2);
-    } else {
-        document.getElementById(`total-${logiId}`).innerText = '';
-    }
-}
-
+            if (!isNaN(total) && total > 0) {
+                document.getElementById(`total-${logiId}`).innerText = total.toFixed(2);
+            } else {
+                document.getElementById(`total-${logiId}`).innerText = '';
+            }
+        }
 
         precioSelects.forEach(select => {
             select.addEventListener('change', function () {
                 calculateTotal(select);
             });
 
-            // Initial calculation
             calculateTotal(select);
         });
 
-        const cruceSelects = document.querySelectorAll('#cruceSelect');
-        cruceSelects.forEach(select => {
-            select.addEventListener('change', function () {
-                const cell = select.closest('#cruceCell');
-                const selectedOption = select.options[select.selectedIndex];
-                const color = selectedOption.getAttribute('data-color');
+        function updateCruceColors() {
+            const cruceSelects = document.querySelectorAll('.cruce-select');
+            cruceSelects.forEach(select => {
+                const cell = select.closest('td');
+                const value = select.value;
 
-                cell.classList.remove('green', 'red');
-                if (color === 'green') {
-                    cell.classList.add('green');
-                } else if (color === 'red') {
-                    cell.classList.add('red');
+                cell.classList.remove('rojo', 'verde');
+                if (value === 'rojo') {
+                    cell.classList.add('rojo');
+                } else if (value === 'verde') {
+                    cell.classList.add('verde');
                 }
             });
+        }
 
-            // Initial color setting
-            const cell = select.closest('#cruceCell');
-            const selectedOption = select.options[select.selectedIndex];
-            const color = selectedOption.getAttribute('data-color');
-            if (color === 'green') {
-                cell.classList.add('green');
-            } else if (color === 'red') {
-                cell.classList.add('red');
-            }
+        function updateStatusColors() {
+            const statusCells = document.querySelectorAll('.status');
+            statusCells.forEach(cell => {
+                const value = cell.querySelector('select').value;
+
+                cell.classList.remove('pendiente', 'cargada', 'descargada');
+                if (value === 'pendiente') {
+                    cell.classList.add('pendiente');
+                } else if (value === 'cargada') {
+                    cell.classList.add('cargada');
+                } else if (value === 'descargada') {
+                    cell.classList.add('descargada');
+                }
+            });
+        }
+
+        document.querySelectorAll('.cruce-select').forEach(select => {
+            select.addEventListener('change', updateCruceColors);
         });
+
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', updateStatusColors);
+        });
+
+        updateCruceColors();
+        updateStatusColors();
     });
 </script>
 <?php $__env->stopPush(); ?>
+
 
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/logistica/index.blade.php ENDPATH**/ ?>

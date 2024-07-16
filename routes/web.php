@@ -1,13 +1,11 @@
 <?php
 
-
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PagoController;
-use App\Http\Controllers\BluewiImportController;
 use App\Http\Controllers\BluewiController;
 use App\Marchant;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +13,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransporteController;
 use App\Http\Controllers\BolController;
 use App\Http\Controllers\LogisticaController;
-use Sabberworm\CSS\Settings;
 
 // ==============================================================================================================================================================================================
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
@@ -61,7 +58,6 @@ Route::get('/settings/products/destroy/{id}', 'ProductController@destroy')->name
 Route::post('/settings/products', 'ProductController@store')->name('products.store');
 Route::get('/products/syncItems', 'ProductController@syncItems');
 
-
 // ==============================================================================================================================================================================================
 // Route for Quickbook Callback
 Route::get('/quickbook/{user}/callback', 'QuickbookController@callback')->name('qb.callback');
@@ -88,7 +84,6 @@ Route::get('/invoices/Molecula_2', [InvoiceController::class, 'invoiceList3'])->
 Route::get('/invoices/Molecula_3', [InvoiceController::class, 'invoiceList4'])->name('invoice.mole3');
 Route::get('/invoices/remicion/{id}', [InvoiceController::class, 'remi'])->name('invoice.remi');
 Route::post('/invoice/update-status/{id}', [InvoiceController::class, 'updateStatus'])->name('invoice.update.status');
-
 // ==============================================================================================================================================================================================
 
 // ==============================================================================================================================================================================================
@@ -143,9 +138,7 @@ Route::get('/marchants/{cliente_Id}/precios', 'MarchantController@show')->name('
 // Ruta para manejar el envío del formulario y almacenar la factura
 Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoice.store');
 Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
-// routes/web.php
 Route::get('factura/{id}/ver-pdf', [App\Http\Controllers\InvoiceController::class, 'verPDF'])->name('invoice.ver-pdf');
-
 // ==============================================================================================================================================================================================
 
 // ==============================================================================================================================================================================================
@@ -186,7 +179,6 @@ Route::get('/getLastPriceByCustomer', 'InvoiceController@getLastPriceByCustomer'
 Route::get('/getLastPriceByCustomer', [InvoiceController::class, 'getLastPriceByCustomer'])->name('getLastPriceByCustomer');
 Route::get('/get-last-price/{customerId}', [InvoiceController::class, 'getLastPrice'])->name('getLastPrice');
 Route::post('/invoices/{invoice}/update-status', 'InvoiceController@updateStatus')->name('invoice.update.status');
-
 // ==============================================================================================================================================================================================
 
 Route::get('invoice/{id}/pdf', [InvoiceController::class, 'showPdf'])->name('invoice.showPdf');
@@ -208,7 +200,6 @@ Route::get('/dashboard', function () {
 Route::post('/invoicesesp', [InvoiceController::class, 'store2'])->name('invoice.store2');
 Route::get('/invoices/{fecha}', 'App\Http\Controllers\InvoiceController@karen');
 Route::post('/invoice/karen', [InvoiceController::class, 'karen'])->name('invoice.karen');
-
 // ==============================================================================================================================================================================================
 
 Route::get('/transporte', [TransporteController::class, 'index'])->name('transporte.index');;
@@ -217,7 +208,6 @@ Route::post('/transporte', [TransporteController::class, 'store'])->name('transp
 Route::get('transportes/{id}/edit', [TransporteController::class, 'edit'])->name('transporte.edit');
 Route::delete('transportes/{transporte}/destroy', [TransporteController::class, 'destroy'])->name('transporte.destroy');
 Route::put('/transporte/{id}/update', [TransporteController::class, 'update'])->name('transporte.update');
-
 // ==============================================================================================================================================================================================
 
 Route::get('/Cuentas', [BolController::class, 'index'])->name('bol.index');
@@ -243,3 +233,5 @@ Route::get('/transfer-data', [LogisticaController::class, 'transferData'])->name
 Route::get('/logistica/formulario-asignar-cliente', [LogisticaController::class, 'showForm'])->name('logistica.mostrar_formulario');
 Route::post('/logistica/asignar-cliente', [LogisticaController::class, 'asignarCliente'])->name('logistica.asignar_cliente');
 Route::get('logistica/filterByWeek', 'LogisticaController@filterByWeek')->name('logistica.filterByWeek');
+Route::post('/logistica/guardar-todos', [LogisticaController::class, 'guardarTodos'])->name('logistica.guardar_todos');
+Route::post('/calcular-precio', [LogisticaController::class, 'calcularPrecio'])->name('logistica.calcularPrecio');

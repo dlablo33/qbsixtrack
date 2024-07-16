@@ -15,7 +15,7 @@ class LogisticaController extends Controller
 {
     public function index()
     {
-        $logis = Logistica::all();
+        $logis = Logistica::orderBy('fecha', 'desc')->get();
         $clientes = Customer::all();
         $transportistas = Transportista::all();
         $destinos = Destino::all();
@@ -61,9 +61,10 @@ class LogisticaController extends Controller
 
     public function transferData()
     {
+        ini_set('max_execution_time', 600);
         // Obtener todos los registros de bluewi
         $bluewiRecords = Bluewi::all();
-
+    
         // Iterar sobre cada registro de bluewi y crear un nuevo registro en logistica si no existe y bol no es nulo
         foreach ($bluewiRecords as $record) {
             // Verificar si el campo bol_number está definido y no es nulo
@@ -72,30 +73,39 @@ class LogisticaController extends Controller
                 $exists = Logistica::where('bol', $record->bol_number)
                                     ->where('order_number', $record->order_number)
                                     ->exists();
-
-                if (!$exists) {
+    
+        if (!$exists) {
+            $transportistaId = null;
+            if (isset($record->carrier)) {
+                if ($record->carrier == 'JOSE LUIS LUMBRERAS') {
+                    $transportistaId = 2; // ID del transportista XLV (Liji)
+                } elseif ($record->carrier == 'Autotransportes SK') {
+                    $transportistaId = 1; // ID del transportista SK
+                }
+            }
+    
                     Logistica::create([
                         'bol' => $record->bol_number,
-                        'order_number' => $record->order_number ?? '', 
-                        'semana' => null, 
-                        'fecha' => $record->bol_date, 
-                        'linea' => $record->carrier ?? '', 
-                        'no_pipa' => $record->trailer ?? '', 
+                        'order_number' => $record->order_number ?? '',
+                        'semana' => null,
+                        'fecha' => $record->bol_date,
+                        'linea' => $record->carrier ?? '',
+                        'no_pipa' => $record->trailer ?? '',
                         'cliente' => null,
                         'destino' => null,
-                        'transportista_id' => null,
+                        'transportista_id' => $transportistaId,
                         'destino_id' => null,
                         'status' => null,
                         'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,
-                        'cruce' => null, 
+                        'cruce' => null,
                     ]);
                 }
             }
         }
-
+    
         return redirect()->route('logistica.index')->with('success', 'Datos transferidos con éxito');
     }
-
+    
     public function asignarCliente(Request $request)
     {
         // Validar la solicitud
@@ -118,10 +128,7 @@ class LogisticaController extends Controller
                 if ($cliente && strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
                     $logistica->destino_id = 5; // Asignar ID 5 para 'FOB'
                     $logistica->transportista_id = null;
-                } else {
-                    $logistica->transportista_id = $request->transportista;
-                    $logistica->destino_id = $request->destino;
-                }
+                } 
             }
     
             // Si el transportista ya está asignado, no permitir cambiarlo
@@ -157,4 +164,44 @@ class LogisticaController extends Controller
         return redirect()->back()->with('success', 'Cliente y estado asignados exitosamente');
     }
     
+    public function guardarTodos(Request $request)
+    {
+        $logisticaData = $request->input('logistica');
+    
+        foreach ($logisticaData as $id => $data) {
+            $logistica = Logistica::find($id);
+    
+            if (!$logistica) {
+                continue; // Saltar si no se encuentra la instancia de Logistica
+            }
+    
+            if (!$logistica->cliente) {
+                $cliente = Customer::find($data['cliente']);
+                $logistica->cliente = $data['cliente'];
+    
+                if ($cliente && strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
+                    $logistica->destino_id = 5; // Asignar ID 5 para 'FOB'
+                    $logistica->transportista_id = null;
+                }
+            }
+    
+            // Actualizar otros campos
+            $logistica->status = $data['status'];
+            $logistica->cruce = $data['cruce'];
+    
+            // Asignar el precio si existe en los datos recibidos
+            if (isset($data['precio'])) {
+                $logistica->precio = $data['precio'];
+            }
+
+            $logistica->transportista_id = $data['transportista'] ?? $logistica->transportista_id;
+            $logistica->destino_id = $data['destino'] ?? $logistica->destino_id;
+    
+    
+            $logistica->save();
+        }
+    
+        return redirect()->route('logistica.index')->with('success', 'Datos guardados correctamente.');
+    }
+
 }

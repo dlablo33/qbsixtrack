@@ -48,13 +48,13 @@
                                 <thead>
                                 <tr>
                                 <th>ID</th>
-                <th>CLIENTE_LP</th>
-                <th>NOMBRE_COMERCIAL</th>
-                <th>STATUS</th>
-                <th>RFC</th>
-                <th>EMPRESA_VENDEDORA</th>
-                <th>CVE_CTE</th>
-                <th>Accion</th>
+                                <th>CLIENTE_LP</th>
+                                <th>NOMBRE_COMERCIAL</th>
+                                <th>STATUS</th>
+                                <th>RFC</th>
+                                <th>EMPRESA_VENDEDORA</th>
+                                <th>CVE_CTE</th>
+                                <th>Accion</th>
                                 </tr>
                                 </thead>
                                 <tbody>
