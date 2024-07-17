@@ -294,7 +294,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                        @if (Auth::user()->tipo_usuario == 1)  
+                        @if (Auth::user()->tipo_usuario >= 3)  
                             <li class="nav-item ml-2">
                             <a href="{{Route('logistica.index')}}" class="nav-link">
                                     <p>Logistica</p>

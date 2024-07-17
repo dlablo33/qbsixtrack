@@ -114,6 +114,9 @@ class LogisticaController extends Controller
             'logistica_id' => 'required|exists:logistica,id',
             'status' => 'required|in:pendiente,cargada,descargada',
             'cruce' => 'required|in:verde,rojo',
+            'fecha_salida' => 'nullable|date',
+            'fecha_entrega' => 'nullable|date',
+            'fecha_descarga' => 'nullable|date',
         ]);
     
         $logistica = Logistica::find($request->input('logistica_id'));
@@ -143,6 +146,9 @@ class LogisticaController extends Controller
     
             $logistica->status = $request->input('status');
             $logistica->cruce = $request->input('cruce');
+            $logistica->fecha_salida = $request->input('fecha_salida');
+            $logistica->fecha_entrega = $request->input('fecha_entrega');
+            $logistica->fecha_descarga = $request->input('fecha_descarga');
     
             // Asignar el precio basado en el cliente y la semana
             $semana = Carbon::parse($logistica->fecha)->weekOfYear;
@@ -155,11 +161,9 @@ class LogisticaController extends Controller
         } else {
             $logistica->precio = $precio;
         }
-            
-    
+
             $logistica->save();
         }
-    
         // Redirigir con un mensaje de éxito
         return redirect()->back()->with('success', 'Cliente y estado asignados exitosamente');
     }
@@ -188,6 +192,9 @@ class LogisticaController extends Controller
             // Actualizar otros campos
             $logistica->status = $data['status'];
             $logistica->cruce = $data['cruce'];
+            $logistica->fecha_salida = array_key_exists('fecha_salida', $data) && $data['fecha_salida'] ? Carbon::parse($data['fecha_salida'])->format('Y-m-d') : null;
+            $logistica->fecha_entrega = array_key_exists('fecha_entrega', $data) && $data['fecha_entrega'] ? Carbon::parse($data['fecha_entrega'])->format('Y-m-d') : null;
+            $logistica->fecha_descarga = array_key_exists('fecha_descarga', $data) && $data['fecha_descarga'] ? Carbon::parse($data['fecha_descarga'])->format('Y-m-d') : null;
     
             // Asignar el precio si existe en los datos recibidos
             if (isset($data['precio'])) {
@@ -196,7 +203,6 @@ class LogisticaController extends Controller
 
             $logistica->transportista_id = $data['transportista'] ?? $logistica->transportista_id;
             $logistica->destino_id = $data['destino'] ?? $logistica->destino_id;
-    
     
             $logistica->save();
         }

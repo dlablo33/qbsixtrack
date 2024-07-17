@@ -32,11 +32,16 @@
                         <th>Cliente</th>
                         <th>Destino</th>
                         <th>Transportista</th>
-                        <th class="width:20%">Estatus</th>
+                        <th>Estatus</th>
                         <th>Litros</th>
-                        <th class="width:24%">Cruce</th>
+                        <th>Cruce</th>
+                        <?php if(Auth::user()->tipo_usuario == 1): ?> 
                         <th>Precio</th>
                         <th>Total</th>
+                        <th>Fecha Salida</th>
+                        <th>Fecha Entrega</th>
+                        <th>Fecha Descarga</th>
+                        <?php endif; ?>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -89,6 +94,8 @@
                                     <option value="verde" <?php echo e($logi->cruce == 'verde' ? 'selected' : ''); ?>>Verde</option>
                                 </select>
                             </td>
+
+                            <?php if(Auth::user()->tipo_usuario == 1): ?> 
                             <td>
                                 <?php if($logi->cliente): ?>
                                     <select name="logistica[<?php echo e($logi->id); ?>][precio]" class="form-control precio-select" data-logi-id="<?php echo e($logi->id); ?>">
@@ -108,6 +115,12 @@
 
                                 <?php endif; ?>
                             </td>
+
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_salida]" class="form-control" value="<?php echo e($logi->fecha_salida); ?>"></td>
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_entrega]" class="form-control" value="<?php echo e($logi->fecha_entrega); ?>"></td>
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_descarga]" class="form-control" value="<?php echo e($logi->fecha_descarga); ?>"></td>
+                            <?php endif; ?>
+                            
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
@@ -132,6 +145,16 @@
         max-width: 100%;
         margin-bottom: 1rem;
         background-color: transparent;
+        font-size: 0.8rem; /* Reduce the font size */
+    }
+
+    .table th, .table td {
+        white-space: nowrap;
+        padding: 0.5rem;
+    }
+
+    .form-control {
+        font-size: 0.8rem; /* Reduce the font size for form controls */
     }
 
     .status.pendiente {
@@ -157,6 +180,10 @@
     .cruce.verde {
         background-color: green;
         color: white;
+    }
+
+    .btn {
+        font-size: 0.8rem; /* Reduce the font size for buttons */
     }
 </style>
 <?php $__env->stopPush(); ?>
@@ -232,7 +259,4 @@
     });
 </script>
 <?php $__env->stopPush(); ?>
-
-
-
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/logistica/index.blade.php ENDPATH**/ ?>

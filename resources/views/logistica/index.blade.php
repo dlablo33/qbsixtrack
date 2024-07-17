@@ -31,11 +31,16 @@
                         <th>Cliente</th>
                         <th>Destino</th>
                         <th>Transportista</th>
-                        <th class="width:20%">Estatus</th>
+                        <th>Estatus</th>
                         <th>Litros</th>
-                        <th class="width:24%">Cruce</th>
+                        <th>Cruce</th>
+                        @if (Auth::user()->tipo_usuario == 1) 
                         <th>Precio</th>
                         <th>Total</th>
+                        <th>Fecha Salida</th>
+                        <th>Fecha Entrega</th>
+                        <th>Fecha Descarga</th>
+                        @endif
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -88,6 +93,8 @@
                                     <option value="verde" {{ $logi->cruce == 'verde' ? 'selected' : '' }}>Verde</option>
                                 </select>
                             </td>
+
+                            @if (Auth::user()->tipo_usuario == 1) 
                             <td>
                                 @if ($logi->cliente)
                                     <select name="logistica[{{ $logi->id }}][precio]" class="form-control precio-select" data-logi-id="{{ $logi->id }}">
@@ -105,6 +112,12 @@
                                     ${{ $totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : '' }}
                                 @endif
                             </td>
+
+                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_salida]" class="form-control" value="{{ $logi->fecha_salida }}"></td>
+                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_entrega]" class="form-control" value="{{ $logi->fecha_entrega }}"></td>
+                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_descarga]" class="form-control" value="{{ $logi->fecha_descarga }}"></td>
+                            @endif
+                            
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
@@ -129,6 +142,16 @@
         max-width: 100%;
         margin-bottom: 1rem;
         background-color: transparent;
+        font-size: 0.8rem; /* Reduce the font size */
+    }
+
+    .table th, .table td {
+        white-space: nowrap;
+        padding: 0.5rem;
+    }
+
+    .form-control {
+        font-size: 0.8rem; /* Reduce the font size for form controls */
     }
 
     .status.pendiente {
@@ -154,6 +177,10 @@
     .cruce.verde {
         background-color: green;
         color: white;
+    }
+
+    .btn {
+        font-size: 0.8rem; /* Reduce the font size for buttons */
     }
 </style>
 @endpush
@@ -229,5 +256,3 @@
     });
 </script>
 @endpush
-
-

@@ -23,6 +23,11 @@ class Logistica extends Model
         'destino_id',
         'cruce',
         'litros',
+        'precio',
+        'fecha_salida',
+        'fecha_entrega',
+        'fecha_descarga',
+        
     ];
 
     protected $casts = [
