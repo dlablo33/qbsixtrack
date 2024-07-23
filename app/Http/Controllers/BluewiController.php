@@ -13,7 +13,6 @@ use App\Invoice;
 
 class BluewiController extends Controller
 {
-    // Método para mostrar la lista de registros
     public function index(Request $request)
     {
         $query = Bluewi::query();
@@ -21,6 +20,8 @@ class BluewiController extends Controller
         if ($request->has('filter') && $request->input('filter') == 1) {
             $query->whereNull('bol_number')->orWhere('bol_number', '');
         }
+
+        $query->orderBy('bol_date','desc');
     
         $bluewi = $query->paginate(10);
     
@@ -33,7 +34,6 @@ class BluewiController extends Controller
         return view("bluewi.index", $data);
     }
     
-    // Método para mostrar el formulario de subida de archivos
     public function showUploadForm()
     {
         $data = [
@@ -206,7 +206,5 @@ class BluewiController extends Controller
 
     return view('bluewi.not-in-invoice', $data);
     }
-
-
 
 }

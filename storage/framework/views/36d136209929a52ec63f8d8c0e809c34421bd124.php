@@ -107,14 +107,13 @@
         <form action="<?php echo e(route('bluewi.index')); ?>" method="GET" class="filter-form">
             <div class="form-group d-flex align-items-center">
                 <label for="filter" class="filter-label">Ordenes sin BOL</label>
-                <input type="checkbox" id="filter" name="filter" value="1" <?php echo e(request('filter') ? 'checked' : ''); ?> class="toggle-checkbox">
+                <input type="checkbox" id="filter" name="filter" value="1" <?php echo e(request('filter') ? 'checked' : ''); ?> class="toggle-checkbox" onchange="this.form.submit()">
                 <label for="filter"></label>
-                <button type="submit" class="btn btn-primary apply-filter-btn ml-2">Aplicar</button>
             </div>
         </form>
 
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table id="example1" class="table table-striped">
                 <thead>
                     <tr>
                         <th>Order Number</th>
@@ -123,16 +122,22 @@
                         <th>Order Type</th>
                         <th>Status</th>
                         <th>BOL Date</th>
+                        <!--
                         <th>Position Holder</th>
                         <th>Supplier</th>
                         <th>Customer</th>
                         <th>Destination</th>
+                        -->
                         <th>Carrier</th>
+                        <!--
                         <th>PO</th>
                         <th>Truck</th>
+                        -->
                         <th>Trailer</th>
+                        <!--
                         <th>Bay</th>
                         <th>Product</th>
+                        -->
                         <th>Scheduled Amount (USG)</th>
                         <th>Gross(USG)</th>
                         <th>Net(USG)</th>
@@ -150,16 +155,22 @@
                             <td><?php echo e($row->order_type); ?></td>
                             <td><?php echo e($row->status); ?></td>
                             <td><?php echo e($row->bol_date); ?></td>
+                            <!--
                             <td><?php echo e($row->position_holder); ?></td>
                             <td><?php echo e($row->supplier); ?></td>
                             <td><?php echo e($row->customer); ?></td>
                             <td><?php echo e($row->destination); ?></td>
+                            -->
                             <td><?php echo e($row->carrier); ?></td>
+                            <!--
                             <td><?php echo e($row->po); ?></td>
                             <td><?php echo e($row->truck); ?></td>
+                            -->
                             <td><?php echo e($row->trailer); ?></td>
+                            <!--
                             <td><?php echo e($row->bay); ?></td>
                             <td><?php echo e($row->product); ?></td>
+                             -->
                             <td><?php echo e($row->scheduled_amount_usg); ?></td>
                             <td><?php echo e($row->gross_usg); ?></td>
                             <td><?php echo e($row->net_usg); ?></td>

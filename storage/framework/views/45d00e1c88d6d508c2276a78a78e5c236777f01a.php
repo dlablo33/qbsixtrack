@@ -20,7 +20,7 @@
         <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-success mb-3">Guardar Todos los Cambios</button>
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>BOL</th>
@@ -31,16 +31,20 @@
                         <th>No Pipa</th>
                         <th>Cliente</th>
                         <th>Destino</th>
+                        <!--
                         <th>Transportista</th>
+                        -->
                         <th>Estatus</th>
+                        <!--
                         <th>Litros</th>
+                        -->
                         <th>Cruce</th>
-                        <?php if(Auth::user()->tipo_usuario == 1): ?> 
-                        <th>Precio</th>
-                        <th>Total</th>
                         <th>Fecha Salida</th>
                         <th>Fecha Entrega</th>
                         <th>Fecha Descarga</th>
+                        <?php if(Auth::user()->tipo_usuario == 1): ?> 
+                        <th>Precio</th>
+                        <th>Total</th>
                         <?php endif; ?>
                         <th>Acciones</th>
                     </tr>
@@ -54,15 +58,17 @@
                             <td><?php echo e(\Carbon\Carbon::parse($logi->fecha)->format('d-m-Y')); ?></td>
                             <td><?php echo e($logi->linea); ?></td>
                             <td><?php echo e($logi->no_pipa); ?></td>
+
                             <td>
                                 <input type="hidden" name="logistica[<?php echo e($logi->id); ?>][id]" value="<?php echo e($logi->id); ?>">
                                 <select name="logistica[<?php echo e($logi->id); ?>][cliente]" class="form-control cliente-select" <?php echo e($logi->cliente ? 'disabled' : ''); ?>>
-                                    <option value="">Selecciona un cliente</option>
+                                    <option value="">Selecciona un cliente</option>|111112
                                     <?php $__currentLoopData = $clientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cliente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($cliente->id); ?>" <?php echo e($logi->cliente == $cliente->id ? 'selected' : ''); ?>><?php echo e($cliente->NOMBRE_COMERCIAL); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </td>
+
                             <td>
                                 <select name="logistica[<?php echo e($logi->id); ?>][destino]" class="form-control destino-select" <?php echo e($logi->destino_id ? 'disabled' : ''); ?>>
                                     <option value="">Selecciona un destino</option>
@@ -72,6 +78,8 @@
                                     <option value="5" <?php echo e($logi->destino_id == 5 ? 'selected' : ''); ?>>FOB</option>
                                 </select>
                             </td>
+
+                            <!--
                             <td>
                                 <select name="logistica[<?php echo e($logi->id); ?>][transportista]" class="form-control transportista-select" <?php echo e($logi->transportista_id ? 'disabled' : ''); ?>>
                                     <option value="">Selecciona un transportista</option>
@@ -80,6 +88,8 @@
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </td>
+                            -->
+
                             <td class="status">
                                 <select name="logistica[<?php echo e($logi->id); ?>][status]" class="form-control status-select">
                                     <option value="pendiente" <?php echo e($logi->status == 'pendiente' ? 'selected' : ''); ?>>Pendiente</option>
@@ -87,13 +97,23 @@
                                     <option value="descargada" <?php echo e($logi->status == 'descargada' ? 'selected' : ''); ?>>Descargada</option>
                                 </select>
                             </td>
-                            <td class="litros" id="litros-<?php echo e($logi->id); ?>"><?php echo e($logi->litros); ?></td>
+
+                            <!--
+                            <td class="ocultar-columna"><?php echo e(number_format($logi->litros)); ?></td>
+                            -->
+
                             <td class="cruce">
                                 <select name="logistica[<?php echo e($logi->id); ?>][cruce]" class="form-control cruce-select">
                                     <option value="rojo" <?php echo e($logi->cruce == 'rojo' ? 'selected' : ''); ?>>Rojo</option>
                                     <option value="verde" <?php echo e($logi->cruce == 'verde' ? 'selected' : ''); ?>>Verde</option>
                                 </select>
                             </td>
+
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_salida]" class="form-control" value="<?php echo e($logi->fecha_salida); ?>"></td>
+
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_entrega]" class="form-control" value="<?php echo e($logi->fecha_entrega); ?>"></td>
+
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_descarga]" class="form-control" value="<?php echo e($logi->fecha_descarga); ?>"></td>
 
                             <?php if(Auth::user()->tipo_usuario == 1): ?> 
                             <td>
@@ -109,21 +129,19 @@
 
                                 <?php endif; ?>
                             </td>
+
                             <td id="total-<?php echo e($logi->id); ?>">
                                 <?php if(isset($totales[$logi->id])): ?>
                                     $<?php echo e($totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : ''); ?>
 
                                 <?php endif; ?>
-                            </td>
-
-                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_salida]" class="form-control" value="<?php echo e($logi->fecha_salida); ?>"></td>
-                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_entrega]" class="form-control" value="<?php echo e($logi->fecha_entrega); ?>"></td>
-                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_descarga]" class="form-control" value="<?php echo e($logi->fecha_descarga); ?>"></td>
+                            </td>   
                             <?php endif; ?>
-                            
+
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
+                            
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
@@ -136,6 +154,7 @@
 
 <?php $__env->startPush('styles'); ?>
 <style>
+    
     .table-responsive {
         overflow-x: auto;
     }
@@ -145,7 +164,7 @@
         max-width: 100%;
         margin-bottom: 1rem;
         background-color: transparent;
-        font-size: 0.8rem; /* Reduce the font size */
+        font-size: 0.8rem; 
     }
 
     .table th, .table td {
@@ -154,7 +173,7 @@
     }
 
     .form-control {
-        font-size: 0.8rem; /* Reduce the font size for form controls */
+        font-size: 0.8rem; 
     }
 
     .status.pendiente {
@@ -183,8 +202,14 @@
     }
 
     .btn {
-        font-size: 0.8rem; /* Reduce the font size for buttons */
+        font-size: 0.8rem;
     }
+
+    .ocultar-columna {
+        width: 0;
+        height: 0;
+    }
+
 </style>
 <?php $__env->stopPush(); ?>
 

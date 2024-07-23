@@ -19,7 +19,7 @@
         @csrf
         <button type="submit" class="btn btn-success mb-3">Guardar Todos los Cambios</button>
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>BOL</th>
@@ -30,16 +30,20 @@
                         <th>No Pipa</th>
                         <th>Cliente</th>
                         <th>Destino</th>
+                        <!--
                         <th>Transportista</th>
+                        -->
                         <th>Estatus</th>
+                        <!--
                         <th>Litros</th>
+                        -->
                         <th>Cruce</th>
-                        @if (Auth::user()->tipo_usuario == 1) 
-                        <th>Precio</th>
-                        <th>Total</th>
                         <th>Fecha Salida</th>
                         <th>Fecha Entrega</th>
                         <th>Fecha Descarga</th>
+                        @if (Auth::user()->tipo_usuario == 1) 
+                        <th>Precio</th>
+                        <th>Total</th>
                         @endif
                         <th>Acciones</th>
                     </tr>
@@ -53,15 +57,17 @@
                             <td>{{ \Carbon\Carbon::parse($logi->fecha)->format('d-m-Y') }}</td>
                             <td>{{ $logi->linea }}</td>
                             <td>{{ $logi->no_pipa }}</td>
+
                             <td>
                                 <input type="hidden" name="logistica[{{ $logi->id }}][id]" value="{{ $logi->id }}">
                                 <select name="logistica[{{ $logi->id }}][cliente]" class="form-control cliente-select" {{ $logi->cliente ? 'disabled' : '' }}>
-                                    <option value="">Selecciona un cliente</option>
+                                    <option value="">Selecciona un cliente</option>|111112
                                     @foreach($clientes as $cliente)
                                         <option value="{{ $cliente->id }}" {{ $logi->cliente == $cliente->id ? 'selected' : '' }}>{{ $cliente->NOMBRE_COMERCIAL }}</option>
                                     @endforeach
                                 </select>
                             </td>
+
                             <td>
                                 <select name="logistica[{{ $logi->id }}][destino]" class="form-control destino-select" {{ $logi->destino_id ? 'disabled' : '' }}>
                                     <option value="">Selecciona un destino</option>
@@ -71,6 +77,8 @@
                                     <option value="5" {{ $logi->destino_id == 5 ? 'selected' : '' }}>FOB</option>
                                 </select>
                             </td>
+
+                            <!--
                             <td>
                                 <select name="logistica[{{ $logi->id }}][transportista]" class="form-control transportista-select" {{ $logi->transportista_id ? 'disabled' : '' }}>
                                     <option value="">Selecciona un transportista</option>
@@ -79,6 +87,8 @@
                                     @endforeach
                                 </select>
                             </td>
+                            -->
+
                             <td class="status">
                                 <select name="logistica[{{ $logi->id }}][status]" class="form-control status-select">
                                     <option value="pendiente" {{ $logi->status == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
@@ -86,13 +96,23 @@
                                     <option value="descargada" {{ $logi->status == 'descargada' ? 'selected' : '' }}>Descargada</option>
                                 </select>
                             </td>
-                            <td class="litros" id="litros-{{ $logi->id }}">{{ $logi->litros }}</td>
+
+                            <!--
+                            <td class="ocultar-columna">{{ number_format($logi->litros) }}</td>
+                            -->
+
                             <td class="cruce">
                                 <select name="logistica[{{ $logi->id }}][cruce]" class="form-control cruce-select">
                                     <option value="rojo" {{ $logi->cruce == 'rojo' ? 'selected' : '' }}>Rojo</option>
                                     <option value="verde" {{ $logi->cruce == 'verde' ? 'selected' : '' }}>Verde</option>
                                 </select>
                             </td>
+
+                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_salida]" class="form-control" value="{{ $logi->fecha_salida }}"></td>
+
+                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_entrega]" class="form-control" value="{{ $logi->fecha_entrega }}"></td>
+
+                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_descarga]" class="form-control" value="{{ $logi->fecha_descarga }}"></td>
 
                             @if (Auth::user()->tipo_usuario == 1) 
                             <td>
@@ -107,20 +127,18 @@
                                     {{ $logi->precio }}
                                 @endif
                             </td>
+
                             <td id="total-{{ $logi->id }}">
                                 @if (isset($totales[$logi->id]))
                                     ${{ $totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : '' }}
                                 @endif
-                            </td>
-
-                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_salida]" class="form-control" value="{{ $logi->fecha_salida }}"></td>
-                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_entrega]" class="form-control" value="{{ $logi->fecha_entrega }}"></td>
-                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_descarga]" class="form-control" value="{{ $logi->fecha_descarga }}"></td>
+                            </td>   
                             @endif
-                            
+
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
+                            
                         </tr>
                     @endforeach
                 </tbody>
@@ -133,6 +151,7 @@
 
 @push('styles')
 <style>
+    
     .table-responsive {
         overflow-x: auto;
     }
@@ -142,7 +161,7 @@
         max-width: 100%;
         margin-bottom: 1rem;
         background-color: transparent;
-        font-size: 0.8rem; /* Reduce the font size */
+        font-size: 0.8rem; 
     }
 
     .table th, .table td {
@@ -151,7 +170,7 @@
     }
 
     .form-control {
-        font-size: 0.8rem; /* Reduce the font size for form controls */
+        font-size: 0.8rem; 
     }
 
     .status.pendiente {
@@ -180,8 +199,14 @@
     }
 
     .btn {
-        font-size: 0.8rem; /* Reduce the font size for buttons */
+        font-size: 0.8rem;
     }
+
+    .ocultar-columna {
+        width: 0;
+        height: 0;
+    }
+
 </style>
 @endpush
 

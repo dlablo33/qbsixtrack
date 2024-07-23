@@ -107,14 +107,13 @@
         <form action="{{ route('bluewi.index') }}" method="GET" class="filter-form">
             <div class="form-group d-flex align-items-center">
                 <label for="filter" class="filter-label">Ordenes sin BOL</label>
-                <input type="checkbox" id="filter" name="filter" value="1" {{ request('filter') ? 'checked' : '' }} class="toggle-checkbox">
+                <input type="checkbox" id="filter" name="filter" value="1" {{ request('filter') ? 'checked' : '' }} class="toggle-checkbox" onchange="this.form.submit()">
                 <label for="filter"></label>
-                <button type="submit" class="btn btn-primary apply-filter-btn ml-2">Aplicar</button>
             </div>
         </form>
 
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table id="example1" class="table table-striped">
                 <thead>
                     <tr>
                         <th>Order Number</th>
@@ -123,16 +122,22 @@
                         <th>Order Type</th>
                         <th>Status</th>
                         <th>BOL Date</th>
+                        <!--
                         <th>Position Holder</th>
                         <th>Supplier</th>
                         <th>Customer</th>
                         <th>Destination</th>
+                        -->
                         <th>Carrier</th>
+                        <!--
                         <th>PO</th>
                         <th>Truck</th>
+                        -->
                         <th>Trailer</th>
+                        <!--
                         <th>Bay</th>
                         <th>Product</th>
+                        -->
                         <th>Scheduled Amount (USG)</th>
                         <th>Gross(USG)</th>
                         <th>Net(USG)</th>
@@ -150,16 +155,22 @@
                             <td>{{ $row->order_type }}</td>
                             <td>{{ $row->status }}</td>
                             <td>{{ $row->bol_date }}</td>
+                            <!--
                             <td>{{ $row->position_holder }}</td>
                             <td>{{ $row->supplier }}</td>
                             <td>{{ $row->customer }}</td>
                             <td>{{ $row->destination }}</td>
+                            -->
                             <td>{{ $row->carrier }}</td>
+                            <!--
                             <td>{{ $row->po }}</td>
                             <td>{{ $row->truck }}</td>
+                            -->
                             <td>{{ $row->trailer }}</td>
+                            <!--
                             <td>{{ $row->bay }}</td>
                             <td>{{ $row->product }}</td>
+                             -->
                             <td>{{ $row->scheduled_amount_usg }}</td>
                             <td>{{ $row->gross_usg }}</td>
                             <td>{{ $row->net_usg }}</td>

@@ -23,7 +23,7 @@ class Factura extends Model
         'Numero_Factura',
         'total',
         'created_at',
-        'update_at',
+        'updated_at',
         'code_factura',
         'estatus'
 

@@ -190,7 +190,7 @@
                         <ul class="nav nav-treeview">
                         @if (Auth::user()->tipo_usuario == 1)  
                             <li class="nav-item ml-2">
-                            <a href="{{ route('invoice.index') }}" class="nav-link">
+                            <a href="{{ route('facturas.index') }}" class="nav-link">
                                     <p>Remisiones Y Facturas</p>
                                 </a>
                             </li>
@@ -294,7 +294,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                        @if (Auth::user()->tipo_usuario >= 3)  
+                        @if (Auth::user()->tipo_usuario >= 1)  
                             <li class="nav-item ml-2">
                             <a href="{{Route('logistica.index')}}" class="nav-link">
                                     <p>Logistica</p>

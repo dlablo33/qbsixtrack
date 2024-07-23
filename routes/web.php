@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransporteController;
 use App\Http\Controllers\BolController;
 use App\Http\Controllers\LogisticaController;
+use App\Http\Controllers\FacturaController;
 
 // ==============================================================================================================================================================================================
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
@@ -235,3 +236,11 @@ Route::post('/logistica/asignar-cliente', [LogisticaController::class, 'asignarC
 Route::get('logistica/filterByWeek', 'LogisticaController@filterByWeek')->name('logistica.filterByWeek');
 Route::post('/logistica/guardar-todos', [LogisticaController::class, 'guardarTodos'])->name('logistica.guardar_todos');
 Route::post('/calcular-precio', [LogisticaController::class, 'calcularPrecio'])->name('logistica.calcularPrecio');
+
+// ================================================================================================================================================================================================
+Route::get('/factyremi', [FacturaController::class, 'index'])->name('factura.index');
+Route::post('factyremi/transfer', [FacturaController::class, 'transferLogisticaToFactura'])->name('facturas.transferLogisticaToFactura');
+Route::get('/factyremi', [FacturaController::class, 'index'])->name('facturas.index');
+Route::get('/facturas/{id}/pdf', [FacturaController::class, 'showPdf'])->name('facturas.showPdf');
+Route::delete('/facturas/{id}', [FacturaController::class, 'destroy'])->name('facturas.delete');
+Route::post('/facturas/{id}/link', [FacturaController::class, 'link'])->name('facturas.link');

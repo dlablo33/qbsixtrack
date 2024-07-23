@@ -10,33 +10,39 @@ use App\Destino;
 use App\Transportista;
 use App\Marchant;
 use Carbon\Carbon; 
+use App\Mail\InvoiceMail;
 
 class LogisticaController extends Controller
 {
     public function index()
     {
+        ini_set('max_execution_time', 500);
+
+        // Ordena las instancias de Logistica por fecha de manera descendente
         $logis = Logistica::orderBy('fecha', 'desc')->get();
         $clientes = Customer::all();
         $transportistas = Transportista::all();
         $destinos = Destino::all();
-    
+
         $precios = [];
         $totales = [];
-    
+
         foreach ($logis as $logi) {
+            // Obtén la semana del año a partir de la fecha del registro de Logistica
             $semana = Carbon::parse($logi->fecha)->weekOfYear;
             $cliente = Customer::find($logi->cliente);
-    
+
             if ($cliente) {
                 $clienteCveCte = $cliente->CVE_CTE;
+                // Busca los precios para el cliente y semana específica
                 $precios[$logi->id] = Marchant::where('cliente_id', $clienteCveCte)
-                    ->where('semana',">=", $semana)
+                    ->where('semana', '>=', $semana)
                     ->pluck('precio', 'id');
                 
-                // Calcula el total solo si hay un precio asignado
                 if (isset($precios[$logi->id])) {
                     $precioSeleccionado = $logi->precio ?? 0;
                     $litros = $logi->litros;
+                    // Calcula el total multiplicando el precio por los litros
                     $totales[$logi->id] = $precioSeleccionado * $litros;
                 } else {
                     $totales[$logi->id] = null;
@@ -46,66 +52,74 @@ class LogisticaController extends Controller
                 $totales[$logi->id] = null;
             }
         }
-    
-        $data['menu'] = 'logistica';
-        $data['submenu'] = '';
-        $data['logis'] = $logis;
-        $data['clientes'] = $clientes;
-        $data['transportistas'] = $transportistas;
-        $data['destinos'] = $destinos;
-        $data['precios'] = $precios;
-        $data['totales'] = $totales;
-    
+
+        // Prepara los datos para la vista
+        $data = [
+            'menu' => 'logistica',
+            'submenu' => '',
+            'logis' => $logis,
+            'clientes' => $clientes,
+            'transportistas' => $transportistas,
+            'destinos' => $destinos,
+            'precios' => $precios,
+            'totales' => $totales
+        ];
+
+        // Retorna la vista con los datos
         return view('logistica.index', $data);
     }
 
     public function transferData()
     {
-        ini_set('max_execution_time', 600);
-        // Obtener todos los registros de bluewi
-        $bluewiRecords = Bluewi::all();
-    
-        // Iterar sobre cada registro de bluewi y crear un nuevo registro en logistica si no existe y bol no es nulo
-        foreach ($bluewiRecords as $record) {
-            // Verificar si el campo bol_number está definido y no es nulo
-            if (!empty($record->bol_number)) {
-                // Verificar si el registro ya existe en logistica
-                $exists = Logistica::where('bol', $record->bol_number)
-                                    ->where('order_number', $record->order_number)
-                                    ->exists();
-    
-        if (!$exists) {
-            $transportistaId = null;
-            if (isset($record->carrier)) {
-                if ($record->carrier == 'JOSE LUIS LUMBRERAS') {
-                    $transportistaId = 2; // ID del transportista XLV (Liji)
-                } elseif ($record->carrier == 'Autotransportes SK') {
-                    $transportistaId = 1; // ID del transportista SK
+    ini_set('max_execution_time', 600);
+    // Obtener todos los registros de bluewi
+    $bluewiRecords = Bluewi::all();
+
+    // Iterar sobre cada registro de bluewi y crear un nuevo registro en logistica si no existe y bol no es nulo
+    foreach ($bluewiRecords as $record) {
+        // Verificar si el campo bol_number está definido y no es nulo
+        if (!empty($record->bol_number)) {
+            // Verificar si el registro ya existe en logistica
+            $exists = Logistica::where('bol', $record->bol_number)
+                                ->where('order_number', $record->order_number)
+                                ->exists();
+
+            if (!$exists) {
+                // Inicializar la variable transportistaId
+                $transportistaId = null;
+                
+                if (isset($record->carrier)) {
+                    if ($record->carrier == 'JOSE LUIS LUMBRERAS') {
+                        $transportistaId = 2; // ID del transportista XLV (Liji)
+                    } elseif ($record->carrier == 'Autotransportes SK') {
+                        $transportistaId = 1; // ID del transportista SK
+                    } elseif ($record->carrier == 'TOKKO CARRIERS DE MEXICO SA DE CV') {
+                        $transportistaId = 3; // ID del transportista TOKKO
+                    }
                 }
-            }
-    
-                    Logistica::create([
-                        'bol' => $record->bol_number,
-                        'order_number' => $record->order_number ?? '',
-                        'semana' => null,
-                        'fecha' => $record->bol_date,
-                        'linea' => $record->carrier ?? '',
-                        'no_pipa' => $record->trailer ?? '',
-                        'cliente' => null,
-                        'destino' => null,
-                        'transportista_id' => $transportistaId,
-                        'destino_id' => null,
-                        'status' => null,
-                        'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,
-                        'cruce' => null,
-                    ]);
-                }
+
+                Logistica::create([
+                    'bol' => $record->bol_number,
+                    'order_number' => $record->order_number ?? '',
+                    'semana' => Carbon::parse($record->bol_date)->weekOfYear,
+                    'fecha' => $record->bol_date,
+                    'linea' => $record->carrier ?? '',
+                    'no_pipa' => $record->trailer ?? '',
+                    'cliente' => null,
+                    'destino' => null,
+                    'transportista_id' => $transportistaId,
+                    'destino_id' => null,
+                    'status' => "pendiente",
+                    'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,
+                    'cruce' => "rojo",
+                ]);
             }
         }
-    
-        return redirect()->route('logistica.index')->with('success', 'Datos transferidos con éxito');
     }
-    
+
+    return redirect()->route('logistica.index')->with('success', 'Datos transferidos con éxito');
+    }
+
     public function asignarCliente(Request $request)
     {
         // Validar la solicitud
