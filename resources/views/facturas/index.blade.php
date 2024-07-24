@@ -22,7 +22,7 @@
         <th>Nombre Cliente</th>
         <th>Nombre Producto</th>
         <th>Producto ID</th>
-        <th>Numero de Invoice</th>
+        <!--<th>Numero de Invoice</th>-->
         <th>Bol</th>
         <th>Trailer</th>
         <th>Estatus</th>
@@ -43,7 +43,7 @@
           <td>{{ $factura->cliente_name }}</td>
           <td>{{ $factura->producto_name }}</td>
           <td>{{ $factura->producto_id }}</td>
-          <td>{{ $factura->Numero_Factura }}</td>
+          <!--<td>{{ $factura->Numero_Factura }}</td>-->
           <td>{{ $factura->bol }}</td>
           <td>{{ $factura->trailer }}</td>
           <td>{{ $factura->estatus }}</td>
@@ -54,7 +54,7 @@
           <td>
             <a href="{{ route('facturas.showPdf', ['id' => $factura->id]) }}" class="btn btn-sm btn-info">Ver PDF</a>
             <!--<a href="" class="btn btn-sm btn-info" data-toggle="modal" data-target="#sendEmailModal-{{ $factura->id }}">Enviar PDF</a>-->
-            @if ($factura->code_factura == null)
+            @if ($factura->Numero_Factura == null)
               <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkInvoiceModal-{{ $factura->id }}">Enlazar Factura</button>
             @endif
             <form action="{{ route('facturas.delete', ['id' => $factura->id]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta remisión?')">
@@ -64,7 +64,6 @@
             </form>
           </td>
         </tr>
-
         
         <div class="modal fade" id="linkInvoiceModal-{{ $factura->id }}" tabindex="-1" role="dialog" aria-labelledby="linkInvoiceModalLabel-{{ $factura->id }}" aria-hidden="true">
           <div class="modal-dialog" role="document">

@@ -22,7 +22,7 @@
         <th>Nombre Cliente</th>
         <th>Nombre Producto</th>
         <th>Producto ID</th>
-        <th>Numero de Invoice</th>
+        <!--<th>Numero de Invoice</th>-->
         <th>Bol</th>
         <th>Trailer</th>
         <th>Estatus</th>
@@ -43,7 +43,7 @@
           <td><?php echo e($factura->cliente_name); ?></td>
           <td><?php echo e($factura->producto_name); ?></td>
           <td><?php echo e($factura->producto_id); ?></td>
-          <td><?php echo e($factura->Numero_Factura); ?></td>
+          <!--<td><?php echo e($factura->Numero_Factura); ?></td>-->
           <td><?php echo e($factura->bol); ?></td>
           <td><?php echo e($factura->trailer); ?></td>
           <td><?php echo e($factura->estatus); ?></td>
@@ -54,7 +54,7 @@
           <td>
             <a href="<?php echo e(route('facturas.showPdf', ['id' => $factura->id])); ?>" class="btn btn-sm btn-info">Ver PDF</a>
             <!--<a href="" class="btn btn-sm btn-info" data-toggle="modal" data-target="#sendEmailModal-<?php echo e($factura->id); ?>">Enviar PDF</a>-->
-            <?php if($factura->code_factura == null): ?>
+            <?php if($factura->Numero_Factura == null): ?>
               <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkInvoiceModal-<?php echo e($factura->id); ?>">Enlazar Factura</button>
             <?php endif; ?>
             <form action="<?php echo e(route('facturas.delete', ['id' => $factura->id])); ?>" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta remisión?')">
@@ -64,7 +64,6 @@
             </form>
           </td>
         </tr>
-
         
         <div class="modal fade" id="linkInvoiceModal-<?php echo e($factura->id); ?>" tabindex="-1" role="dialog" aria-labelledby="linkInvoiceModalLabel-<?php echo e($factura->id); ?>" aria-hidden="true">
           <div class="modal-dialog" role="document">

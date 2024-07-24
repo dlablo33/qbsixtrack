@@ -155,7 +155,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
-                                <a href="<?php echo e(route('invoice.invoice-list')); ?>" class="nav-link">
+                                <a href="<?php echo e(route('moleculas.molecula1')); ?>" class="nav-link">
                                     <p>Invoice</p>
                                 </a>
                             </li>
