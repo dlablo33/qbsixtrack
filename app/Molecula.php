@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class Molecula extends Model
 {
-    protected $table = 'Molecula1';
+    protected $table = 'molecula1';
 
     protected $fillable = [
         "id",

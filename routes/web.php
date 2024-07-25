@@ -249,14 +249,7 @@ Route::post('/facturas/{id}/link', [FacturaController::class, 'link'])->name('fa
 //=================================================================================================================================================
 Route::resource('moleculas', MoleculaController::class);
 Route::post('/facturas/sync-bluewi', [FacturaController::class, 'syncBluewi'])->name('facturas.syncBluewi');
-Route::get('/molecula1', [MoleculaController::class, 'calcularMolecula'])->name('moleculas.molecula1');
-Route::get('/moleculas', [MoleculaController::class, 'index'])->name('moleculas.index');
-Route::post('/moleculas/calcular', [MoleculaController::class, 'calcularTotal'])->name('moleculas.calcularTotal');
-Route::get('moleculas/molecula1', function () {
-  return view('moleculas.molecula1');
-})->name('moleculas.index');
-
-Route::post('moleculas/calcularMolecula', [MoleculaController::class, 'calcularMolecula'])->name('moleculas.calcularMolecula');
-Route::post('moleculas/transferLogisticaToMolecula', [MoleculaController::class, 'transferLogisticaToMolecula'])->name('moleculas.transferLogisticaToMolecula');
-Route::get('/molecula1', [MoleculaController::class, 'showMolecula1'])->name('moleculas.molecula1');
-Route::post('/moleculas/transfer', [MoleculaController::class, 'transferLogisticaToMolecula'])->name('moleculas.transferLogisticaToMolecula');
+Route::get('moleculas', [MoleculaController::class, 'index'])->name('moleculas.index');
+Route::get('moleculas/create', [MoleculaController::class, 'create'])->name('moleculas.create');
+Route::post('moleculas', [MoleculaController::class, 'store'])->name('moleculas.store');
+Route::post('moleculas/transfer', [MoleculaController::class, 'transferLogisticaToMolecula'])->name('moleculas.transfer');

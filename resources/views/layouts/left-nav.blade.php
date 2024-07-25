@@ -138,7 +138,7 @@
                             @endif
                         </ul>
                     </li>
- <!--=============================================================================================================================================================================================== -->               
+<!--=============================================================================================================================================================================================== -->               
 
 <!--=============================================================================================================================================================================================== -->               
 
@@ -153,24 +153,26 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
-                                <a href="{{ route('moleculas.molecula1') }}" class="nav-link">
-                                    <p>Invoice</p>
+                                <a href="{{ route('moleculas.index') }}" class="nav-link">
+                                    <p>Molecula 1</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item ml-2">
+                                <a href="{{ route('invoice.mole2') }}" class="nav-link">
+                                    <p>Molecula 2</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item ml-2">
+                                <a href="{{ route('invoice.mole3') }}" class="nav-link">
+                                    <p>Molecula 3</p>
                                 </a>
                             </li>
 
                             <li class="nav-item ml-2">
                                 <a href="" class="nav-link">
                                     <p>Agente Aduanal</p>
-                                </a>
-                            </li>
-                            <li class="nav-item ml-2">
-                                <a href="{{ route('invoice.mole2') }}" class="nav-link">
-                                    <p>Molecula 2</p>
-                                </a>
-                            </li>
-                            <li class="nav-item ml-2">
-                                <a href="{{ route('invoice.mole3') }}" class="nav-link">
-                                    <p>Molecula 3</p>
                                 </a>
                             </li>
 
