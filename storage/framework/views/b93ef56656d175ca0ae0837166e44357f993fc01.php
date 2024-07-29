@@ -18,7 +18,7 @@
         </div>
     <?php endif; ?>
 
-    <form action="<?php echo e(route('moleculas.transfer')); ?>" method="POST">
+    <form action="" method="POST">
         <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-primary">Transferir Datos de Logística a Moléculas</button>
     </form>
@@ -31,23 +31,19 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Molécula</th>
                     <th>Precio</th>
                     <th>Usuario</th>
                     <th>Fecha de Creación</th>
-                    <th>Fecha de Actualización</th>
                 </tr>
             </thead>
             <tbody>
                 <?php $__currentLoopData = $moleculas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $molecula): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td><?php echo e($molecula->id); ?></td>
                         <td><?php echo e($molecula->molecula); ?></td>
                         <td><?php echo e(number_format($molecula->precio, 2, '.', ',')); ?></td>
                         <td><?php echo e($molecula->usuario); ?></td>
                         <td><?php echo e($molecula->created_at); ?></td>
-                        <td><?php echo e($molecula->updated_at); ?></td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>

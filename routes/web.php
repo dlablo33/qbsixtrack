@@ -247,9 +247,12 @@ Route::delete('/facturas/{id}', [FacturaController::class, 'destroy'])->name('fa
 Route::post('/facturas/{id}/link', [FacturaController::class, 'link'])->name('facturas.link');
 
 //=================================================================================================================================================
-Route::resource('moleculas', MoleculaController::class);
 Route::post('/facturas/sync-bluewi', [FacturaController::class, 'syncBluewi'])->name('facturas.syncBluewi');
-Route::get('moleculas', [MoleculaController::class, 'index'])->name('moleculas.index');
-Route::get('moleculas/create', [MoleculaController::class, 'create'])->name('moleculas.create');
-Route::post('moleculas', [MoleculaController::class, 'store'])->name('moleculas.store');
-Route::post('moleculas/transfer', [MoleculaController::class, 'transferLogisticaToMolecula'])->name('moleculas.transfer');
+Route::get('/moleculas', [MoleculaController::class, 'index'])->name('moleculas.index');
+Route::get('/moleculas/molecula1', [MoleculaController::class, 'molecula1'])->name('moleculas.molecula1');
+Route::post('/moleculas/migrate', [MoleculaController::class, 'migrateLogisticaToMolecula1'])->name('moleculas.migrateLogisticaToMolecula1');
+Route::get('/moleculas/create', [MoleculaController::class, 'create'])->name('moleculas.create');
+Route::post('/moleculas/store', [MoleculaController::class, 'store'])->name('moleculas.store');
+Route::get('/molecula1', [MoleculaController::class, 'showMolecula1'])->name('molecula1.show');
+Route::post('/moleculas/calculate-best-options', [MoleculaController::class, 'calculateBestOptions'])->name('moleculas.calculateBestOptions');
+

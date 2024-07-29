@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form action="{{ route('moleculas.transfer') }}" method="POST">
+    <form action="" method="POST">
         @csrf
         <button type="submit" class="btn btn-primary">Transferir Datos de Logística a Moléculas</button>
     </form>
@@ -29,23 +29,19 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Molécula</th>
                     <th>Precio</th>
                     <th>Usuario</th>
                     <th>Fecha de Creación</th>
-                    <th>Fecha de Actualización</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($moleculas as $molecula)
                     <tr>
-                        <td>{{ $molecula->id }}</td>
                         <td>{{ $molecula->molecula }}</td>
                         <td>{{ number_format($molecula->precio, 2, '.', ',') }}</td>
                         <td>{{ $molecula->usuario }}</td>
                         <td>{{ $molecula->created_at }}</td>
-                        <td>{{ $molecula->updated_at }}</td>
                     </tr>
                 @endforeach
             </tbody>

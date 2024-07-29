@@ -11,16 +11,13 @@ class Molecula extends Model
 
     protected $fillable = [
         "id",
-        "molecula1",
-        "bol",
+        "bol_number",
         "litros",
-        "rate1",
+        "rate",
+        "total",
         "created_at",
-        "update_at",
-        "total1",
-        "ferjr",
-        "total2",
-        "total_final"
+        "updated_at",
+        "estatus"
     ];
 
     

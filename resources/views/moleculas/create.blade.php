@@ -20,7 +20,10 @@
         @csrf
         <div class="form-group">
             <label for="molecula">Molécula</label>
-            <input type="number" class="form-control" id="molecula" name="molecula" required>
+            <select name="molecula" id="molecula" class="form-control">
+                <option value="1">Molécula 1</option>
+                <option value="2">Molécula 2</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="precio">Precio</label>

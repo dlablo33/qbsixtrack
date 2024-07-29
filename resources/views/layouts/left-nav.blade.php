@@ -153,19 +153,19 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item ml-2">
-                                <a href="{{ route('moleculas.index') }}" class="nav-link">
+                                <a href="{{ route('moleculas.molecula1')}}" class="nav-link">
                                     <p>Molecula 1</p>
                                 </a>
                             </li>
 
                             <li class="nav-item ml-2">
-                                <a href="{{ route('invoice.mole2') }}" class="nav-link">
+                                <a href="" class="nav-link">
                                     <p>Molecula 2</p>
                                 </a>
                             </li>
 
                             <li class="nav-item ml-2">
-                                <a href="{{ route('invoice.mole3') }}" class="nav-link">
+                                <a href="" class="nav-link">
                                     <p>Molecula 3</p>
                                 </a>
                             </li>
@@ -258,15 +258,20 @@
                                     </a>
                                 </li>
                                 <li class="nav-item ml-2">
-                                <a href="{{ route('transporte.index') }}" class="nav-link">
+                                    <a href="{{ route('transporte.index') }}" class="nav-link">
                                     <p>Tarifa Trasporte</p>
+                                    </a>
+                                </li>
+                            <li class="nav-item ml-2">
+                                <a href="{{ route('moleculas.index') }}" class="nav-link">
+                                    <p>Precios Molecula</p>
                                 </a>
                             </li>
                             </ul>
                         </li>
                     @endif
 <!--=============================================================================================================================================================================================== -->               
-<li class="nav-item has-treeview">
+    <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-cash-register"></i>
                             <p>
