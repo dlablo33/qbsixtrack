@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Banco extends Model
+class transacciones extends Model
 {
-    protected $table = "bancos";
+    protected $table = "transacciones";
     protected $fillable = 
     [ 
     "id",
@@ -14,5 +14,4 @@ class Banco extends Model
     "created_at",
     "updated_at",
     ];
-    
 }

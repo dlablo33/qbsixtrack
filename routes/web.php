@@ -15,6 +15,7 @@ use App\Http\Controllers\BolController;
 use App\Http\Controllers\LogisticaController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\MoleculaController;
+use App\Http\Controllers\AdministracionController;
 
 // ==============================================================================================================================================================================================
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
@@ -256,3 +257,10 @@ Route::post('/moleculas/store', [MoleculaController::class, 'store'])->name('mol
 Route::get('/molecula1', [MoleculaController::class, 'showMolecula1'])->name('molecula1.show');
 Route::post('/moleculas/calculate-best-options', [MoleculaController::class, 'calculateBestOptions'])->name('moleculas.calculateBestOptions');
 
+// =============================================================================================================================================0===
+
+Route::get('/Administracion', [AdministracionController::class, 'index'])->name('Admin.index');
+Route::get('/administracion/depositar', [AdministracionController::class, 'showDepositForm'])->name('Admin.showDepositForm');
+Route::post('/administracion/depositar', [AdministracionController::class, 'processDeposit'])->name('Admin.processDeposit');
+Route::get('/admin/cliente/{id}/bancos', [AdministracionController::class, 'showClientBanks'])->name('Admin.showClientBanks');
+Route::get('/clientes/{id}/historial-depositos', [AdministracionController::class, 'showDepositHistory'])->name('Admin.showDepositHistory');

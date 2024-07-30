@@ -282,7 +282,7 @@
                         <ul class="nav nav-treeview">
                         @if (Auth::user()->tipo_usuario == 1)  
                             <li class="nav-item ml-2">
-                            <a href="" class="nav-link">
+                            <a href="{{ route('Admin.index') }}" class="nav-link">
                                     <p>Bancos</p>
                                 </a>
                             </li>

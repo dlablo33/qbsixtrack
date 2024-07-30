@@ -273,7 +273,7 @@
                         </li>
                     <?php endif; ?>
 <!--=============================================================================================================================================================================================== -->               
-<li class="nav-item has-treeview">
+    <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-cash-register"></i>
                             <p>
@@ -284,7 +284,7 @@
                         <ul class="nav nav-treeview">
                         <?php if(Auth::user()->tipo_usuario == 1): ?>  
                             <li class="nav-item ml-2">
-                            <a href="" class="nav-link">
+                            <a href="<?php echo e(route('Admin.index')); ?>" class="nav-link">
                                     <p>Bancos</p>
                                 </a>
                             </li>
@@ -326,5 +326,4 @@
         </div>
         <!-- /.sidebar -->
     </div>
-</aside>
-<?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/layouts/left-nav.blade.php ENDPATH**/ ?>
+</aside><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/layouts/left-nav.blade.php ENDPATH**/ ?>
