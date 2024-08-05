@@ -23,4 +23,8 @@ class CustomerAdmin extends Model
         return $this->belongsToMany(Banco::class, 'cliente_banco', 'cliente_id', 'banco_id')
                     ->withPivot('saldo_mxn', 'saldo_usd');
     }
+    public function depositos()
+    {
+        return $this->hasMany(ClienteBanco::class, 'cliente_id', 'id');
+    }
 }

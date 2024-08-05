@@ -15,4 +15,10 @@ class Banco extends Model
     "updated_at",
     ];
     
+    public function depositos()
+    {
+        return $this->hasMany(ClienteBanco::class, 'banco_id');
+    }
+
+    
 }

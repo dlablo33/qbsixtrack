@@ -108,7 +108,7 @@
 
         <div class="form-group">
             <label for="cantidad">Cantidad</label>
-            <input type="number" name="cantidad" id="cantidad" class="form-control" required>
+            <input type="float" name="cantidad" id="cantidad" class="form-control" required>
         </div>
 
         <div class="form-group">

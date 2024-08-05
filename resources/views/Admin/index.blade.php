@@ -36,7 +36,6 @@
             @endforeach
         </tbody>
     </table>
-    <a href="{{ route('Admin.index') }}" class="btn btn-success mt-3 btn-animated">Volver</a>
 </div>
 @endsection
 

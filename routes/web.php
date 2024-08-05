@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\InvoiceController;
@@ -263,4 +264,9 @@ Route::get('/Administracion', [AdministracionController::class, 'index'])->name(
 Route::get('/administracion/depositar', [AdministracionController::class, 'showDepositForm'])->name('Admin.showDepositForm');
 Route::post('/administracion/depositar', [AdministracionController::class, 'processDeposit'])->name('Admin.processDeposit');
 Route::get('/admin/cliente/{id}/bancos', [AdministracionController::class, 'showClientBanks'])->name('Admin.showClientBanks');
-Route::get('/clientes/{id}/historial-depositos', [AdministracionController::class, 'showDepositHistory'])->name('Admin.showDepositHistory');
+Route::get('/admin/depositos_historial/{id}', [AdministracionController::class, 'showDepositHistory'])->name('Admin.showDepositHistory');
+
+Route::get('/devoluciones/{cliente_id}', [AdministracionController::class, 'showDevolucionesForm'])->name('showDevolucionesForm');
+Route::post('/refund-deposit', [AdministracionController::class, 'storeDevolucion'])->name('Admin.refundDeposit');
+
+

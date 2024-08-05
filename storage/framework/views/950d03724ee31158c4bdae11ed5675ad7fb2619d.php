@@ -37,7 +37,6 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </tbody>
     </table>
-    <a href="<?php echo e(route('Admin.index')); ?>" class="btn btn-success mt-3 btn-animated">Volver</a>
 </div>
 <?php $__env->stopSection(); ?>
 

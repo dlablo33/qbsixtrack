@@ -88,16 +88,16 @@
             <thead class="thead-custom">
                 <tr>
                     <th>Banco</th>
-                    <th>Saldo en MXN</th>
-                    <th>Saldo en USD</th>
+                    <th>Saldo Total en MXN</th>
+                    <th>Saldo Total en USD</th>
                 </tr>
             </thead>
             <tbody>
-                <?php $__currentLoopData = $cliente->bancos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $banco): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $totales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $total): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td><?php echo e($banco->banco); ?></td>
-                        <td>$<?php echo e(number_format($banco->pivot->saldo_mxn, 2, '.', ',')); ?></td>
-                        <td>$<?php echo e(number_format($banco->pivot->saldo_usd, 2, '.', ',')); ?></td>
+                        <td><?php echo e($total['banco']); ?></td>
+                        <td>$<?php echo e(number_format($total['saldo_mxn'], 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($total['saldo_usd'], 2, '.', ',')); ?></td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
@@ -109,7 +109,5 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
-
-
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/Admin/showClientBanks.blade.php ENDPATH**/ ?>

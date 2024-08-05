@@ -23,4 +23,15 @@ class ClienteBanco extends Model
     {
         return $this->belongsTo(Banco::class, 'banco_id');
     }
+
+    public function historial()
+    {
+        return $this->hasMany(Historial::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(CustomerAdmin::class, 'cliente_id');
+    }
+    
 }

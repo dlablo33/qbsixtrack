@@ -88,16 +88,16 @@
             <thead class="thead-custom">
                 <tr>
                     <th>Banco</th>
-                    <th>Saldo en MXN</th>
-                    <th>Saldo en USD</th>
+                    <th>Saldo Total en MXN</th>
+                    <th>Saldo Total en USD</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($cliente->bancos as $banco)
+                @foreach($totales as $total)
                     <tr>
-                        <td>{{ $banco->banco }}</td>
-                        <td>${{ number_format($banco->pivot->saldo_mxn, 2, '.', ',') }}</td>
-                        <td>${{ number_format($banco->pivot->saldo_usd, 2, '.', ',') }}</td>
+                        <td>{{ $total['banco'] }}</td>
+                        <td>${{ number_format($total['saldo_mxn'], 2, '.', ',') }}</td>
+                        <td>${{ number_format($total['saldo_usd'], 2, '.', ',') }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -109,5 +109,3 @@
     </div>
 </div>
 @endsection
-
-

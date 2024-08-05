@@ -30,6 +30,7 @@ console_command = 'php /var/www/html/artisan tinker'
   processes = ['app']
 
 [[vm]]
-  memory = '2gb'
+  memory = '4096MB'  # Aumenta la memoria a 4GB
   cpu_kind = 'shared'
-  cpus = 1
+  cpus = 2  # Aumenta los CPUs a 2
+
