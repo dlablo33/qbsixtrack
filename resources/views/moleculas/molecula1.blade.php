@@ -56,32 +56,32 @@
     </button>
 
     <!-- Ventana modal -->
-    <div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="calculateModalLabel">Calcular Mejores Opciones</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Formulario para introducir el presupuesto -->
-                    <form id="calculateForm" action="{{ route('moleculas.calculateBestOptions') }}" method="POST" class="mt-2">
-                        @csrf
-                        <div class="form-group">
-                            <label for="budget">Presupuesto:</label>
-                            <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Introduce el presupuesto" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Calcular</button>
-                    </form>
-
-                    <!-- Resultados de las mejores opciones -->
-                    <div id="results" class="mt-4"></div>
-                </div>
+<!-- Ventana modal -->
+<div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
+    <div class="modal-dialog custom-modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calculateModalLabel">Calcular Mejores Opciones</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para introducir el presupuesto -->
+                <form id="calculateForm" action="{{ route('moleculas.calculateBestOptions') }}" method="POST" class="mt-2">
+                    @csrf
+                    <div class="form-group">
+                        <label for="budget">Presupuesto:</label>
+                        <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Introduce el presupuesto" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calcular</button>
+                </form>
+                <!-- Resultados de las mejores opciones -->
+                <div id="results" class="mt-4"></div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Mensajes de éxito y error -->
     @if (session('success'))
@@ -153,4 +153,14 @@ document.getElementById('calculateForm').addEventListener('submit', function(eve
     });
 });
 </script>
+<style>
+    .custom-modal-dialog {
+        max-width: 80%; /* Ajusta el ancho máximo de la modal */
+        margin: 1.75rem auto; /* Ajusta el margen para centrar la modal */
+    }
+    
+    .modal-lg .modal-content {
+        width: 100%; /* Asegura que el contenido ocupa todo el ancho de la modal */
+    }
+</style>
 @endsection

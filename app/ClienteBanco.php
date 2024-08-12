@@ -16,7 +16,8 @@ class ClienteBanco extends Model
     "saldo_mxn",
     "saldo_usd",
     "created_at",
-    "updated_at"
+    "updated_at",
+    "asignado"
     ];
 
     public function banco()

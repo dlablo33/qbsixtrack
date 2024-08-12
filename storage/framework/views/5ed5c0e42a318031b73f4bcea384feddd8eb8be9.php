@@ -161,7 +161,7 @@
                             </li>
 
                             <li class="nav-item ml-2">
-                                <a href="" class="nav-link">
+                                <a href="<?php echo e(route('moleculas.molecula2')); ?>" class="nav-link">
                                     <p>Molecula 2</p>
                                 </a>
                             </li>
@@ -286,6 +286,11 @@
                             <li class="nav-item ml-2">
                             <a href="<?php echo e(route('Admin.index')); ?>" class="nav-link">
                                     <p>Bancos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                            <a href="<?php echo e(route('empresa_cuenta.index')); ?>" class="nav-link">
+                                    <p>Gastos</p>
                                 </a>
                             </li>
                             <?php endif; ?>

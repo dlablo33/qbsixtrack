@@ -159,7 +159,7 @@
                             </li>
 
                             <li class="nav-item ml-2">
-                                <a href="" class="nav-link">
+                                <a href="{{ route('moleculas.molecula2') }}" class="nav-link">
                                     <p>Molecula 2</p>
                                 </a>
                             </li>
@@ -284,6 +284,11 @@
                             <li class="nav-item ml-2">
                             <a href="{{ route('Admin.index') }}" class="nav-link">
                                     <p>Bancos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                            <a href="{{ route('empresa_cuenta.index') }}" class="nav-link">
+                                    <p>Gastos</p>
                                 </a>
                             </li>
                             @endif

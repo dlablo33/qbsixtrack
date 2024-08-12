@@ -4,7 +4,7 @@
 <div style="display: flex; justify-content: space-between;">
   <h1 class="title">Factura Y Remisiones</h1>
   <div class="download-button-container">
-  <form action="<?php echo e(route('facturas.transferLogisticaToFactura')); ?>" method="POST">
+    <form action="<?php echo e(route('facturas.transferLogisticaToFactura')); ?>" method="POST">
       <?php echo csrf_field(); ?>
       <button type="submit" class="btn btn-primary">Transferir a Factura</button>
     </form>
@@ -24,11 +24,14 @@
         <th>Producto ID</th>
         <!--<th>Numero de Invoice</th>-->
         <th>Bol</th>
+        <th>Precio</th>
         <th>Trailer</th>
         <th>Estatus</th>
         <th>Cantidad</th>
+        <th>Precio Sin IVA</th>
         <th>Total</th>
         <th>Fecha Creación</th>
+        <th>Pedimiento</th>
         <th>Codigo o Referencia</th>
         <th>Accion</th>
         <th></th>
@@ -45,15 +48,18 @@
           <td><?php echo e($factura->producto_id); ?></td>
           <!--<td><?php echo e($factura->Numero_Factura); ?></td>-->
           <td><?php echo e($factura->bol); ?></td>
+          <td>$<?php echo e(number_format($factura->precio, 2, '.', ',')); ?></td>
           <td><?php echo e($factura->trailer); ?></td>
           <td><?php echo e($factura->estatus); ?></td>
           <td><?php echo e(number_format($factura->cantidad, 2, '.', ',')); ?></td>
+          <td>$<?php echo e(number_format((($factura->precio - 0.137205) / 1.16), 2, '.', ',')); ?></td>
+          
           <td>$<?php echo e(number_format($factura->total, 2, '.', ',')); ?></td>
           <td><?php echo e($factura->fecha_create); ?></td>
+          <td><?php echo e($factura->pedimento); ?></td>
           <td><?php echo e($factura->code_factura); ?></td>
           <td>
             <a href="<?php echo e(route('facturas.showPdf', ['id' => $factura->id])); ?>" class="btn btn-sm btn-info">Ver PDF</a>
-            <!--<a href="" class="btn btn-sm btn-info" data-toggle="modal" data-target="#sendEmailModal-<?php echo e($factura->id); ?>">Enviar PDF</a>-->
             <?php if($factura->Numero_Factura == null): ?>
               <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkInvoiceModal-<?php echo e($factura->id); ?>">Enlazar Factura</button>
             <?php endif; ?>
@@ -94,4 +100,5 @@
   <p>No Remisiones.</p>
 <?php endif; ?>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/facturas/index.blade.php ENDPATH**/ ?>

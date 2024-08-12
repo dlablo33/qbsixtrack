@@ -11,6 +11,8 @@
             @yield('content')
             </div>
 
+            <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+
             @include('layouts.footer')
             @include('sweetalert::alert')
     </body>

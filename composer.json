@@ -10,7 +10,7 @@
     "require": {
         "php": "^7.2.5|^8.0",
         "ext-json": "*",
-        "barryvdh/laravel-dompdf": "^2.2",
+        "barryvdh/laravel-dompdf": "*",
         "dompdf/dompdf": "^2.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",

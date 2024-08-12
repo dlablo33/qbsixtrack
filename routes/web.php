@@ -17,6 +17,8 @@ use App\Http\Controllers\LogisticaController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\MoleculaController;
 use App\Http\Controllers\AdministracionController;
+use App\Http\Controllers\EmpresaCuentaController;
+
 
 // ==============================================================================================================================================================================================
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
@@ -205,7 +207,6 @@ Route::post('/invoicesesp', [InvoiceController::class, 'store2'])->name('invoice
 Route::get('/invoices/{fecha}', 'App\Http\Controllers\InvoiceController@karen');
 Route::post('/invoice/karen', [InvoiceController::class, 'karen'])->name('invoice.karen');
 // ==============================================================================================================================================================================================
-
 Route::get('/transporte', [TransporteController::class, 'index'])->name('transporte.index');;
 Route::get('/transporte/create', [TransporteController::class, 'create'])->name('transporte.create');
 Route::post('/transporte', [TransporteController::class, 'store'])->name('transporte.store');
@@ -213,25 +214,19 @@ Route::get('transportes/{id}/edit', [TransporteController::class, 'edit'])->name
 Route::delete('transportes/{transporte}/destroy', [TransporteController::class, 'destroy'])->name('transporte.destroy');
 Route::put('/transporte/{id}/update', [TransporteController::class, 'update'])->name('transporte.update');
 // ==============================================================================================================================================================================================
-
 Route::get('/Cuentas', [BolController::class, 'index'])->name('bol.index');
 Route::get('/bols/pair', [BolController::class, 'showPairForm'])->name('bol.pair.form');
 Route::post('/bols/pair', [BolController::class, 'pair'])->name('bol.pair');
 Route::put('/invoices/{bol}/cliente', [BolController::class, 'updateCliente'])->name('bol.updateCliente');
 Route::put('/invoices/{bol}/transporte', [BolController::class, 'updateTransporte'])->name('bol.updateTransporte');
 // ==============================================================================================================================================================================================R¿
-
 Route::get('/logistica',[LogisticaController::class, 'index'])->name('logistica.index');
-
 // ==============================================================================================================================================================================================R¿
-
 Route::get('/bluewi', [BluewiController::class, 'index'])->name('bluewi.index');
 Route::get('/bluewi/upload', [BluewiController::class, 'showUploadForm'])->name('bluewi.upload.form');
 Route::post('/bluewi/upload', [BluewiController::class, 'upload'])->name('bluewi.upload.xlsx');
 Route::get('/bluewi/compare-bol', 'BluewiController@compareBol')->name('bluewi.compare.bol');
-
 // ==============================================================================================================================================================================================R¿
-
 Route::get('/Logistica', [LogisticaController::class, 'index'])->name('logistica.index');
 Route::get('/transfer-data', [LogisticaController::class, 'transferData'])->name('logistica.transferData');
 Route::get('/logistica/formulario-asignar-cliente', [LogisticaController::class, 'showForm'])->name('logistica.mostrar_formulario');
@@ -239,7 +234,6 @@ Route::post('/logistica/asignar-cliente', [LogisticaController::class, 'asignarC
 Route::get('logistica/filterByWeek', 'LogisticaController@filterByWeek')->name('logistica.filterByWeek');
 Route::post('/logistica/guardar-todos', [LogisticaController::class, 'guardarTodos'])->name('logistica.guardar_todos');
 Route::post('/calcular-precio', [LogisticaController::class, 'calcularPrecio'])->name('logistica.calcularPrecio');
-
 // ================================================================================================================================================================================================
 Route::get('/factyremi', [FacturaController::class, 'index'])->name('factura.index');
 Route::post('factyremi/transfer', [FacturaController::class, 'transferLogisticaToFactura'])->name('facturas.transferLogisticaToFactura');
@@ -247,7 +241,6 @@ Route::get('/factyremi', [FacturaController::class, 'index'])->name('facturas.in
 Route::get('/facturas/{id}/pdf', [FacturaController::class, 'showPdf'])->name('facturas.showPdf');
 Route::delete('/facturas/{id}', [FacturaController::class, 'destroy'])->name('facturas.delete');
 Route::post('/facturas/{id}/link', [FacturaController::class, 'link'])->name('facturas.link');
-
 //=================================================================================================================================================
 Route::post('/facturas/sync-bluewi', [FacturaController::class, 'syncBluewi'])->name('facturas.syncBluewi');
 Route::get('/moleculas', [MoleculaController::class, 'index'])->name('moleculas.index');
@@ -257,16 +250,42 @@ Route::get('/moleculas/create', [MoleculaController::class, 'create'])->name('mo
 Route::post('/moleculas/store', [MoleculaController::class, 'store'])->name('moleculas.store');
 Route::get('/molecula1', [MoleculaController::class, 'showMolecula1'])->name('molecula1.show');
 Route::post('/moleculas/calculate-best-options', [MoleculaController::class, 'calculateBestOptions'])->name('moleculas.calculateBestOptions');
+Route::post('/moleculas/process-payment-batch', [MoleculaController::class, 'processPaymentBatch'])->name('moleculas.processPaymentBatch');
+Route::post('/moleculas/pay-best-options', [MoleculaController::class, 'payBestOptions'])->name('moleculas.payBestOptions');
+Route::get('/moleculas/download-pdf', [MoleculaController::class, 'downloadPdf'])->name('moleculas.downloadPdf');
+Route::get('/generate-pdf', [MoleculaController::class, 'generatePdf'])->name('generatePdf');
+Route::post('/process-payment-batch/{batchId}', [MoleculaController::class, 'processPaymentBatch'])
+    ->name('processPaymentBatch');
+
 
 // =============================================================================================================================================0===
-
 Route::get('/Administracion', [AdministracionController::class, 'index'])->name('Admin.index');
 Route::get('/administracion/depositar', [AdministracionController::class, 'showDepositForm'])->name('Admin.showDepositForm');
 Route::post('/administracion/depositar', [AdministracionController::class, 'processDeposit'])->name('Admin.processDeposit');
 Route::get('/admin/cliente/{id}/bancos', [AdministracionController::class, 'showClientBanks'])->name('Admin.showClientBanks');
 Route::get('/admin/depositos_historial/{id}', [AdministracionController::class, 'showDepositHistory'])->name('Admin.showDepositHistory');
-
 Route::get('/devoluciones/{cliente_id}', [AdministracionController::class, 'showDevolucionesForm'])->name('showDevolucionesForm');
 Route::post('/refund-deposit', [AdministracionController::class, 'storeDevolucion'])->name('Admin.refundDeposit');
+Route::get('/admin/ingresos-devoluciones', [AdministracionController::class, 'showIncomesAndRefunds'])->name('Admin.incomesAndRefunds');
+Route::post('/depositos/{id}/asignarSaldo', [AdministracionController::class, 'asignarSaldo'])->name('depositos.asignarSaldo');
+// ===============================================================================================================================================
+Route::get('/empresa_cuenta', [EmpresaCuentaController::class, 'index'])->name('empresa_cuenta.index');
+Route::post('/empresa_cuenta/agregar', [EmpresaCuentaController::class, 'agregarIngreso'])->name('empresa_cuenta.agregarIngreso');
+// ==============================================================================================================================================
+Route::get('/gastos/formulario', [EmpresaCuentaController::class, 'showGastosForm'])->name('empresa_cuenta.showGastosForm');
+Route::get('/gastos', [EmpresaCuentaController::class, 'showGastosForm'])->name('empresa_cuenta.gastos');
+Route::post('/gastos', [EmpresaCuentaController::class, 'storeGasto'])->name('empresa_cuenta.storeGasto');
+Route::get('/gastos/listar', [EmpresaCuentaController::class, 'listaGastos'])->name('empresa_cuenta.listarGastos');
+Route::get('/empresa_cuenta/gastos', [EmpresaCuentaController::class, 'showGastosForm'])->name('empresa_cuenta.showGastos');
+Route::post('/empresa_cuenta/gastos', [EmpresaCuentaController::class, 'storeGasto'])->name('empresa_cuenta.storeGasto');
+Route::get('/empresa_cuenta/gastos/lista', [EmpresaCuentaController::class, 'listaGastos'])->name('empresa_cuenta.listaGastos');
+// ===============================================================================================================================================
 
-
+Route::post('/moleculas/assign-tariff', [MoleculaController::class, 'assignTariffToBOL'])->name('moleculas.assignTariffToBOL');
+Route::post('/moleculas/storeMolecula2', [MoleculaController::class, 'storeMolecula2'])->name('moleculas.storeMolecula2');
+Route::post('/molecula2/migrate', [MoleculaController::class, 'migrateDataForMolecula2'])->name('moleculas.migrateDataForMolecula2');
+Route::get('/moleculas/molecula2', [MoleculaController::class, 'molecula2'])->name('moleculas.molecula2');
+Route::post('/moleculas/storeMolecula2', [MoleculaController::class, 'storeMolecula2'])->name('moleculas.storeMolecula2');
+Route::post('/moleculas/processMolecula2', [MoleculaController::class, 'processMolecula2'])->name('moleculas.processMolecula2');
+Route::post('/moleculas/migrateToMolecula2', [MoleculaController::class, 'migrateToMolecula2'])->name('moleculas.migrateToMolecula2');
+Route::post('/moleculas/molecula2/process', [MoleculaController::class, 'processMolecula2'])->name('moleculas.molecula2.process');

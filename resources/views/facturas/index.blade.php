@@ -4,7 +4,7 @@
 <div style="display: flex; justify-content: space-between;">
   <h1 class="title">Factura Y Remisiones</h1>
   <div class="download-button-container">
-  <form action="{{ route('facturas.transferLogisticaToFactura') }}" method="POST">
+    <form action="{{ route('facturas.transferLogisticaToFactura') }}" method="POST">
       @csrf
       <button type="submit" class="btn btn-primary">Transferir a Factura</button>
     </form>
@@ -24,11 +24,14 @@
         <th>Producto ID</th>
         <!--<th>Numero de Invoice</th>-->
         <th>Bol</th>
+        <th>Precio</th>
         <th>Trailer</th>
         <th>Estatus</th>
         <th>Cantidad</th>
+        <th>Precio Sin IVA</th>
         <th>Total</th>
         <th>Fecha Creación</th>
+        <th>Pedimiento</th>
         <th>Codigo o Referencia</th>
         <th>Accion</th>
         <th></th>
@@ -45,15 +48,18 @@
           <td>{{ $factura->producto_id }}</td>
           <!--<td>{{ $factura->Numero_Factura }}</td>-->
           <td>{{ $factura->bol }}</td>
+          <td>${{ number_format($factura->precio, 2, '.', ',') }}</td>
           <td>{{ $factura->trailer }}</td>
           <td>{{ $factura->estatus }}</td>
           <td>{{ number_format($factura->cantidad, 2, '.', ',') }}</td>
+          <td>${{ number_format((($factura->precio - 0.137205) / 1.16), 2, '.', ',') }}</td>
+          
           <td>${{ number_format($factura->total, 2, '.', ',') }}</td>
           <td>{{ $factura->fecha_create }}</td>
+          <td>{{ $factura->pedimento }}</td>
           <td>{{ $factura->code_factura }}</td>
           <td>
             <a href="{{ route('facturas.showPdf', ['id' => $factura->id]) }}" class="btn btn-sm btn-info">Ver PDF</a>
-            <!--<a href="" class="btn btn-sm btn-info" data-toggle="modal" data-target="#sendEmailModal-{{ $factura->id }}">Enviar PDF</a>-->
             @if ($factura->Numero_Factura == null)
               <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#linkInvoiceModal-{{ $factura->id }}">Enlazar Factura</button>
             @endif

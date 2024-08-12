@@ -34,4 +34,9 @@ class Customer extends Model
         return $this->hasMany(Factura::class, 'cliente_id');
     }
 
+    public function moleculas()
+    {
+        return $this->hasMany(Molecula2::class, 'cliente_id');
+    }
+    
 }

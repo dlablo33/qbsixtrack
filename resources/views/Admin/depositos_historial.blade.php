@@ -2,12 +2,11 @@
 
 @section('content')
 <style>
-    /* Estilos personalizados */
     h1.display-6 {
         font-family: 'Arial', sans-serif;
         font-weight: bold;
         color: #343a40;
-        margin-bottom: 30px; /* Aumenta el espacio debajo del encabezado */
+        margin-bottom: 30px;
     }
 
     .table-responsive {
@@ -15,30 +14,30 @@
     }
 
     .table {
-        background-color: #f8f9fa; /* Color de fondo de la tabla */
-        border-radius: 8px; /* Bordes redondeados */
-        overflow: hidden; /* Para que los bordes redondeados se apliquen */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .thead-custom {
-        background-color: #007bff; /* Color de fondo del encabezado */
-        color: #ffffff; /* Color del texto en el encabezado */
+        background-color: #007bff;
+        color: #ffffff;
     }
 
     .table-hover tbody tr:hover {
-        background-color: #e9ecef; /* Color de fondo al pasar el ratón */
+        background-color: #e9ecef;
     }
 
     .btn-success {
-        background-color: #28a745; /* Color de fondo del botón */
-        border-color: #28a745; /* Color del borde del botón */
+        background-color: #28a745;
+        border-color: #28a745;
     }
 
     .btn-success:hover {
-        background-color: #218838; /* Color de fondo del botón al pasar el ratón */
-        border-color: #1e7e34; /* Color del borde del botón al pasar el ratón */
-        transition: background-color 0.3s ease, border-color 0.3s ease; /* Animación para el cambio de color */
+        background-color: #218838;
+        border-color: #1e7e34;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .btn-animated {
@@ -71,12 +70,12 @@
 
     .btn-container {
         display: flex;
-        justify-content: space-between; /* Espacio entre los botones */
+        justify-content: space-between;
         margin-top: 20px;
     }
 
     .btn-container a {
-        margin: 0 5px; /* Espacio entre botones */
+        margin: 0 5px;
     }
 </style>
 
@@ -104,12 +103,24 @@
                         <td>${{ number_format($deposito->saldo_usd, 2, '.', ',') }}</td>
                         <td>{{ $deposito->created_at->format('d/m/Y H:i') }}</td>
                         <td>
-                            <button type="button" class="btn btn-success btn-animated"
-                                    onclick="openRefundModal({{ $deposito->id }}, '{{ $deposito->banco->banco }}', {{ $deposito->saldo_mxn }}, {{ $deposito->banco_id }}, '{{ $deposito->moneda }}')">
-                                Agregar Devolución
-                            </button>
+                            @if(!$devoluciones->where('id_deposito', $deposito->id)->count())
+                                <button type="button" class="btn btn-success btn-animated"
+                                        onclick="openRefundModal({{ $deposito->id }}, '{{ $deposito->banco->banco }}', {{ $deposito->saldo_mxn }}, {{ $deposito->saldo_usd }}, {{ $deposito->banco_id }})">
+                                    Agregar Devolución
+                                </button>
+                            @endif
                         </td>
                     </tr>
+                    @foreach($devoluciones->where('id_deposito', $deposito->id) as $devolucion)
+                        <tr class="table-warning">
+                            <td>{{ $devolucion->id }}</td>
+                            <td>{{ $deposito->banco->banco }}</td>
+                            <td>- ${{ number_format($devolucion->cantidad, 2, '.', ',') }}</td>
+                            <td>-</td>
+                            <td>{{ $devolucion->created_at->format('d/m/Y H:i') }}</td>
+                            <td>Devolución en {{ $devolucion->moneda }}</td>
+                        </tr>
+                    @endforeach
                 @endforeach
             </tbody>
         </table>
@@ -146,7 +157,10 @@
                     </div>
                     <div class="form-group">
                         <label for="moneda">Moneda</label>
-                        <input type="text" class="form-control" id="moneda" name="moneda" readonly>
+                        <select class="form-control" id="moneda" name="moneda" required>
+                            <option value="MXN">MXN</option>
+                            <option value="USD">USD</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -159,16 +173,19 @@
 </div>
 
 <script>
-function openRefundModal(depositoId, banco, saldo, bancoId, moneda) {
-    console.log("Moneda:", moneda);
+function openRefundModal(depositoId, banco, saldoMXN, saldoUSD, bancoId) {
     document.getElementById('deposito_id').value = depositoId;
     document.getElementById('banco').value = banco;
+    document.getElementById('banco_id').value = bancoId;
+
+    // Determinar qué saldo se debe mostrar y establecer la moneda predeterminada
+    var saldo = saldoMXN > 0 ? saldoMXN : saldoUSD;
+    var moneda = saldoMXN > 0 ? 'MXN' : 'USD';
+
     document.getElementById('cantidad').value = saldo;
     document.getElementById('moneda').value = moneda;
-    document.getElementById('banco_id').value = bancoId; // Asignar banco_id al campo oculto
 
-    $('#devolucionModal').modal('show'); // Mostrar el modal
-
+    $('#devolucionModal').modal('show');
 }
 </script>
 @endsection

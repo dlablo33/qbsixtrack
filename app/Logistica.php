@@ -27,6 +27,7 @@ class Logistica extends Model
         'fecha_salida',
         'fecha_entrega',
         'fecha_descarga',
+        'pedimento'
         
     ];
 
@@ -49,6 +50,11 @@ class Logistica extends Model
     public function destino()
     {
         return $this->belongsTo(Destino::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Customer::class, 'cliente', 'id');
     }
 
 }

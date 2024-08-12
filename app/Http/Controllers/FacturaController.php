@@ -24,6 +24,7 @@ class FacturaController extends Controller
         $productos = Product::all();
         $logistica = Logistica::all();
 
+
         $data = [];
         $data['menu'] = "pagos";
         $data['menu_sub'] = "";
@@ -180,6 +181,8 @@ class FacturaController extends Controller
                 $factura->updated_at = Carbon::now();
                 $factura->code_factura = $this->generarCodigoFactura();
                 $factura->estatus = 'Pendiente';
+                $factura->pedimento = $logistica->pedimento;
+                $factura->precio = $logistica->precio;
 
                 $factura->save();
             }

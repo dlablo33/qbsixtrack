@@ -30,20 +30,15 @@
                         <th>No Pipa</th>
                         <th>Cliente</th>
                         <th>Destino</th>
-                        <!--
-                        <th>Transportista</th>
-                        -->
                         <th>Estatus</th>
-                        <!--
-                        <th>Litros</th>
-                        -->
                         <th>Cruce</th>
                         <th>Fecha Salida</th>
                         <th>Fecha Entrega</th>
                         <th>Fecha Descarga</th>
-                        @if (Auth::user()->tipo_usuario == 1) 
-                        <th>Precio</th>
-                        <th>Total</th>
+                        <th>Pedimento</th>
+                        @if (Auth::user()->tipo_usuario == 1)
+                            <th>Precio</th>
+                            <th>Total</th>
                         @endif
                         <th>Acciones</th>
                     </tr>
@@ -53,21 +48,19 @@
                         <tr>
                             <td>{{ $logi->bol }}</td>
                             <td>{{ $logi->order_number }}</td>
-                            <td>{{ \Carbon\Carbon::parse($logi->fecha)->weekOfYear }}</td>
-                            <td>{{ \Carbon\Carbon::parse($logi->fecha)->format('d-m-Y') }}</td>
+                            <td>{{ $logi->fecha->weekOfYear }}</td>
+                            <td>{{ $logi->fecha->format('d-m-Y') }}</td>
                             <td>{{ $logi->linea }}</td>
                             <td>{{ $logi->no_pipa }}</td>
-
                             <td>
                                 <input type="hidden" name="logistica[{{ $logi->id }}][id]" value="{{ $logi->id }}">
                                 <select name="logistica[{{ $logi->id }}][cliente]" class="form-control cliente-select" {{ $logi->cliente ? 'disabled' : '' }}>
-                                    <option value="">Selecciona un cliente</option>|111112
+                                    <option value="">Selecciona un cliente</option>
                                     @foreach($clientes as $cliente)
                                         <option value="{{ $cliente->id }}" {{ $logi->cliente == $cliente->id ? 'selected' : '' }}>{{ $cliente->NOMBRE_COMERCIAL }}</option>
                                     @endforeach
                                 </select>
                             </td>
-
                             <td>
                                 <select name="logistica[{{ $logi->id }}][destino]" class="form-control destino-select" {{ $logi->destino_id ? 'disabled' : '' }}>
                                     <option value="">Selecciona un destino</option>
@@ -77,18 +70,6 @@
                                     <option value="5" {{ $logi->destino_id == 5 ? 'selected' : '' }}>FOB</option>
                                 </select>
                             </td>
-
-                            <!--
-                            <td>
-                                <select name="logistica[{{ $logi->id }}][transportista]" class="form-control transportista-select" {{ $logi->transportista_id ? 'disabled' : '' }}>
-                                    <option value="">Selecciona un transportista</option>
-                                    @foreach($transportistas as $transportista)
-                                        <option value="{{ $transportista->id }}" {{ $logi->transportista_id == $transportista->id ? 'selected' : '' }}>{{ $transportista->nombre }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            -->
-
                             <td class="status">
                                 <select name="logistica[{{ $logi->id }}][status]" class="form-control status-select">
                                     <option value="pendiente" {{ $logi->status == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
@@ -96,49 +77,38 @@
                                     <option value="descargada" {{ $logi->status == 'descargada' ? 'selected' : '' }}>Descargada</option>
                                 </select>
                             </td>
-
-                            <!--
-                            <td class="ocultar-columna">{{ number_format($logi->litros) }}</td>
-                            -->
-
                             <td class="cruce">
                                 <select name="logistica[{{ $logi->id }}][cruce]" class="form-control cruce-select">
                                     <option value="rojo" {{ $logi->cruce == 'rojo' ? 'selected' : '' }}>Rojo</option>
                                     <option value="verde" {{ $logi->cruce == 'verde' ? 'selected' : '' }}>Verde</option>
                                 </select>
                             </td>
-
                             <td><input type="date" name="logistica[{{ $logi->id }}][fecha_salida]" class="form-control" value="{{ $logi->fecha_salida }}"></td>
-
                             <td><input type="date" name="logistica[{{ $logi->id }}][fecha_entrega]" class="form-control" value="{{ $logi->fecha_entrega }}"></td>
-
                             <td><input type="date" name="logistica[{{ $logi->id }}][fecha_descarga]" class="form-control" value="{{ $logi->fecha_descarga }}"></td>
-
-                            @if (Auth::user()->tipo_usuario == 1) 
-                            <td>
-                                @if ($logi->cliente)
-                                    <select name="logistica[{{ $logi->id }}][precio]" class="form-control precio-select" data-logi-id="{{ $logi->id }}">
-                                        <option value="">Selecciona un precio</option>
-                                        @foreach ($precios[$logi->id] as $precioId => $precio)
-                                            <option value="{{ $precio }}" {{ $logi->precio == $precio ? 'selected' : '' }}>{{ $precio }}</option>
-                                        @endforeach
-                                    </select>
-                                @else
-                                    {{ $logi->precio }}
-                                @endif
-                            </td>
-
-                            <td id="total-{{ $logi->id }}">
-                                @if (isset($totales[$logi->id]))
-                                    ${{ $totales[$logi->id] !== null ? number_format($totales[$logi->id], 2) : '' }}
-                                @endif
-                            </td>   
+                            <td><input type="text" name="logistica[{{ $logi->id }}][pedimento]" class="form-control" value="{{ $logi->pedimento }}"></td>
+                            @if (Auth::user()->tipo_usuario == 1)
+                                <td>
+                                    @if ($logi->cliente)
+                                        <select name="logistica[{{ $logi->id }}][precio]" class="form-control precio-select" data-logi-id="{{ $logi->id }}">
+                                            <option value="">Selecciona un precio</option>
+                                            @foreach ($precios[$logi->id] as $precioId => $precio)
+                                                <option value="{{ $precio }}" {{ $logi->precio == $precio ? 'selected' : '' }}>{{ $precio }}</option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        {{ $logi->precio }}
+                                    @endif
+                                </td>
+                                <td id="total-{{ $logi->id }}">
+                                    @if (isset($totales[$logi->id]))
+                                        ${{ number_format($totales[$logi->id], 2) }}
+                                    @endif
+                                </td>
                             @endif
-
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
-                            
                         </tr>
                     @endforeach
                 </tbody>
@@ -151,7 +121,6 @@
 
 @push('styles')
 <style>
-    
     .table-responsive {
         overflow-x: auto;
     }
@@ -161,7 +130,7 @@
         max-width: 100%;
         margin-bottom: 1rem;
         background-color: transparent;
-        font-size: 0.8rem; 
+        font-size: 0.8rem;
     }
 
     .table th, .table td {
@@ -170,114 +139,16 @@
     }
 
     .form-control {
-        font-size: 0.8rem; 
-    }
-
-    .status.pendiente {
-        background-color: red;
-        color: white;
-    }
-
-    .status.cargada {
-        background-color: yellow;
-        color: black;
-    }
-
-    .status.descargada {
-        background-color: green;
-        color: white;
-    }
-
-    .cruce.rojo {
-        background-color: red;
-        color: white;
-    }
-
-    .cruce.verde {
-        background-color: green;
-        color: white;
-    }
-
-    .btn {
         font-size: 0.8rem;
     }
 
-    .ocultar-columna {
-        width: 0;
-        height: 0;
+    .status select {
+        background-color: transparent;
     }
 
+    .cruce select {
+        background-color: transparent;
+    }
 </style>
 @endpush
 
-@push('script')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const precioSelects = document.querySelectorAll('.precio-select');
-
-        function calculateTotal(precioSelect) {
-            const logiId = precioSelect.getAttribute('data-logi-id');
-            const selectedPrice = parseFloat(precioSelect.value) || 0;
-            const litros = parseFloat(document.getElementById(`litros-${logiId}`).innerText) || 0;
-
-            const total = selectedPrice * litros;
-
-            if (!isNaN(total) && total > 0) {
-                document.getElementById(`total-${logiId}`).innerText = total.toFixed(2);
-            } else {
-                document.getElementById(`total-${logiId}`).innerText = '';
-            }
-        }
-
-        precioSelects.forEach(select => {
-            select.addEventListener('change', function () {
-                calculateTotal(select);
-            });
-
-            calculateTotal(select);
-        });
-
-        function updateCruceColors() {
-            const cruceSelects = document.querySelectorAll('.cruce-select');
-            cruceSelects.forEach(select => {
-                const cell = select.closest('td');
-                const value = select.value;
-
-                cell.classList.remove('rojo', 'verde');
-                if (value === 'rojo') {
-                    cell.classList.add('rojo');
-                } else if (value === 'verde') {
-                    cell.classList.add('verde');
-                }
-            });
-        }
-
-        function updateStatusColors() {
-            const statusCells = document.querySelectorAll('.status');
-            statusCells.forEach(cell => {
-                const value = cell.querySelector('select').value;
-
-                cell.classList.remove('pendiente', 'cargada', 'descargada');
-                if (value === 'pendiente') {
-                    cell.classList.add('pendiente');
-                } else if (value === 'cargada') {
-                    cell.classList.add('cargada');
-                } else if (value === 'descargada') {
-                    cell.classList.add('descargada');
-                }
-            });
-        }
-
-        document.querySelectorAll('.cruce-select').forEach(select => {
-            select.addEventListener('change', updateCruceColors);
-        });
-
-        document.querySelectorAll('.status-select').forEach(select => {
-            select.addEventListener('change', updateStatusColors);
-        });
-
-        updateCruceColors();
-        updateStatusColors();
-    });
-</script>
-@endpush

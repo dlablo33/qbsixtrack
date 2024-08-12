@@ -30,7 +30,7 @@
             <label for="banco">Banco</label>
             <select name="banco" id="banco" class="form-control" onchange="setBancoId(this)">
                 <option value="">Selecciona un banco</option>
-                <!-- Aquí deberías cargar dinámicamente los bancos disponibles -->
+                
                 @foreach($bancos as $banco)
                     <option value="{{ $banco->id }}" {{ old('banco') == $banco->id ? 'selected' : '' }}>{{ $banco->nombre }}</option>
                 @endforeach

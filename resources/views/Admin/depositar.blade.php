@@ -124,6 +124,13 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.getElementById('cantidad').addEventListener('input', function() {
+        // Reemplazar el símbolo de dólar y las comas
+        this.value = this.value.replace(/[$,]/g, '');
+    });
+</script>
 @endsection
 
 

@@ -25,8 +25,9 @@ class Factura extends Model
         'created_at',
         'updated_at',
         'code_factura',
-        'estatus'
-
+        'estatus',
+        'pedimento',
+        'precio'
     ];
 
     public function products()
