@@ -1,3 +1,9 @@
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
 <div class="container mt-4">
     <h3>Mejores Opciones según tu Presupuesto</h3>
 
@@ -9,7 +15,7 @@
         </div>
         
         <h2 class="mt-4">Mejores Opciones para Pagar</h2>
-        <form action="{{ route('moleculas.processPaymentBatch') }}" method="POST">
+        <form id="paymentBatchForm" action="{{ route('moleculas.processPaymentBatch') }}" method="POST">
             @csrf
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -21,7 +27,6 @@
                             <th>Rate</th>
                             <th>Total</th>
                             <th>Fecha de Creación</th>
-                            
                         </tr>
                     </thead>
                     <tbody>
@@ -35,38 +40,53 @@
                                 <td>${{ number_format($record->rate, 2, '.', ',') }}</td>
                                 <td>${{ number_format($record->total, 2, '.', ',') }}</td>
                                 <td>{{ $record->created_at }}</td>
-                                
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <button type="submit" class="btn btn-success">Procesar Pago y Descargar PDF</button>
+            <button type="submit" id="processPaymentButton" class="btn btn-success">Procesar Pago y Descargar PDF</button>
         </form>
+
+        <a href="{{ route('moleculas.molecula1') }}" class="btn btn-primary mt-4">Volver a la Página de Opciones</a>
 
     @elseif(isset($bestCombination))
         <p>No se encontraron facturas dentro del presupuesto dado.</p>
     @endif
 </div>
 
-<style>
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    table {
-        width: 100%;
-        table-layout: fixed;
+<script>
+document.getElementById('paymentBatchForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Evita el envío tradicional del formulario
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = this.action;
+
+    // Agregar el token CSRF
+    var csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('input[name="_token"]').value;
+    form.appendChild(csrfToken);
+
+    // Agregar los datos del formulario
+    var formData = new FormData(this);
+    for (var [key, value] of formData.entries()) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
     }
 
-    th, td {
-        word-wrap: break-word;
-        text-align: center;
-    }
+    document.body.appendChild(form);
+    form.submit();
 
-    thead th {
-        background-color: #f8f9fa;
-    }
-</style>
-
+    // Redirigir después de un breve retraso para asegurar que el formulario se envíe primero
+    setTimeout(function() {
+        window.location.reload();
+    }, 100);
+});
+</script>

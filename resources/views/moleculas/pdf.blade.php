@@ -5,7 +5,7 @@
     <style>
         /* Estilos para el PDF */
         table {
-            width: 60%;
+            width: 100%;
             border-collapse: collapse;
         }
         table, th, td {
@@ -14,6 +14,12 @@
         th, td {
             padding: 8px;
             text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h1 {
+            text-align: center;
         }
     </style>
 </head>
@@ -52,7 +58,3 @@
     @endif
 </body>
 </html>
-
-
-
-

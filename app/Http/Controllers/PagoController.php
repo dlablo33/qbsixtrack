@@ -11,144 +11,156 @@ use Illuminate\Support\Facades\DB;
 class PagoController extends Controller
 {
     public function index()
-{
-    // Obtener las facturas con saldos pendientes
-    $facturasPendientes = Factura::select(
-            'cliente_name',
-            DB::raw('SUM(total) as totalFacturas')
-        )
-        ->groupBy('cliente_name')
-        ->havingRaw('SUM(total) > 0') // Solo facturas con saldo pendiente
-        ->get();
+    {
+        // Obtener las facturas con saldos pendientes
+        $facturasPendientes = Factura::select(
+                'cliente_name',
+                DB::raw('SUM(total) as totalFacturas')
+            )
+            ->groupBy('cliente_name')
+            ->havingRaw('SUM(total) > 0') // Solo facturas con saldo pendiente
+            ->get();
 
-    // Obtener los pagos realizados
-    $pagosRealizados = Pago::select(
-            'fac_invoice.cliente_name',
-            DB::raw('SUM(monto) as totalPagos')
-        )
-        ->leftJoin('fac_invoice', 'pagos.factura_id', '=', 'fac_invoice.id')
-        ->groupBy('fac_invoice.cliente_name')
-        ->get();
+        // Obtener los pagos realizados
+        $pagosRealizados = Pago::select(
+                'fac_invoice.cliente_name',
+                DB::raw('SUM(monto) as totalPagos')
+            )
+            ->leftJoin('fac_invoice', 'pagos.factura_id', '=', 'fac_invoice.id')
+            ->groupBy('fac_invoice.cliente_name')
+            ->get();
 
-    // Calcular el saldo pendiente por cliente
-    $deudasPorCliente = $facturasPendientes->map(function ($factura) use ($pagosRealizados) {
-        $pagosCliente = $pagosRealizados->firstWhere('cliente_name', $factura->cliente_name);
-        $totalPagos = $pagosCliente ? $pagosCliente->totalPagos : 0;
-        $saldoRestante = $factura->totalFacturas - $totalPagos;
+        // Calcular el saldo pendiente por cliente
+        $deudasPorCliente = $facturasPendientes->map(function ($factura) use ($pagosRealizados) {
+            $pagosCliente = $pagosRealizados->firstWhere('cliente_name', $factura->cliente_name);
+            $totalPagos = $pagosCliente ? $pagosCliente->totalPagos : 0;
+            $saldoRestante = $factura->totalFacturas - $totalPagos;
 
-        // Calcular saldo a favor
-        $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
-        $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
+            // Calcular saldo a favor
+            $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
+            $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
-        return (object) [
-            'cliente_name' => $factura->cliente_name,
-            'saldoRestante' => $saldoRestante,
-            'saldoAFavor' => $saldoAFavor,
+            return (object) [
+                'cliente_name' => $factura->cliente_name,
+                'saldoRestante' => $saldoRestante,
+                'saldoAFavor' => $saldoAFavor,
+            ];
+        });
+
+        // Preparar los datos para la vista
+        $data = [
+            'menu' => "deudasPorCliente",
+            'menu_sub' => "",
+            'deudasPorCliente' => $deudasPorCliente,
         ];
-    });
 
-    // Preparar los datos para la vista
-    $data['menu'] = "deudasPorCliente";
-    $data['menu_sub'] = "";
-    $data['deudasPorCliente'] = $deudasPorCliente;
-
-    return view('cuentas.index', $data);
+        return view('cuentas.index', $data);
     }
-
-//==============================================================================================================================================================================================
 
     public function facturasCliente($cliente)
     {
         $facturas = Factura::where('cliente_name', $cliente)->get();
-        return view('invoice.index', compact('facturas', 'cliente_name'));
-    }
 
-    //==============================================================================================================================================================================================
+        $data = [
+            'facturas' => $facturas,
+            'cliente_name' => $cliente,
+        ];
+
+        return view('invoice.index', $data);
+    }
 
     public function show($cliente_name)
-{
+    {
     $facturas = Factura::where('cliente_name', $cliente_name)->get();
-
-    //=================
-    $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
-    $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
-
-
-    return view('cuentas.cnc-detalle', compact('facturas', 'cliente_name','saldoAFavor'));
-    }
-
-    //==============================================================================================================================================================================================
-
-    public function create($factura_id)
-{
-    $factura = Factura::findOrFail($factura_id);
-    $cliente_name = $factura->cliente_name;
 
     // Obtener el saldo a favor del cliente
     $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
     $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
-    return view('cuentas.create', compact('factura', 'cliente_name', 'saldoAFavor'));
+    // Preparar los datos para la vista
+    $data = [
+        'facturas' => $facturas,
+        'cliente_name' => $cliente_name,
+        'saldoAFavor' => $saldoAFavor,
+    ];
+
+    // Pasar los datos a la vista
+    return view('cuentas.cnc-detalle', $data);
     }
 
-    //==============================================================================================================================================================================================
+    public function create($factura_id)
+    {
+        $factura = Factura::findOrFail($factura_id);
+        $cliente_name = $factura->cliente_name;
+
+        // Obtener el saldo a favor del cliente
+        $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
+        $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
+
+        $data = [
+            'factura' => $factura,
+            'cliente_name' => $cliente_name,
+            'saldoAFavor' => $saldoAFavor,
+        ];
+
+        return view('cuentas.create', $data);
+    }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'factura_id' => 'required|exists:fac_invoice,id',
-        'monto' => 'required|numeric|min:0',
-        'referencia' => 'required|string|max:255',
-    ]);
-
-    $factura = Factura::findOrFail($request->factura_id);
-    $montoPendiente = $factura->montoPendiente();
-    $montoPago = $request->monto;
-
-    if ($montoPago >= $montoPendiente) {
-        // Pago completo o con saldo a favor
-        $this->registrarSaldoAFavor($factura, $montoPago, $montoPendiente, $request->referencia);
-
-        // Cambiar el estatus de la factura a 'Pagado'
-        $factura->estatus = 'Pagado';
-        $factura->save();
-    } else {
-        // Pago parcial sin saldo a favor
-        Pago::create([
-            'factura_id' => $factura->id,
-            'monto' => $montoPago,
-            'fecha_pago' => now(),
-            'referencia' => $request->referencia,
+    {
+        $request->validate([
+            'factura_id' => 'required|exists:fac_invoice,id',
+            'monto' => 'required|numeric|min:0',
+            'referencia' => 'required|string|max:255',
         ]);
 
-        // Cambiar el estatus de la factura a 'Abonado'
-        $factura->estatus = 'Abonado';
-        $factura->save();
+        $factura = Factura::findOrFail($request->factura_id);
+        $montoPendiente = $factura->montoPendiente();
+        $montoPago = $request->monto;
+
+        if ($montoPago >= $montoPendiente) {
+            // Pago completo o con saldo a favor
+            $this->registrarSaldoAFavor($factura, $montoPago, $montoPendiente, $request->referencia);
+
+            // Cambiar el estatus de la factura a 'Pagado'
+            $factura->estatus = 'Pagado';
+            $factura->save();
+        } else {
+            // Pago parcial sin saldo a favor
+            Pago::create([
+                'factura_id' => $factura->id,
+                'monto' => $montoPago,
+                'fecha_pago' => now(),
+                'referencia' => $request->referencia,
+            ]);
+
+            // Cambiar el estatus de la factura a 'Abonado'
+            $factura->estatus = 'Abonado';
+            $factura->save();
+        }
+
+        $data = [
+            'cliente_name' => $factura->cliente_name,
+        ];
+
+        return redirect()->route('cuentas.cnc-detalle', $data)
+            ->with('success', 'Pago registrado exitosamente.');
     }
-
-    return redirect()->route('cuentas.cnc-detalle', ['cliente_name' => $factura->cliente_name])
-        ->with('success', 'Pago registrado exitosamente.');
-    }
-
-
-//==============================================================================================================================================================================================
 
     private function registrarSaldoAFavor(Factura $factura, $montoPago, $montoPendiente, $referencia)
-{
-    Pago::create([
-        'factura_id' => $factura->id,
-        'monto' => $montoPendiente,
-        'fecha_pago' => now(),
-        'referencia' => $referencia,
-    ]);
+    {
+        Pago::create([
+            'factura_id' => $factura->id,
+            'monto' => $montoPendiente,
+            'fecha_pago' => now(),
+            'referencia' => $referencia,
+        ]);
 
-    $saldoAFavor = $montoPago - $montoPendiente;
-    $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
-    $cliente->saldo_a_favor += $saldoAFavor;
-    $cliente->save();
+        $saldoAFavor = $montoPago - $montoPendiente;
+        $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
+        $cliente->saldo_a_favor += $saldoAFavor;
+        $cliente->save();
     }
-
-    //==============================================================================================================================================================================================
 
     public function usarSaldo(Factura $factura)
     {
@@ -177,7 +189,7 @@ class PagoController extends Controller
 
                 $factura = Factura::find($factura->id);
     
-                // Cambiar el estatus de la factura a 'Abonado'
+                // Cambiar el estatus de la factura a 'Pagado'
                 $factura->estatus = 'Pagado';
                 $factura->save();
     
@@ -208,34 +220,18 @@ class PagoController extends Controller
         }
     }
 
-    //==============================================================================================================================================================================================
-
-    public function edit($id)
-    {
-    }
-
-    //==============================================================================================================================================================================================
-
-    public function update(Request $request, $id)
-    {
-    }
-
-    //==============================================================================================================================================================================================
-
-    public function destroy($id)
-    {
-    }
-
-    //==============================================================================================================================================================================================
-
     public function pagos($factura_id)
     {
         $factura = Factura::findOrFail($factura_id);
         $pagos = $factura->pagos;
-        return view('cuentas.index', compact('factura', 'pagos'));
-    }
 
-    //==============================================================================================================================================================================================
+        $data = [
+            'factura' => $factura,
+            'pagos' => $pagos,
+        ];
+
+        return view('cuentas.index', $data);
+    }
 
     public function pagarCompleto(Request $request, Factura $factura)
     {
@@ -250,28 +246,25 @@ class PagoController extends Controller
             'factura_id' => $factura->id,
             'monto' => $montoPendiente,
             'fecha_pago' => now(),
+            'referencia' => $request->referencia,
         ];
-    
-        // Si se proporcionó una referencia, añadirla a los datos del pago
-        if ($request->has('referencia')) {
-            $data['referencia'] = $request->referencia;
-        }
     
         Pago::create($data);
 
         $factura = Factura::find($factura->id);
         
         if ($factura) {
-            // Verificar si el total pagado es igual al total de la factura
-            if ($factura->pagos->sum('monto') == $factura->total) {
-                // Cambiar el estatus de la factura a 'Pagado'
-                $factura->estatus = 'Pagado';
-                $factura->save();
-            }
+            // Cambiar el estatus de la factura a 'Pagado'
+            $factura->estatus = 'Pagado';
+            $factura->save();
         }
     
-        return redirect()->route('cuentas.cnc-detalle', ['cliente_name' => $factura->cliente_name])
-            ->with('success', 'Deuda pagada completamente.');
+        $data = [
+            'factura' => $factura,
+        ];
+    
+        return redirect()->back()->with('success', 'Factura pagada completamente.');
     }
 
 }
+

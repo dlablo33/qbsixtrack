@@ -2,14 +2,12 @@
 
 <?php $__env->startSection('content'); ?>
 <div class="container mt-4">
-    <h2>Molecula 2 - Gestión de BOLs</h2>
+    <h2>Molecula 2</h2>
 
 <form action="<?php echo e(route('moleculas.migrateDataForMolecula2')); ?>" method="POST">
     <?php echo csrf_field(); ?>
     <button type="submit" class="btn btn-primary">Migrar Datos para Molecula 2</button>
 </form>
-
-
 
     <form method="POST" action="<?php echo e(route('moleculas.molecula2.process')); ?>">
         <?php echo csrf_field(); ?>
@@ -41,7 +39,7 @@
                     <td><?php echo e($clienteNombre); ?></td>
                     <td><?php echo e($destinoNombre); ?></td>
                     <td><?php echo e($record->linea); ?></td>
-                    <td><?php echo e($record->litros); ?></td>
+                    <td><?php echo e($record->litros); ?></td> 
                     <td><?php echo e($record->precio); ?></td>
                     <td><?php echo e($record->status); ?></td>
                 </tr>

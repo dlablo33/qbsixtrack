@@ -257,6 +257,7 @@ Route::get('/generate-pdf', [MoleculaController::class, 'generatePdf'])->name('g
 Route::post('/process-payment-batch/{batchId}', [MoleculaController::class, 'processPaymentBatch'])
     ->name('processPaymentBatch');
 
+Route::get('/payment/download-and-refresh', [MoleculaController::class, 'downloadAndRefresh'])->name('payment.downloadAndRefresh');
 
 // =============================================================================================================================================0===
 Route::get('/Administracion', [AdministracionController::class, 'index'])->name('Admin.index');
@@ -289,3 +290,9 @@ Route::post('/moleculas/storeMolecula2', [MoleculaController::class, 'storeMolec
 Route::post('/moleculas/processMolecula2', [MoleculaController::class, 'processMolecula2'])->name('moleculas.processMolecula2');
 Route::post('/moleculas/migrateToMolecula2', [MoleculaController::class, 'migrateToMolecula2'])->name('moleculas.migrateToMolecula2');
 Route::post('/moleculas/molecula2/process', [MoleculaController::class, 'processMolecula2'])->name('moleculas.molecula2.process');
+
+Route::get('/moleculas/downloadPdf/{pdfPath}', [MoleculaController::class, 'downloadPdf'])->name('moleculas.downloadPdf');
+Route::get('/moleculas/redirectAfterDownload/{pdfPath}', [MoleculaController::class, 'redirectAfterDownload'])->name('moleculas.redirectAfterDownload');
+Route::post('/moleculas/processPaymentBatch', [MoleculaController::class, 'processPaymentBatch'])->name('moleculas.processPaymentBatch');
+Route::get('/molecula1', [MoleculaController::class, 'molecula1'])->name('molecula1');
+

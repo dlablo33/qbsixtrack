@@ -226,11 +226,11 @@
                                     <p>Traking</p>
                                 </a>
                             </li>
-                            <li class="nav-item ml-2">
+                            <!--<li class="nav-item ml-2">
                                 <a href="{{ route('bol.index') }}" class="nav-link">
                                     <p>Deuda</p>
                                 </a>
-                            </li>
+                            </li>-->
                             </ul>
                         </li>
                     @endif

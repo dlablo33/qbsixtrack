@@ -37,6 +37,7 @@
                                     <div class="form-group">
                                         <label for="cliente_id">Asignar a Cliente:</label>
                                         <select name="cliente_id" id="cliente_id" class="form-control">
+                                        <option value="" disabled selected>--Seleccionar cliente--</option>
                                             <?php $__currentLoopData = $clientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cliente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($cliente->id); ?>"><?php echo e($cliente->NOMBRE_COMERCIAL); ?></option>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

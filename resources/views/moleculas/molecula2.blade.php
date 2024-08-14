@@ -9,8 +9,6 @@
     <button type="submit" class="btn btn-primary">Migrar Datos para Molecula 2</button>
 </form>
 
-yy
-
     <form method="POST" action="{{ route('moleculas.molecula2.process') }}">
         @csrf
         <table id="example1" class="table table-bordered">
@@ -41,7 +39,7 @@ yy
                     <td>{{ $clienteNombre }}</td>
                     <td>{{ $destinoNombre }}</td>
                     <td>{{ $record->linea }}</td>
-                    <td>{{ $record->litros }}</td>
+                    <td>{{ $record->litros }}</td> 
                     <td>{{ $record->precio }}</td>
                     <td>{{ $record->status }}</td>
                 </tr>

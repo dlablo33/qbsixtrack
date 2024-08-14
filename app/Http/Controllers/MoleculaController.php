@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Tarifa;
 use App\Molecula2;
 use App\Customer;
+use App\PaymentBatch;
+use App\PaymentBatchItem;
 
 
 class MoleculaController extends Controller
@@ -216,25 +218,44 @@ class MoleculaController extends Controller
             return redirect()->back()->with('error', 'No se encontraron registros válidos.');
         }
     
-        // Aquí puedes agregar la lógica para procesar el pago
-        // Por ejemplo, actualizar el estatus de los registros a "pagado"
-        $records->each(function ($record) {
+        // Genera un número de lote único para batch_number
+        $batchNumber = 'BATCH-' . strtoupper(uniqid());
+    
+        // Calcular el monto total para el lote
+        $totalAmount = $records->sum('total'); // Asegúrate de que 'total' sea un campo en tu modelo Molecula
+    
+        // Crear un nuevo registro en la tabla payment_batches
+        $paymentBatch = PaymentBatch::create([
+            'batch_number' => $batchNumber,
+            'total_amount' => $totalAmount,
+        ]);
+    
+        // Procesar cada registro y vincularlo al lote de pagos en la tabla payment_batch_items
+        $records->each(function ($record) use ($paymentBatch) {
+            // Actualizar el estatus de la factura a "pagado"
             $record->estatus = 'pagado';
             $record->save();
+    
+            // Crear un nuevo registro en la tabla payment_batch_items
+            PaymentBatchItem::create([
+                'batch_id' => $paymentBatch->id,
+                'bol_number' => $record->bol_number, // Suponiendo que bol_number existe en Molecula
+                'amount' => $record->total, // Asegúrate de que 'total' sea un campo en tu modelo Molecula
+            ]);
         });
     
         // Genera el PDF con los registros seleccionados
         $pdf = PDF::loadView('moleculas.pdf', ['records' => $records]);
-        $pdf->save(storage_path('pdfs/pago.pdf'));
     
         // Guarda el PDF en el servidor
-        $pdfPath = 'pdfs/pago.pdf';
+        $pdfPath = 'pdfs/pago_' . $paymentBatch->id . '.pdf';
         Storage::disk('public')->put($pdfPath, $pdf->output());
     
-        // Redirige a la vista molecula1.blade.php
-        return redirect()->route('moleculas.molecula1')->with('success', 'Pago procesado y PDF generado. Puedes descargar el PDF <a href="' . Storage::url($pdfPath) . '">aquí</a>.');
+        // Descarga automática del PDF
+        return $pdf->download('pago_' . $paymentBatch->id . '.pdf');
+
     }
-    
+
     // =======================================================================================================================================
 
     public function molecula2()
@@ -409,4 +430,5 @@ class MoleculaController extends Controller
         return redirect()->route('moleculas.molecula2')->with('success', 'Datos migrados exitosamente.');
     }
     
+
 } 

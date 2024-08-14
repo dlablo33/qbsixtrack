@@ -28,21 +28,21 @@
                 </td>
                 <td> $ {{ number_format($factura->montoPendiente(), 2, '.', '') }}</td>
                 <td>
-                    <form action="{{ route('cuentas.pagarCompleto', $factura->id) }}" method="POST">
+                   <!-- <form action="{{ route('cuentas.pagarCompleto', $factura->id) }}" method="POST">
                         @csrf
                         <div class="form-group">
                             <label for="referencia">Referencia (en caso de pago completo):</label>
                             <input type="text" name="referencia" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Pagar</button>
-                    </form>
-                    <th><a href="{{ route('cuentas.create', $factura->id) }}" class="btn btn-primary">Abono</a></th>
-                    <th>
+                    </form> -->
+                    <!--<th><a href="{{ route('cuentas.create', $factura->id) }}" class="btn btn-primary">Abono</a></th>-->
+                    
                         <form action="{{ route('cuentas.usarSaldo', $factura->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-primary">Usar Saldo</button>
                         </form>
-                    </th>
+                    
                 </td>
             </tr>
         @endforeach

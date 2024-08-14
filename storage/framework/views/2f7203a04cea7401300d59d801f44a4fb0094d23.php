@@ -28,21 +28,21 @@
                 </td>
                 <td> $ <?php echo e(number_format($factura->montoPendiente(), 2, '.', '')); ?></td>
                 <td>
-                    <form action="<?php echo e(route('cuentas.pagarCompleto', $factura->id)); ?>" method="POST">
+                   <!-- <form action="<?php echo e(route('cuentas.pagarCompleto', $factura->id)); ?>" method="POST">
                         <?php echo csrf_field(); ?>
                         <div class="form-group">
                             <label for="referencia">Referencia (en caso de pago completo):</label>
                             <input type="text" name="referencia" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Pagar</button>
-                    </form>
-                    <th><a href="<?php echo e(route('cuentas.create', $factura->id)); ?>" class="btn btn-primary">Abono</a></th>
-                    <th>
+                    </form> -->
+                    <!--<th><a href="<?php echo e(route('cuentas.create', $factura->id)); ?>" class="btn btn-primary">Abono</a></th>-->
+                    
                         <form action="<?php echo e(route('cuentas.usarSaldo', $factura->id)); ?>" method="POST">
                         <?php echo csrf_field(); ?>
                         <button type="submit" class="btn btn-primary">Usar Saldo</button>
                         </form>
-                    </th>
+                    
                 </td>
             </tr>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -58,4 +58,4 @@
 
 
 
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/cuentas/cnc-detalle.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/cuentas/cnc-detalle.blade.php ENDPATH**/ ?>

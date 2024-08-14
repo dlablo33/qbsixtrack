@@ -56,7 +56,6 @@
         Calcular Mejores Opciones
     </button>
 
-    <!-- Ventana modal -->
 <!-- Ventana modal -->
 <div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
     <div class="modal-dialog custom-modal-dialog" role="document">
@@ -156,6 +155,7 @@ document.getElementById('calculateForm').addEventListener('submit', function(eve
     });
 });
 </script>
+
 <style>
     .custom-modal-dialog {
         max-width: 80%; /* Ajusta el ancho máximo de la modal */
@@ -167,5 +167,4 @@ document.getElementById('calculateForm').addEventListener('submit', function(eve
     }
 </style>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/moleculas/molecula1.blade.php ENDPATH**/ ?>

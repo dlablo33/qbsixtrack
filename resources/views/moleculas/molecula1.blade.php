@@ -55,7 +55,6 @@
         Calcular Mejores Opciones
     </button>
 
-    <!-- Ventana modal -->
 <!-- Ventana modal -->
 <div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
     <div class="modal-dialog custom-modal-dialog" role="document">
@@ -153,6 +152,7 @@ document.getElementById('calculateForm').addEventListener('submit', function(eve
     });
 });
 </script>
+
 <style>
     .custom-modal-dialog {
         max-width: 80%; /* Ajusta el ancho máximo de la modal */

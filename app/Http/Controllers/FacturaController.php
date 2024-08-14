@@ -16,32 +16,26 @@ class FacturaController extends Controller
 {
     public function index()
     {
-        
-        $facturas = Factura::orderBy('updated_at', 'DESC')->get(); 
-
-        $facturas = Factura::all();
-        $clientes = Customer::all();
-        $productos = Product::all();
-        $logistica = Logistica::all();
-
-
         $data = [];
         $data['menu'] = "pagos";
         $data['menu_sub'] = "";
-        $data['facturas'] = $facturas;
-        $data['clientes'] = $clientes;
-        $data['productos'] = $productos;
-        $data['logistica'] = $logistica;
+        $data['facturas'] = Factura::orderBy('updated_at', 'DESC')->get();
+        $data['clientes'] = Customer::all();
+        $data['productos'] = Product::all();
+        $data['logistica'] = Logistica::all();
         
         return view('facturas.index', $data);
     }
 
     public function create()
     {
-        $clientes = Customer::all();
-        $productos = Product::all();
+        $data = [];
+        $data['menu'] = "pagos";
+        $data['menu_sub'] = "";
+        $data['clientes'] = Customer::all();
+        $data['productos'] = Product::all();
 
-        return view('facturas.create', compact('clientes', 'productos'));
+        return view('facturas.create', $data);
     }
 
     public function store(Request $request)
@@ -67,11 +61,14 @@ class FacturaController extends Controller
 
     public function edit($id)
     {
-        $factura = Factura::findOrFail($id);
-        $clientes = Customer::all();
-        $productos = Product::all();
+        $data = [];
+        $data['menu'] = "pagos";
+        $data['menu_sub'] = "";
+        $data['factura'] = Factura::findOrFail($id);
+        $data['clientes'] = Customer::all();
+        $data['productos'] = Product::all();
 
-        return view('facturas.edit', compact('factura', 'clientes', 'productos'));
+        return view('facturas.edit', $data);
     }
 
     public function update(Request $request, $id)
@@ -106,46 +103,30 @@ class FacturaController extends Controller
 
     public function showPdf($id)
     {
-            $factura = Factura::with('customer')->findOrFail($id);
+        $factura = Factura::with('customer')->findOrFail($id);
     
-            // Preparar los datos para la vista
-            $data = [];
-            $data['menu'] = "remisiones";
-            $data['menu_sub'] = "";
-            $data['factura'] = $factura;
+        $data = [];
+        $data['menu'] = "remisiones";
+        $data['menu_sub'] = "";
+        $data['factura'] = $factura;
     
-            // Crear una instancia de Dompdf
-            $dompdf = new Dompdf();
+        $dompdf = new Dompdf();
+        $html = view('invoice.remi-pdf', $data)->render();
+        $dompdf->loadHtml($html);
+        $dompdf->render();
     
-            // Cargar la vista con los datos necesarios
-            $html = view('invoice.remi-pdf', $data)->render();
+        $pdfContent = $dompdf->output();
+        $pdfDirectory = storage_path('app/temp');
     
-            // Generar el PDF
-            $dompdf->loadHtml($html);
-    
-            // Renderizar el PDF
-            $dompdf->render();
-    
-            // Obtener el contenido del PDF
-            $pdfContent = $dompdf->output();
-    
-            // Directorio donde se almacenará el archivo PDF
-            $pdfDirectory = storage_path('app/temp');
-    
-            // Verificar si el directorio existe, si no, crearlo
-            if (!file_exists($pdfDirectory)) {
-                mkdir($pdfDirectory, 0755, true);
-            }
-    
-            // Nombre y ruta completa del archivo PDF
-            $pdfPath = $pdfDirectory . '/remision.pdf';
-    
-            // Guardar el PDF en el directorio
-            file_put_contents($pdfPath, $pdfContent);
-    
-            // Descargar el PDF
-            return response()->download($pdfPath, 'remision.pdf')->deleteFileAfterSend(true);
+        if (!file_exists($pdfDirectory)) {
+            mkdir($pdfDirectory, 0755, true);
         }
+    
+        $pdfPath = $pdfDirectory . '/remision.pdf';
+        file_put_contents($pdfPath, $pdfContent);
+    
+        return response()->download($pdfPath, 'remision.pdf')->deleteFileAfterSend(true);
+    }
 
     public function link(Request $request, $id)
     {
@@ -156,9 +137,8 @@ class FacturaController extends Controller
         return redirect()->route('facturas.index')->with('success', 'Factura enlazada exitosamente.');
     }
 
-	public function transferLogisticaToFactura()
+    public function transferLogisticaToFactura()
     {
-        // Obtener todos los registros de Logistica que ya tienen precio
         $logisticasConPrecio = Logistica::whereNotNull('precio')->get();
 
         foreach ($logisticasConPrecio as $logistica) {
@@ -193,14 +173,11 @@ class FacturaController extends Controller
 
     private function generarNumeroFactura()
     {
-        // Lógica para generar un número de factura único
         return 'FAC-' . uniqid();
     }
 
     private function generarCodigoFactura()
     {
-        // Lógica para generar un código de factura único
         return 'CODE-' . uniqid();
     }
-
 }

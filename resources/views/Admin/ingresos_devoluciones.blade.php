@@ -37,6 +37,7 @@
                                     <div class="form-group">
                                         <label for="cliente_id">Asignar a Cliente:</label>
                                         <select name="cliente_id" id="cliente_id" class="form-control">
+                                        <option value="" disabled selected>--Seleccionar cliente--</option>
                                             @foreach($clientes as $cliente)
                                                 <option value="{{ $cliente->id }}">{{ $cliente->NOMBRE_COMERCIAL }}</option>
                                             @endforeach
