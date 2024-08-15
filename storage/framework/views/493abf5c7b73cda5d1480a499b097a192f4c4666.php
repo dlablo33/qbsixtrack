@@ -2,11 +2,14 @@
 
 <?php $__env->startSection('content'); ?>
 <style>
+    /* Estilo para la cabecera de la modal */
     .modal-header {
         background-color: #007bff;
         color: white;
+        animation: slideDown 0.5s ease-out;
     }
 
+    /* Estilo para los botones de la modal */
     .modal-footer {
         display: flex;
         justify-content: space-between;
@@ -15,6 +18,7 @@
     .btn-primary {
         background-color: #007bff;
         border-color: #007bff;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .btn-primary:hover {
@@ -22,28 +26,55 @@
         border-color: #004085;
     }
 
+    /* Estilo para las filas alternas de la tabla */
     .table-striped tbody tr:nth-of-type(odd) {
         background-color: rgba(0,0,0,.05);
     }
 
+    /* Estilo para los encabezados de la tabla */
     .table thead th {
         vertical-align: bottom;
         border-bottom: 2px solid #dee2e6;
+        animation: fadeIn 0.5s ease-in-out;
     }
 
+    /* Estilo para las celdas de la tabla */
     .table td, .table th {
         padding: .75rem;
         vertical-align: top;
         border-top: 1px solid #dee2e6;
     }
 
+    /* Estilo para etiquetas de los formularios */
     .form-group label {
         font-weight: bold;
+    }
+
+    /* Animación para el contenido de la modal */
+    @keyframes  slideDown {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Animación para el contenido de la tabla */
+    @keyframes  fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 </style>
 
 <div>
-    <h1>Molecula 1</h1>
+    <h1 class="text-center mb-4">Molecula 1</h1>
 
     <!-- Total de Facturas Pendientes -->
     <div class="alert alert-info mt-4">
@@ -52,36 +83,36 @@
     </div>
 
     <!-- Botón para abrir la ventana modal -->
-    <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#calculateModal">
+    <button type="button" class="btn btn-primary btn-lg mt-2" data-toggle="modal" data-target="#calculateModal">
         Calcular Mejores Opciones
     </button>
 
-<!-- Ventana modal -->
-<div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
-    <div class="modal-dialog custom-modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="calculateModalLabel">Calcular Mejores Opciones</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Formulario para introducir el presupuesto -->
-                <form id="calculateForm" action="<?php echo e(route('moleculas.calculateBestOptions')); ?>" method="POST" class="mt-2">
-                    <?php echo csrf_field(); ?>
-                    <div class="form-group">
-                        <label for="budget">Presupuesto:</label>
-                        <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Introduce el presupuesto" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Calcular</button>
-                </form>
-                <!-- Resultados de las mejores opciones -->
-                <div id="results" class="mt-4"></div>
+    <!-- Ventana modal -->
+    <div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
+        <div class="modal-dialog custom-modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="calculateModalLabel">Calcular Mejores Opciones</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para introducir el presupuesto -->
+                    <form id="calculateForm" action="<?php echo e(route('moleculas.calculateBestOptions')); ?>" method="POST" class="mt-2">
+                        <?php echo csrf_field(); ?>
+                        <div class="form-group">
+                            <label for="budget">Presupuesto:</label>
+                            <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Introduce el presupuesto" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Calcular</button>
+                    </form>
+                    <!-- Resultados de las mejores opciones -->
+                    <div id="results" class="mt-4"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Mensajes de éxito y error -->
     <?php if(session('success')): ?>
@@ -101,11 +132,11 @@
     <!-- Botón para migrar los datos -->
     <form action="<?php echo e(route('moleculas.migrateLogisticaToMolecula1')); ?>" method="POST" class="mt-2">
         <?php echo csrf_field(); ?>
-        <button type="submit" class="btn btn-primary">Migrar Datos a Molecula 1</button>
+        <button type="submit" class="btn btn-primary btn-lg">Migrar Datos a Molecula 1</button>
     </form>
 
     <?php if($molecula1Records->count() > 0): ?>
-        <table id="example1" class="table table-striped">
+        <table id="example1" class="table table-striped table-hover mt-4">
             <thead>
                 <tr>
                     <th>BOL</th>
@@ -130,7 +161,7 @@
             </tbody>
         </table>
     <?php else: ?>
-        <p>No hay registros en Molecula 1.</p>
+        <p class="mt-4">No hay registros en Molecula 1.</p>
     <?php endif; ?>
 </div>
 
@@ -157,14 +188,23 @@ document.getElementById('calculateForm').addEventListener('submit', function(eve
 </script>
 
 <style>
+    /* Estilo personalizado para el tamaño de la modal */
     .custom-modal-dialog {
-        max-width: 80%; /* Ajusta el ancho máximo de la modal */
-        margin: 1.75rem auto; /* Ajusta el margen para centrar la modal */
+        max-width: 80%;
+        margin: 1.75rem auto;
     }
-    
+
+    /* Estilo personalizado para el contenido de la modal */
     .modal-lg .modal-content {
-        width: 100%; /* Asegura que el contenido ocupa todo el ancho de la modal */
+        width: 100%;
+    }
+
+    /* Estilo para hover de las filas de la tabla */
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+        animation: fadeIn 0.5s ease-in-out;
     }
 </style>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/moleculas/molecula1.blade.php ENDPATH**/ ?>

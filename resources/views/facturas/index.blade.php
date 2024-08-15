@@ -18,10 +18,10 @@
       <tr>
         <th>ID</th>
         <th>Codigo Facturacion</th>
-        <th>Cliente ID</th>
+        <!--<th>Cliente ID</th>-->
         <th>Nombre Cliente</th>
         <th>Nombre Producto</th>
-        <th>Producto ID</th>
+        <!--<th>Producto ID</th>-->
         <!--<th>Numero de Invoice</th>-->
         <th>Bol</th>
         <th>Precio</th>
@@ -42,10 +42,10 @@
         <tr>
           <td>{{ $factura->id }}</td>
           <td>{{ $factura->Numero_Factura }}</td>
-          <td>{{ $factura->cliente_id }}</td>
+          <!--<td>{{ $factura->cliente_id }}</td>-->
           <td>{{ $factura->cliente_name }}</td>
           <td>{{ $factura->producto_name }}</td>
-          <td>{{ $factura->producto_id }}</td>
+          <!--<td>{{ $factura->producto_id }}</td>-->
           <!--<td>{{ $factura->Numero_Factura }}</td>-->
           <td>{{ $factura->bol }}</td>
           <td>${{ number_format($factura->precio, 2, '.', ',') }}</td>

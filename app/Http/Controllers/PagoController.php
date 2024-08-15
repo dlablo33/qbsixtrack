@@ -62,6 +62,8 @@ class PagoController extends Controller
         $facturas = Factura::where('cliente_name', $cliente)->get();
 
         $data = [
+            'menu' => "deudasPorCliente",
+            'menu_sub' => "",
             'facturas' => $facturas,
             'cliente_name' => $cliente,
         ];
@@ -71,21 +73,22 @@ class PagoController extends Controller
 
     public function show($cliente_name)
     {
-    $facturas = Factura::where('cliente_name', $cliente_name)->get();
+        $facturas = Factura::where('cliente_name', $cliente_name)->get();
 
-    // Obtener el saldo a favor del cliente
-    $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
-    $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
+        // Obtener el saldo a favor del cliente
+        $cliente = Customer::where('NOMBRE_COMERCIAL', $cliente_name)->first();
+        $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
-    // Preparar los datos para la vista
-    $data = [
-        'facturas' => $facturas,
-        'cliente_name' => $cliente_name,
-        'saldoAFavor' => $saldoAFavor,
-    ];
+        // Preparar los datos para la vista
+        $data = [
+            'menu' => "deudasPorCliente",
+            'menu_sub' => "",
+            'facturas' => $facturas,
+            'cliente_name' => $cliente_name,
+            'saldoAFavor' => $saldoAFavor,
+        ];
 
-    // Pasar los datos a la vista
-    return view('cuentas.cnc-detalle', $data);
+        return view('cuentas.cnc-detalle', $data);
     }
 
     public function create($factura_id)
@@ -98,6 +101,8 @@ class PagoController extends Controller
         $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
 
         $data = [
+            'menu' => "deudasPorCliente",
+            'menu_sub' => "",
             'factura' => $factura,
             'cliente_name' => $cliente_name,
             'saldoAFavor' => $saldoAFavor,
@@ -140,6 +145,8 @@ class PagoController extends Controller
         }
 
         $data = [
+            'menu' => "deudasPorCliente",
+            'menu_sub' => "",
             'cliente_name' => $factura->cliente_name,
         ];
 
@@ -226,6 +233,8 @@ class PagoController extends Controller
         $pagos = $factura->pagos;
 
         $data = [
+            'menu' => "deudasPorCliente",
+            'menu_sub' => "",
             'factura' => $factura,
             'pagos' => $pagos,
         ];
@@ -240,31 +249,18 @@ class PagoController extends Controller
         ]);
     
         $montoPendiente = $factura->montoPendiente();
-        
-        // Datos para crear el pago
-        $data = [
+    
+        Pago::create([
             'factura_id' => $factura->id,
             'monto' => $montoPendiente,
             'fecha_pago' => now(),
             'referencia' => $request->referencia,
-        ];
+        ]);
     
-        Pago::create($data);
-
-        $factura = Factura::find($factura->id);
-        
-        if ($factura) {
-            // Cambiar el estatus de la factura a 'Pagado'
-            $factura->estatus = 'Pagado';
-            $factura->save();
-        }
+        $factura->estatus = 'Pagado';
+        $factura->save();
     
-        $data = [
-            'factura' => $factura,
-        ];
-    
-        return redirect()->back()->with('success', 'Factura pagada completamente.');
+        return redirect()->route('cuentas.index')
+            ->with('success', 'Factura pagada completamente con éxito.');
     }
-
 }
-

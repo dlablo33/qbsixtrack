@@ -68,8 +68,8 @@
       </a>
       <ul class="nav nav-treeview">
         <li class="nav-item ml-2">
-          <a href="<?php echo e(route('settings')); ?>" class="nav-link">
-            <p>Proximamente</p>
+          <a href="<?php echo e(route('tipocambio.index')); ?>" class="nav-link">
+            <p>Tipo de cambio ( USD => MXN)</p>
           </a>
         </li>
 

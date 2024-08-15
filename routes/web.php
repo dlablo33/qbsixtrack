@@ -18,6 +18,7 @@ use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\MoleculaController;
 use App\Http\Controllers\AdministracionController;
 use App\Http\Controllers\EmpresaCuentaController;
+use App\Http\Controllers\TipoCambioController;
 
 
 // ==============================================================================================================================================================================================
@@ -290,9 +291,15 @@ Route::post('/moleculas/storeMolecula2', [MoleculaController::class, 'storeMolec
 Route::post('/moleculas/processMolecula2', [MoleculaController::class, 'processMolecula2'])->name('moleculas.processMolecula2');
 Route::post('/moleculas/migrateToMolecula2', [MoleculaController::class, 'migrateToMolecula2'])->name('moleculas.migrateToMolecula2');
 Route::post('/moleculas/molecula2/process', [MoleculaController::class, 'processMolecula2'])->name('moleculas.molecula2.process');
-
 Route::get('/moleculas/downloadPdf/{pdfPath}', [MoleculaController::class, 'downloadPdf'])->name('moleculas.downloadPdf');
 Route::get('/moleculas/redirectAfterDownload/{pdfPath}', [MoleculaController::class, 'redirectAfterDownload'])->name('moleculas.redirectAfterDownload');
 Route::post('/moleculas/processPaymentBatch', [MoleculaController::class, 'processPaymentBatch'])->name('moleculas.processPaymentBatch');
 Route::get('/molecula1', [MoleculaController::class, 'molecula1'])->name('molecula1');
+Route::post('/procesar-pagos', [MoleculaController::class, 'procesarPagos'])->name('pagos.procesar');
+Route::post('/pagos/procesar', [MoleculaController::class, 'procesar'])->name('moleculas.procesar');
 
+// ====================================================================================================================
+
+Route::get('/tipo-cambio', [TipoCambioController::class, 'index'])->name('tipocambio.index');
+Route::get('/tipo-cambio/create', [TipoCambioController::class, 'create'])->name('tipocambio.create');
+Route::post('/tipo-cambio', [TipoCambioController::class, 'store'])->name('tipocambio.store');

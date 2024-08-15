@@ -298,6 +298,7 @@ class MoleculaController extends Controller
                 'fecha_entrega' => 'nullable|date',
                 'fecha_descarga' => 'nullable|date',
                 'pedimento' => 'nullable|string',
+                'moneda' => 'nullable|string'
             ]);
     
             // Crea un nuevo registro en la tabla molecula2 con los datos validados
@@ -326,53 +327,10 @@ class MoleculaController extends Controller
             // Redirige de vuelta a la vista de molecula2 con un mensaje de éxito
             return redirect()->route('moleculas.molecula2')->with('success', 'Proceso completado.');
     }
-
-    public function migrateToMolecula2()
-        {
-            // Obtener los registros de la tabla Logistica (asumiendo que Logistica es la tabla origen)
-            $logisticaRecords = Logistica::whereNotNull('transportista_id')
-                ->whereNotNull('destino_id')
-                ->where('destino_id', '!=', 'FOB')
-                ->get();
-        
-            // Recorrer los registros para migrarlos a Molecula2
-            foreach ($logisticaRecords as $logistica) {
-                // Obtener el precio correspondiente del transporte desde la tabla de tarifas
-                $tarifa = Tarifa::where('transportista_id', $logistica->transportista_id)
-                    ->where('destino_id', $logistica->destino_id)
-                    ->first();
-        
-                // Si se encuentra una tarifa correspondiente, crear un nuevo registro en Molecula2
-                if ($tarifa) {
-                    Molecula2::create([
-                        'bol' => $logistica->bol_number,
-                        'order_number' => $logistica->order_number,
-                        'semana' => $logistica->semana,
-                        'fecha' => $logistica->fecha,
-                        'linea' => $logistica->linea,
-                        'no_pipa' => $logistica->no_pipa,
-                        'cliente' => $logistica->cliente,
-                        'destino' => $logistica->destino,
-                        'transportista_id' => $logistica->transportista_id,
-                        'destino_id' => $logistica->destino_id,
-                        'status' => 'pendiente',
-                        'cruce' => $logistica->cruce,
-                        'litros' => $logistica->litros,
-                        'precio' => $tarifa->moneda === 'MXN' ? $tarifa->tar_mex : $tarifa->tar_usa,
-                        'fecha_salida' => $logistica->fecha_salida,
-                        'fecha_entrega' => $logistica->fecha_entrega,
-                        'fecha_descarga' => $logistica->fecha_descarga,
-                        'pedimento' => $logistica->pedimento,
-                    ]);
-                }
-            }
-        
-            // Redirigir a la vista de molecula2 con un mensaje de éxito
-            return redirect()->route('moleculas.molecula2')->with('success', 'Datos migrados exitosamente.');
-    }
  
     public function migrateDataForMolecula2()
     {
+
         // Obtener los registros de la tabla Logistica donde los campos necesarios no son nulos
         $logisticaRecords = Logistica::whereNotNull('transportista_id')
             ->whereNotNull('destino_id')
@@ -416,6 +374,7 @@ class MoleculaController extends Controller
                             'cruce' => $logistica->cruce,
                             'litros' => $logistica->litros,
                             'precio' => $tarifa->iva,
+                            'moneda' => $tarifa->moneda,
                             'fecha_salida' => $logistica->fecha_salida,
                             'fecha_entrega' => $logistica->fecha_entrega,
                             'fecha_descarga' => $logistica->fecha_descarga,
@@ -430,5 +389,44 @@ class MoleculaController extends Controller
         return redirect()->route('moleculas.molecula2')->with('success', 'Datos migrados exitosamente.');
     }
     
+    public function procesarPagos(Request $request)
+{
+    $clientes = Customer::all();
+    $destinos = Destino::all();
+    $selectedRecords = $request->input('selected_records', []);
+    $codekas = $request->input('codeka', []);
+
+    if (!empty($selectedRecords)) {
+        // Cargar los registros junto con sus relaciones de cliente y destino
+        $records = Molecula2::whereIn('id', $selectedRecords)
+                            ->with(['cliente', 'destino']) // Cargar relaciones
+                            ->get();
+
+        // Actualizar el estatus a 'pagado' para los registros seleccionados
+        foreach ($records as $record) {
+            $record->status = 'pagado';
+            $record->codeka = $codekas[$record->id] ?? null;
+            $record->save();
+        }
+
+        // Generar y descargar el PDF si se procesaron registros
+        if ($records->isNotEmpty()) {
+            $data = ['records' => $records, 'clientes' => $clientes, 'destinos' => $destinos];
+            $pdf = PDF::loadView('moleculas.registro_compras_pdf', $data);
+            $pdfFile = 'moleculas_registro_compras.pdf';
+
+            // Guarda el PDF en el servidor temporalmente antes de descargar
+            $pdf->save(storage_path('app/public/' . $pdfFile));
+
+            return response()->json([
+                'url' => url('storage/' . $pdfFile)
+            ]);
+        }
+    }
+
+    return response()->json(['error' => 'No records selected'], 400);
+}
+
+                                                                                                                                                                                                                                                                             
 
 } 

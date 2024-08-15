@@ -66,8 +66,8 @@
                             </div>
                             </p>
                         </div>
-                        <div class="row">
-<!--                            <div class="col-4">
+                        <div class="row justify-content-center">
+                        <!-- <div class="col-4">
                                 <div class="icheck-primary">
                                     <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="remember">
@@ -76,11 +76,12 @@
                                 </div>
                             </div>-->
 
-                            <!-- /.col -->
+                            <!-- /.col 
                             <div class="col-6">
                                 <a href="{{ Route('register')}}" class="btn btn-default btn-block">Registro</a>
-                            </div>
-                            <div class="col-6">
+                            </div> -->
+
+                            <div class="col-8">
                                 <button type="submit" class="btn btn-primary btn-block">{{ __('Ingresa') }}</button>
                             </div>
                             <!-- /.col -->

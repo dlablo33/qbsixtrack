@@ -18,10 +18,10 @@
       <tr>
         <th>ID</th>
         <th>Codigo Facturacion</th>
-        <th>Cliente ID</th>
+        <!--<th>Cliente ID</th>-->
         <th>Nombre Cliente</th>
         <th>Nombre Producto</th>
-        <th>Producto ID</th>
+        <!--<th>Producto ID</th>-->
         <!--<th>Numero de Invoice</th>-->
         <th>Bol</th>
         <th>Precio</th>
@@ -42,10 +42,10 @@
         <tr>
           <td><?php echo e($factura->id); ?></td>
           <td><?php echo e($factura->Numero_Factura); ?></td>
-          <td><?php echo e($factura->cliente_id); ?></td>
+          <!--<td><?php echo e($factura->cliente_id); ?></td>-->
           <td><?php echo e($factura->cliente_name); ?></td>
           <td><?php echo e($factura->producto_name); ?></td>
-          <td><?php echo e($factura->producto_id); ?></td>
+          <!--<td><?php echo e($factura->producto_id); ?></td>-->
           <!--<td><?php echo e($factura->Numero_Factura); ?></td>-->
           <td><?php echo e($factura->bol); ?></td>
           <td>$<?php echo e(number_format($factura->precio, 2, '.', ',')); ?></td>

@@ -139,12 +139,23 @@ class FacturaController extends Controller
 
     public function transferLogisticaToFactura()
     {
-        $logisticasConPrecio = Logistica::whereNotNull('precio')->get();
+    $logisticasConPrecio = Logistica::whereNotNull('precio')->get();
 
-        foreach ($logisticasConPrecio as $logistica) {
-            $cliente = Customer::find($logistica->cliente);
+    foreach ($logisticasConPrecio as $logistica) {
+        $cliente = Customer::find($logistica->cliente);
 
-            if ($cliente) {
+        if ($cliente) {
+            // Buscar si ya existe una factura con el mismo bol y trailer
+            $facturaExistente = Factura::where('bol', $logistica->bol)
+                                       ->where('trailer', $logistica->no_pipa)
+                                       ->first();
+
+            if ($facturaExistente) {
+                // Actualizar el campo pedimento si la factura ya existe
+                $facturaExistente->pedimento = $logistica->pedimento;
+                $facturaExistente->save();
+            } else {
+                // Crear una nueva factura si no existe
                 $factura = new Factura();
                 $factura->cliente_id = $cliente->id;
                 $factura->cliente_name = $cliente->NOMBRE_COMERCIAL; 
@@ -167,9 +178,11 @@ class FacturaController extends Controller
                 $factura->save();
             }
         }
-
-        return redirect()->route('facturas.index')->with('success', 'Datos transferidos con éxito');
     }
+
+    return redirect()->route('facturas.index')->with('success', 'Datos transferidos con éxito');
+    }
+  
 
     private function generarNumeroFactura()
     {
@@ -180,4 +193,5 @@ class FacturaController extends Controller
     {
         return 'CODE-' . uniqid();
     }
+
 }

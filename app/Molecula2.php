@@ -12,7 +12,7 @@ class Molecula2 extends Model
         'bol', 'order_number', 'semana', 'fecha', 'linea', 'no_pipa', 
         'cliente', 'destino', 'transportista_id', 'destino_id', 'status',
         'cruce', 'litros', 'precio', 'fecha_salida', 'fecha_entrega', 
-        'fecha_descarga', 'pedimento'
+        'fecha_descarga', 'pedimento' , 'moneda','codeka'
     ];
 
     public function destino()
@@ -22,7 +22,7 @@ class Molecula2 extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Customer::class, 'cliente_id');
+        return $this->belongsTo(Customer::class, 'cliente');
     }
 
     

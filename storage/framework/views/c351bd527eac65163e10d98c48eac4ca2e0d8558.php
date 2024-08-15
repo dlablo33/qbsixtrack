@@ -95,8 +95,8 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                             </p>
                         </div>
-                        <div class="row">
-<!--                            <div class="col-4">
+                        <div class="row justify-content-center">
+                        <!-- <div class="col-4">
                                 <div class="icheck-primary">
                                     <input class="form-check-input" type="checkbox" name="remember" id="remember" <?php echo e(old('remember') ? 'checked' : ''); ?>>
                                     <label class="form-check-label" for="remember">
@@ -106,11 +106,12 @@ unset($__errorArgs, $__bag); ?>
                                 </div>
                             </div>-->
 
-                            <!-- /.col -->
+                            <!-- /.col 
                             <div class="col-6">
                                 <a href="<?php echo e(Route('register')); ?>" class="btn btn-default btn-block">Registro</a>
-                            </div>
-                            <div class="col-6">
+                            </div> -->
+
+                            <div class="col-8">
                                 <button type="submit" class="btn btn-primary btn-block"><?php echo e(__('Ingresa')); ?></button>
                             </div>
                             <!-- /.col -->
