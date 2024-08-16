@@ -11,6 +11,8 @@
         "php": "^7.2.5|^8.0",
         "ext-json": "*",
         "barryvdh/laravel-dompdf": "*",
+        "consolibyte/quickbooks": "dev-master",
+        "datatables.net/datatables.net-bs": "^2.1",
         "dompdf/dompdf": "^2.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
@@ -24,7 +26,7 @@
         "monolog/monolog": "^2.9",
         "nesbot/carbon": "^2.72",
         "niklasravnsborg/laravel-pdf": "^1.5",
-        "quickbooks/v3-php-sdk": "^5.4",
+        "quickbooks/v3-php-sdk": "^6.1",
         "realrashid/sweet-alert": "^3.2",
         "shuchkin/simplexlsx": "^1.1",
         "symfony/http-client": "^6.0",
@@ -82,5 +84,11 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ]
+    },
+    "repositories": {
+        "quickbooks-php": {
+            "type": "vcs",
+            "url": "https://github.com/consolibyte/quickbooks-php"
+        }
     }
 }

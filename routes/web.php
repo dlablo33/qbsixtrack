@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MarchantController;
 use App\Http\Controllers\InvoiceController;
@@ -19,8 +18,7 @@ use App\Http\Controllers\MoleculaController;
 use App\Http\Controllers\AdministracionController;
 use App\Http\Controllers\EmpresaCuentaController;
 use App\Http\Controllers\TipoCambioController;
-
-
+use App\Http\Controllers\QuickBooksController;
 // ==============================================================================================================================================================================================
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
 Route::get('/', function () {
@@ -33,8 +31,6 @@ Route::get('/register', function () {
     return view('auth/register');
 })->middleware('guest');
 //$this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-// ==============================================================================================================================================================================================
-
 // ==============================================================================================================================================================================================
 Auth::routes();
 Route::get('/test', 'TestingController@index');
@@ -53,9 +49,6 @@ Route::get('/journal', 'CustomerController@index')->middleware('auth')->name('jo
 Route::get('/journal/new', 'CustomerController@create')->middleware('auth')->name('journal.create');
 Route::post('/journal/store', 'CustomerController@store')->middleware('auth')->name('journal.store');
 // ==============================================================================================================================================================================================
-
-// ==============================================================================================================================================================================================
-// Products of QB
 Route::get('/settings/products', 'ProductController@index')->name('products.index');
 Route::get('/settings/products/create/{id?}', 'ProductController@create')->name('products.create');
 Route::get('/settings/products/edit/{id}', 'ProductController@edit')->name('products.edit');
@@ -64,14 +57,9 @@ Route::get('/products/autocomplete', [ProductController::class, 'autocomplete'])
 Route::get('/settings/products/destroy/{id}', 'ProductController@destroy')->name('products.destroy');
 Route::post('/settings/products', 'ProductController@store')->name('products.store');
 Route::get('/products/syncItems', 'ProductController@syncItems');
-
 // ==============================================================================================================================================================================================
-// Route for Quickbook Callback
 Route::get('/quickbook/{user}/callback', 'QuickbookController@callback')->name('qb.callback');
 // ==============================================================================================================================================================================================
-
-// ==============================================================================================================================================================================================
-//Rote for Marchant
 Route::get('/marchants', [MarchantController::class, 'index'])->name('marchants.index');
 Route::get('/marchants/create', [MarchantController::class, 'create'])->name('marchants.create');
 Route::post('/marchants', [MarchantController::class, 'store'])->name('marchants.store');
@@ -79,9 +67,6 @@ Route::get('/marchants/edit/{id}', [MarchantController::class, 'edit'])->name('m
 Route::put('/marchants/update/{id}', [MarchantController::class, 'update'])->name('marchants.update');
 Route::delete('/marchants/destroy/{id}', [MarchantController::class, 'destroy'])->name('marchants.destroy');
 // ==============================================================================================================================================================================================
-
-// ==============================================================================================================================================================================================
-//Route For payemnt Request
 Route::get('/invoice', [InvoiceController::class, 'index'])->name('invoice.index');
 Route::get('/invoices', [InvoiceController::class, 'invoiceList'])->name('invoice.invoice-list');
 Route::get('/invoices/edit/{id}', [InvoiceController::class, 'edit'])->name('invoice.edit-invoice');
@@ -92,9 +77,6 @@ Route::get('/invoices/Molecula_3', [InvoiceController::class, 'invoiceList4'])->
 Route::get('/invoices/remicion/{id}', [InvoiceController::class, 'remi'])->name('invoice.remi');
 Route::post('/invoice/update-status/{id}', [InvoiceController::class, 'updateStatus'])->name('invoice.update.status');
 // ==============================================================================================================================================================================================
-
-// ==============================================================================================================================================================================================
-// Customer routes
 Route::prefix('customers')->group(function () {
     Route::get('/', 'CustomerController@index')->name('customers.index');
     Route::get('/create', 'CustomerController@create')->name('customers.create');
@@ -104,8 +86,6 @@ Route::prefix('customers')->group(function () {
     Route::delete('/{id}', 'CustomerController@destroy')->name('customers.destroy');
     Route::get('/syncCustomers', 'CustomerController@syncCustomers');
 });
-// ==============================================================================================================================================================================================
-
 // ==============================================================================================================================================================================================
 Route::post('/webhook', 'WebhookController@index');
 Route::get('/testGetCustomer', 'TestingController@testGetCustomer');
@@ -125,9 +105,6 @@ Route::get('/test-database', function () {
     }
 });
 // ==============================================================================================================================================================================================
-
-// ==============================================================================================================================================================================================
-//propias
 Route::post('/invoice/download', 'InvoiceController@download')->name('invoice.download');
 Route::get('/invoice/{numeroFactura}/download-pdf', 'ItemController@downloadPDF')->name('item.download-pdf');
 Route::get('settings/{id}/edit', [settingsController::class, 'edit'])->name('settings.edit');
@@ -141,13 +118,9 @@ Route::post('/item/{NumeroFactura}/email', [ItemController::class, 'sendEmail'])
 Route::get('/marchants/{id}/edit', [MarchantController::class, 'edit'])->name('marchants.edit');
 Route::get('/marchants/{cliente_Id}/precios', 'MarchantController@show')->name('marchants.show');
 // ==============================================================================================================================================================================================
-
-// Ruta para manejar el envío del formulario y almacenar la factura
 Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoice.store');
 Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
 Route::get('factura/{id}/ver-pdf', [App\Http\Controllers\InvoiceController::class, 'verPDF'])->name('invoice.ver-pdf');
-// ==============================================================================================================================================================================================
-
 // ==============================================================================================================================================================================================
 Route::get('/precios/{cliente_id}/{product_id}', function ($cliente_id, $product_id) {
     // Implement your logic to retrieve the price data based on $customerId and $productId
@@ -155,7 +128,6 @@ Route::get('/precios/{cliente_id}/{product_id}', function ($cliente_id, $product
     $precio = Marchant::where('cliente_id', $cliente_id)
       ->where('producto_id', $product_id)
       ->first();
-  
     // Return the price data in JSON format
     if ($precio) {
       return response()->json([$precio]);
@@ -165,9 +137,6 @@ Route::get('/precios/{cliente_id}/{product_id}', function ($cliente_id, $product
     }
   });
 // ==============================================================================================================================================================================================
-
-// ==============================================================================================================================================================================================
-  //Cuentas por cobrar
   Route::get('/Cuentas/Index', 'PagoController@index')->name('cuentas.index');
   Route::get('/Cuentas/index', [PagoController::class, 'index']);
   Route::get('/clientes/{cliente_name}/detalles', [PagoController::class, 'show'])->name('cuentas.cnc-detalle');
@@ -176,8 +145,6 @@ Route::post('/pagos', [PagoController::class, 'store'])->name('cuentas.store');
 Route::post('/facturas/{factura}/pagar-completo', [PagoController::class, 'pagarCompleto'])->name('cuentas.pagarCompleto');
 Route::post('/usar-saldo/{factura}', 'PagoController@usarSaldo')->name('cuentas.usarSaldo');
 // ============================================================================================================================================================================================== 
-
-// ==============================================================================================================================================================================================
 Route::get('/get-products-by-customer/{cliente_id}', [InvoiceController::class, 'getProductsByCustomer']);
 Route::get('/get-prices-by-product-and-customer/{cliente_id}/{product_id}', [InvoiceController::class, 'getPricesByProductAndCustomer']);
 Route::get('/get-price-by-customer', 'InvoiceController@getPriceByCustomer')->name('getPriceByCustomer');
@@ -187,22 +154,16 @@ Route::get('/getLastPriceByCustomer', [InvoiceController::class, 'getLastPriceBy
 Route::get('/get-last-price/{customerId}', [InvoiceController::class, 'getLastPrice'])->name('getLastPrice');
 Route::post('/invoices/{invoice}/update-status', 'InvoiceController@updateStatus')->name('invoice.update.status');
 // ==============================================================================================================================================================================================
-
 Route::get('invoice/{id}/pdf', [InvoiceController::class, 'showPdf'])->name('invoice.showPdf');
 Route::post('/invoice/{id}/sendPdf', [InvoiceController::class, 'sendPdf'])->name('invoice.sendPdf');
-
 // ==============================================================================================================================================================================================
-
 Route::get('/invoices/filter', 'InvoiceController@filter')->name('invoice.filter');
 Route::post('/invoice/link/{id}', 'InvoiceController@linkInvoice')->name('invoice.link');
 Route::delete('/invoice/delete/{id}', 'InvoiceController@deleteInvoice')->name('invoice.delete');
-
 // ==============================================================================================================================================================================================
-
 Route::get('/dashboard', function () {
   return view('dashboard');
 });
-
 // ==============================================================================================================================================================================================
 Route::post('/invoicesesp', [InvoiceController::class, 'store2'])->name('invoice.store2');
 Route::get('/invoices/{fecha}', 'App\Http\Controllers\InvoiceController@karen');
@@ -257,10 +218,8 @@ Route::get('/moleculas/download-pdf', [MoleculaController::class, 'downloadPdf']
 Route::get('/generate-pdf', [MoleculaController::class, 'generatePdf'])->name('generatePdf');
 Route::post('/process-payment-batch/{batchId}', [MoleculaController::class, 'processPaymentBatch'])
     ->name('processPaymentBatch');
-
 Route::get('/payment/download-and-refresh', [MoleculaController::class, 'downloadAndRefresh'])->name('payment.downloadAndRefresh');
-
-// =============================================================================================================================================0===
+// =============================================================================================================================================
 Route::get('/Administracion', [AdministracionController::class, 'index'])->name('Admin.index');
 Route::get('/administracion/depositar', [AdministracionController::class, 'showDepositForm'])->name('Admin.showDepositForm');
 Route::post('/administracion/depositar', [AdministracionController::class, 'processDeposit'])->name('Admin.processDeposit');
@@ -282,7 +241,6 @@ Route::get('/empresa_cuenta/gastos', [EmpresaCuentaController::class, 'showGasto
 Route::post('/empresa_cuenta/gastos', [EmpresaCuentaController::class, 'storeGasto'])->name('empresa_cuenta.storeGasto');
 Route::get('/empresa_cuenta/gastos/lista', [EmpresaCuentaController::class, 'listaGastos'])->name('empresa_cuenta.listaGastos');
 // ===============================================================================================================================================
-
 Route::post('/moleculas/assign-tariff', [MoleculaController::class, 'assignTariffToBOL'])->name('moleculas.assignTariffToBOL');
 Route::post('/moleculas/storeMolecula2', [MoleculaController::class, 'storeMolecula2'])->name('moleculas.storeMolecula2');
 Route::post('/molecula2/migrate', [MoleculaController::class, 'migrateDataForMolecula2'])->name('moleculas.migrateDataForMolecula2');
@@ -297,9 +255,11 @@ Route::post('/moleculas/processPaymentBatch', [MoleculaController::class, 'proce
 Route::get('/molecula1', [MoleculaController::class, 'molecula1'])->name('molecula1');
 Route::post('/procesar-pagos', [MoleculaController::class, 'procesarPagos'])->name('pagos.procesar');
 Route::post('/pagos/procesar', [MoleculaController::class, 'procesar'])->name('moleculas.procesar');
-
-// ====================================================================================================================
-
+// ===============================================================================================================================================
 Route::get('/tipo-cambio', [TipoCambioController::class, 'index'])->name('tipocambio.index');
 Route::get('/tipo-cambio/create', [TipoCambioController::class, 'create'])->name('tipocambio.create');
 Route::post('/tipo-cambio', [TipoCambioController::class, 'store'])->name('tipocambio.store');
+// ================================================================================================================================================
+Route::get('/quickbooks/connect', [QuickBooksController::class, 'connect'])->name('quickbooks.connect');
+Route::get('/quickbooks/callback', [QuickBooksController::class, 'callback'])->name('quickbooks.callback');
+Route::get('/quickbooks/invoices', [QuickBooksController::class, 'fetchInvoices'])->name('quickbooks.fetchInvoices');
