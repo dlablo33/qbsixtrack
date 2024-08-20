@@ -228,11 +228,11 @@
                                     <p>Traking</p>
                                 </a>
                             </li>
-                            <!--<li class="nav-item ml-2">
-                                <a href="<?php echo e(route('bol.index')); ?>" class="nav-link">
-                                    <p>Deuda</p>
+                            <li class="nav-item ml-2">
+                                <a href="<?php echo e(route('quickbooks.index')); ?>" class="nav-link">
+                                    <p>QuickBooks</p>
                                 </a>
-                            </li>-->
+                            </li>
                             </ul>
                         </li>
                     <?php endif; ?>

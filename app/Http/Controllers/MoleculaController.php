@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Tarifa;
 use App\Molecula2;
+use App\Molecula3;
 use App\Customer;
 use App\PaymentBatch;
 use App\PaymentBatchItem;

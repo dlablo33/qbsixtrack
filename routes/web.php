@@ -262,4 +262,14 @@ Route::post('/tipo-cambio', [TipoCambioController::class, 'store'])->name('tipoc
 // ================================================================================================================================================
 Route::get('/quickbooks/connect', [QuickBooksController::class, 'connect'])->name('quickbooks.connect');
 Route::get('/quickbooks/callback', [QuickBooksController::class, 'callback'])->name('quickbooks.callback');
-Route::get('/quickbooks/invoices', [QuickBooksController::class, 'fetchInvoices'])->name('quickbooks.fetchInvoices');
+Route::get('quickbooks/error', [QuickBooksController::class, 'error'])->name('quickbooks.error');
+Route::get('quickbooks/fetchInvoices', [QuickBooksController::class, 'fetchInvoices'])->name('quickbooks.fetchInvoices');
+Route::get('/test-token', function () {
+  $accessToken = session('quickbooks_access_token');
+  return $accessToken ? 'Token: ' . $accessToken : 'No token found.';
+});
+Route::get('/quickbooks', [QuickBooksController::class, 'index'])->name('quickbooks.index');
+Route::get('/quickbooks/fetch', [QuickBooksController::class, 'fetchInvoices'])->name('quickbooks.fetch');
+
+
+
