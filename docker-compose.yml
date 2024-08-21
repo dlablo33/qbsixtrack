@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  web:
+    image: dbsaucedo33/my-custom-mysql:9.0.1
+    ports:
+      - "8080:8080"
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: viaduct.proxy.rlwy.net
+      DB_PORT: 11013
+      DB_DATABASE: railway
+      DB_USERNAME: root
+      DB_PASSWORD: ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
+
+  mysql:
+    image: mysql:9.0.1
+    command: mysqld --innodb-use-native-aio=0 --disable-log-bin --performance_schema=0
+    environment:
+      MYSQL_ROOT_PASSWORD: ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./backups:/backups  # Volumen para respaldos
+
+  backup:
+    image: mysql:9.0.1
+    volumes:
+      - ./backups:/backups  # Volumen compartido con mysql para almacenar respaldos
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: railway
+    entrypoint: /bin/bash -c "while true; do /backups/backup.sh; sleep 86400; done"

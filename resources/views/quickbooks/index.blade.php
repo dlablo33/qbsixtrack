@@ -39,4 +39,5 @@
         </tbody>
     </table>
 </div>
+
 @endsection

@@ -1,19 +1,13 @@
 # syntax = docker/dockerfile:experimental
 
-# Default to PHP 8.2, but we attempt to match
-# the PHP version from the user (wherever `flyctl launch` is run)
-# Valid version values are PHP 7.4+
+# Etapa base para Laravel
 ARG PHP_VERSION=8.2
 ARG NODE_VERSION=18
 FROM fideloper/fly-laravel:${PHP_VERSION} as base
 
-# PHP_VERSION needs to be repeated here
-# See https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
-ARG PHP_VERSION
-
 LABEL fly_launch_runtime="laravel"
 
-# copy application code, skipping files based on .dockerignore
+# Copia el código de la aplicación
 COPY . /var/www/html
 
 RUN composer install --optimize-autoloader --no-dev \
@@ -24,7 +18,7 @@ RUN composer install --optimize-autoloader --no-dev \
     && cp .fly/entrypoint.sh /entrypoint \
     && chmod +x /entrypoint
 
-# Laravel 11 made changes to how trusting all proxies works, see https://laravel.com/docs/11.x/requests#trusting-all-proxies and https://laravel.com/docs/10.x/requests#trusting-all-proxies
+# Configuración de proxies para Laravel
 RUN if php artisan --version | grep -q "Laravel Framework 1[1-9]"; then \
     sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
         \$middleware->trustProxies(at: "*");\
@@ -33,7 +27,7 @@ RUN if php artisan --version | grep -q "Laravel Framework 1[1-9]"; then \
     sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php; \
 fi
 
-# If we're using Octane...
+# Configuración específica para Octane, si está en uso
 RUN if grep -Fq "laravel/octane" /var/www/html/composer.json; then \
         rm -rf /etc/supervisor/conf.d/fpm.conf; \
         if grep -Fq "spiral/roadrunner" /var/www/html/composer.json; then \
@@ -48,21 +42,16 @@ RUN if grep -Fq "laravel/octane" /var/www/html/composer.json; then \
         ln -sf /etc/nginx/sites-available/default-octane /etc/nginx/sites-enabled/default; \
     fi
 
-# Multi-stage build: Build static assets
-# This allows us to not include Node within the final container
+# Etapa para construir los assets estáticos
 FROM node:${NODE_VERSION} as node_modules_go_brrr
 
 RUN mkdir /app
 
-RUN mkdir -p  /app
 WORKDIR /app
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
-# Use yarn or npm depending on what type of
-# lock file we might find. Defaults to
-# NPM if no lock file is found.
-# Note: We run "production" for Mix and "build" for Vite
+# Usa yarn o npm dependiendo del tipo de archivo de bloqueo encontrado
 RUN if [ -f "vite.config.js" ]; then \
         ASSET_CMD="build"; \
     else \
@@ -83,19 +72,21 @@ RUN if [ -f "vite.config.js" ]; then \
         npm run $ASSET_CMD; \
     fi;
 
-# From our base container created above, we
-# create our final image, adding in static
-# assets that we generated above
+# Etapa final: Combina assets generados y configura el contenedor final
 FROM base
 
-# Packages like Laravel Nova may have added assets to the public directory
-# or maybe some custom assets were added manually! Either way, we merge
-# in the assets we generated above rather than overwrite them
 COPY --from=node_modules_go_brrr /app/public /var/www/html/public-npm
 RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
     && rm -rf /var/www/html/public-npm \
     && chown -R www-data:www-data /var/www/html/public
 
+# Exponer puerto para la aplicación Laravel
 EXPOSE 8080
 
 ENTRYPOINT ["/entrypoint"]
+
+# Usa la imagen base de MySQL 9.0.1
+FROM mysql:9.0.1
+
+# Configura opciones de inicio de MySQL
+CMD ["mysqld", "--innodb-use-native-aio=0", "--disable-log-bin", "--performance_schema=0"]
