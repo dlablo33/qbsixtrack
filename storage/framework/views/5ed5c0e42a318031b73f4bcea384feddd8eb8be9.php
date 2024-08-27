@@ -173,7 +173,7 @@
                             </li>
 
                             <li class="nav-item ml-2">
-                                <a href="" class="nav-link">
+                                <a href="<?php echo e(route('aduana.index')); ?>" class="nav-link">
                                     <p>Agente Aduanal</p>
                                 </a>
                             </li>

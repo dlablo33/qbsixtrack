@@ -19,6 +19,7 @@ use App\Http\Controllers\AdministracionController;
 use App\Http\Controllers\EmpresaCuentaController;
 use App\Http\Controllers\TipoCambioController;
 use App\Http\Controllers\QuickBooksController;
+use App\Http\Controllers\AduanaController;
 // ==============================================================================================================================================================================================
 Route::get('/invoices/show/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
 Route::get('/', function () {
@@ -271,5 +272,17 @@ Route::get('/test-token', function () {
 Route::get('/quickbooks', [QuickBooksController::class, 'index'])->name('quickbooks.index');
 Route::get('/quickbooks/fetch', [QuickBooksController::class, 'fetchInvoices'])->name('quickbooks.fetch');
 
+// PENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTEPENDIENTE
 
+Route::get('/aduana/formulario', [AduanaController::class, 'mostrarFormulario'])->name('aduana.formulario');
+Route::post('/aduana/calcular', [AduanaController::class, 'calcularCuota'])->name('aduana.calcularCuota');
+Route::get('/agentes-aduanales', [AduanaController::class, 'index'])->name('aduana.index');
+Route::get('/agentes-aduanales/create', [AduanaController::class, 'createAgente'])->name('aduana.create');
+Route::post('/agentes-aduanales', [AduanaController::class, 'storeAgente'])->name('aduana.store');
+Route::post('/aduana/agentes', [AduanaController::class, 'indexAgentes'])->name('aduana.listado');
+Route::post('/aduana/assign-agent', [AduanaController::class, 'assignAgent'])->name('aduana.assignAgent');
+Route::put('/aduana/update-agente', [AduanaController::class, 'updateAgente'])->name('aduana.updateAgente');
+Route::post('/aduana/save-all-agents', [AduanaController::class, 'saveAllAgents'])->name('aduana.saveAllAgents');
+Route::post('/aduana/assign-tipo-cambio', [AduanaController::class, 'assignTipoCambio'])->name('aduana.assignTipoCambio');
+Route::post('/aduana/migrate-all', [AduanaController::class, 'migrateAll'])->name('aduana.migrateAll');
 

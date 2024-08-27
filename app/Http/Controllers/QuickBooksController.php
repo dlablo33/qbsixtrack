@@ -24,10 +24,7 @@ class QuickBooksController extends Controller
         $OAuth2LoginHelper = $dataService->getOAuth2LoginHelper();
         $authUrl = $OAuth2LoginHelper->getAuthorizationCodeURL();
 
-        // Convertir a cadena de texto
-        $authUrlString = (string) $authUrl;
-
-        return redirect($authUrlString);
+        return redirect($authUrl);
     }
 
     public function callback(Request $request)
@@ -59,9 +56,11 @@ class QuickBooksController extends Controller
             }
     
             // Store access token and realm ID in session (consider using encrypted storage)
-            session(['quickbooks_access_token' => $accessToken, 'quickbooks_realm_id' => $request->realmId]);
-
-            dd(session()->all());
+            session([
+                'quickbooks_access_token' => $accessToken->getAccessToken(),
+                'quickbooks_refresh_token' => $accessToken->getRefreshToken(),
+                'quickbooks_realm_id' => $request->realmId
+            ]);
 
             // Redirect to fetch route
             return redirect()->route('quickbooks.index');
@@ -72,7 +71,6 @@ class QuickBooksController extends Controller
     
     public function fetchInvoices()
     {
-        // Configurar el servicio de datos de QuickBooks
         $dataService = DataService::Configure([
             'auth_mode' => 'oauth2',
             'ClientID' => env('QUICKBOOKS_CLIENT_ID'),
@@ -82,28 +80,25 @@ class QuickBooksController extends Controller
             'baseUrl' => env('QUICKBOOKS_ENVIRONMENT') === 'sandbox' ? "Development" : "Production",
         ]);
     
-        // Recuperar los tokens de la sesión
         $accessToken = session('quickbooks_access_token');
         $realmId = session('quickbooks_realm_id');
-    
+
         if (!$accessToken || !$realmId) {
             return redirect()->route('quickbooks.index')->with('error', 'Access token or Realm ID missing.');
         }
     
-        // Actualizar el token en el servicio
-        $dataService->updateOAuth2Token($accessToken);
+        // Actualiza el token si es necesario
+        $this->updateTokens();
+    
+        // Reconfigura el servicio con el nuevo token
+        $dataService->updateOAuth2Token(session('quickbooks_access_token'));
     
         try {
-            // Consulta para obtener todas las facturas de QuickBooks
             $invoices = $dataService->Query("SELECT * FROM Invoice");
-    
-            // Guardar las facturas en la base de datos
             $this->storeInvoicesInDatabase($invoices);
     
-            // Retornar los datos de las facturas a la vista
             return view('quickbooks.index', ['invoices' => $invoices]);
         } catch (\Exception $e) {
-            // Manejar errores de la API
             return redirect()->route('quickbooks.index')->with('error', $e->getMessage());
         }
     }
@@ -149,26 +144,26 @@ class QuickBooksController extends Controller
 
     public function testQuickBooksApi()
     {
-    $dataService = DataService::Configure([
-        'auth_mode' => 'oauth2',
-        'ClientID' => env('QUICKBOOKS_CLIENT_ID'),
-        'ClientSecret' => env('QUICKBOOKS_CLIENT_SECRET'),
-        'RedirectURI' => env('QUICKBOOKS_REDIRECT_URI'),
-        'scope' => 'com.intuit.quickbooks.accounting',
-        'baseUrl' => env('QUICKBOOKS_ENVIRONMENT') === 'sandbox' ? "Development" : "Production",
-    ]);
+        $dataService = DataService::Configure([
+            'auth_mode' => 'oauth2',
+            'ClientID' => env('QUICKBOOKS_CLIENT_ID'),
+            'ClientSecret' => env('QUICKBOOKS_CLIENT_SECRET'),
+            'RedirectURI' => env('QUICKBOOKS_REDIRECT_URI'),
+            'scope' => 'com.intuit.quickbooks.accounting',
+            'baseUrl' => env('QUICKBOOKS_ENVIRONMENT') === 'sandbox' ? "Development" : "Production",
+        ]);
 
-    $accessToken = session('quickbooks_access_token');
-    $realmId = session('quickbooks_realm_id');
+        $accessToken = session('quickbooks_access_token');
+        $realmId = session('quickbooks_realm_id');
 
-    $dataService->updateOAuth2Token($accessToken);
+        $dataService->updateOAuth2Token($accessToken);
 
-    try {
-        $companyInfo = $dataService->query("SELECT * FROM CompanyInfo");
-        dd($companyInfo);
-    } catch (\Exception $e) {
-        dd($e->getMessage());
-    }
+        try {
+            $companyInfo = $dataService->query("SELECT * FROM CompanyInfo");
+            dd($companyInfo);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
     }
 
     public function index()
@@ -185,6 +180,34 @@ class QuickBooksController extends Controller
         return view('quickbooks.index', $data);
     }
 
+    public function updateTokens()
+    {
+        $dataService = DataService::Configure([
+            'auth_mode' => 'oauth2',
+            'ClientID' => env('QUICKBOOKS_CLIENT_ID'),
+            'ClientSecret' => env('QUICKBOOKS_CLIENT_SECRET'),
+            'RedirectURI' => env('QUICKBOOKS_REDIRECT_URI'),
+            'scope' => 'com.intuit.quickbooks.accounting',
+            'baseUrl' => env('QUICKBOOKS_ENVIRONMENT') === 'sandbox' ? "Development" : "Production",
+        ]);
+
+        $refreshToken = session('quickbooks_refresh_token');
+
+        if (!$refreshToken) {
+            return redirect()->route('quickbooks.index')->with('error', 'Refresh token missing.');
+        }
+
+        try {
+            $OAuth2LoginHelper = $dataService->getOAuth2LoginHelper();
+            $accessToken = $OAuth2LoginHelper->refreshToken($refreshToken);
+
+            session([
+                'quickbooks_access_token' => $accessToken->getAccessToken(),
+                'quickbooks_refresh_token' => $accessToken->getRefreshToken(),
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('quickbooks.index')->with('error', $e->getMessage());
+        }
+    }
     
 }
-
