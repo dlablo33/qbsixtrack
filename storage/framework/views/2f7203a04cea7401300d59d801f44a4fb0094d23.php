@@ -142,7 +142,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-    <div id="example" class="display">
+    <div id="example" class="container">
         <h1>Facturas del Cliente: <?php echo e($cliente_name); ?></h1>
         <h2>Saldo a Favor: $<?php echo e(number_format($saldoAFavor, 2, '.', '')); ?></h2>
         <table class="table">

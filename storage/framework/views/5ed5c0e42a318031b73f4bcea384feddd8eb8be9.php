@@ -38,7 +38,7 @@
     <div class="container">
         <!-- Brand Logo -->
         <a href="<?php echo e(route('home')); ?>" class="brand-link">
-            <img src="<?php echo e(asset('admin/dist/img/AdminLTELogo.png')); ?>" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <img src="<?php echo e(asset('admin/dist/img/stred.png')); ?>" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
             <span class="brand-text font-weight-light">STenergy QB</span>
         </a>
 

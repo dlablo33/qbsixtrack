@@ -17,7 +17,8 @@ class Aduana extends Model
             'bol_number',
             'precio',
             'honorario',
-            'dls'
+            'dls',
+            'status'
         ];
     
         // Si usas timestamps, estos son los nombres de las columnas de las fechas en tu base de datos

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('content')
     <div class="container">
@@ -9,6 +9,9 @@
                 {{ session('success') }}
             </div>
         @endif
+
+        <!-- Botón de regreso -->
+        <a href="{{ route('aduana.index') }}" class="btn btn-secondary mb-3">Regresar a Aduanas</a>
 
         <a href="{{ route('aduana.create') }}" class="btn btn-primary mb-3">Agregar Nuevo Agente</a>
 

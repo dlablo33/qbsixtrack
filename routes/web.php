@@ -282,7 +282,10 @@ Route::post('/agentes-aduanales', [AduanaController::class, 'storeAgente'])->nam
 Route::post('/aduana/agentes', [AduanaController::class, 'indexAgentes'])->name('aduana.listado');
 Route::post('/aduana/assign-agent', [AduanaController::class, 'assignAgent'])->name('aduana.assignAgent');
 Route::put('/aduana/update-agente', [AduanaController::class, 'updateAgente'])->name('aduana.updateAgente');
-Route::post('/aduana/save-all-agents', [AduanaController::class, 'saveAllAgents'])->name('aduana.saveAllAgents');
+Route::post('/aduana/saveallagents', [AduanaController::class, 'saveAllAgents'])->name('aduana.saveAllAgents');
 Route::post('/aduana/assign-tipo-cambio', [AduanaController::class, 'assignTipoCambio'])->name('aduana.assignTipoCambio');
 Route::post('/aduana/migrate-all', [AduanaController::class, 'migrateAll'])->name('aduana.migrateAll');
-
+Route::get('/aduana/formulario-tipo-cambio', [AduanaController::class, 'formularioTipoCambio'])->name('aduana.formularioTipoCambio');
+Route::post('/aduana/paySelected', [AduanaController::class, 'paySelected'])->name('aduana.paySelected');
+Route::post('/aduana/pagar-seleccionados', [AduanaController::class, 'pagarSeleccionados'])->name('aduana.paySelected');
+Route::post('/aduana/pay-selected', [AduanaController::class, 'pagarSeleccionados'])->name('aduana.paySelected');

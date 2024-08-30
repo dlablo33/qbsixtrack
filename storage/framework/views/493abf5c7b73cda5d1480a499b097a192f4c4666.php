@@ -28,7 +28,7 @@
 
     /* Estilo para las filas alternas de la tabla */
     .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(0,0,0,.05);
+        background-color: rgba(0, 0, 0, .05);
     }
 
     /* Estilo para los encabezados de la tabla */
@@ -43,11 +43,6 @@
         padding: .75rem;
         vertical-align: top;
         border-top: 1px solid #dee2e6;
-    }
-
-    /* Estilo para etiquetas de los formularios */
-    .form-group label {
-        font-weight: bold;
     }
 
     /* Animación para el contenido de la modal */
@@ -136,7 +131,7 @@
     </form>
 
     <?php if($molecula1Records->count() > 0): ?>
-        <table id="example1" class="table table-striped table-hover mt-4">
+        <table id="" class="table table-striped table-hover mt-4">
             <thead>
                 <tr>
                     <th>BOL</th>
@@ -166,26 +161,80 @@
 </div>
 
 <!-- Scripts para manejar el formulario y mostrar los resultados en la modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-document.getElementById('calculateForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        headers: {
-            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('results').innerHTML = data.html;
-        } else {
-            alert('Error al calcular las mejores opciones');
-        }
+$(document).ready(function() {
+    // Asegurar que todos los elementos SVG tengan un width correctamente asignado
+    var svgElement = document.querySelector('svg');
+    if (svgElement) {
+        svgElement.setAttribute('width', '100'); // Asigna el ancho deseado, ajusta según sea necesario
+        svgElement.setAttribute('height', '100'); // También asigna una altura si es necesario
+    } else {
+        console.error('Elemento SVG no encontrado');
+    }
+
+    // Asegurarse de que el DOM está cargado antes de ejecutar cualquier código
+    $('#calculateForm').on('submit', function(event) {
+        event.preventDefault();
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Verificar si el elemento existe antes de establecer el contenido
+                let resultsElement = document.getElementById('results');
+                if (resultsElement) {
+                    resultsElement.innerHTML = data.html;
+                } else {
+                    console.error('Elemento de resultados no encontrado');
+                }
+            } else {
+                alert('Error al calcular las mejores opciones');
+            }
+        })
+        .catch(error => console.error('Error en la solicitud:', error));
     });
+
+    // Código para inicializar Sparkline
+    if (document.getElementById('example1')) {
+        new Sparkline(document.getElementById('example1'), {
+            // Configuración de Sparkline
+        });
+    } else {
+        console.error('Elemento para Sparkline no encontrado');
+    }
+
+    // Inicializar Vector Map si es necesario
+    if ($('#vmap').length > 0) {
+        // Establecer el tamaño explícito antes de inicializar
+        $('#vmap').css({
+            'width': '600px', // Ajustar según sea necesario
+            'height': '400px' // Ajustar según sea necesario
+        });
+
+        // Inicializar el mapa vectorial
+        $('#vmap').vectorMap({
+            map: 'world_mill',
+            backgroundColor: '#ffffff',
+            regionStyle: {
+                initial: {
+                    fill: '#e4ecef'
+                }
+            }
+        });
+    } else {
+        console.error('Mapa vectorial no encontrado');
+    }
 });
 </script>
+
+
 
 <style>
     /* Estilo personalizado para el tamaño de la modal */
@@ -206,5 +255,7 @@ document.getElementById('calculateForm').addEventListener('submit', function(eve
     }
 </style>
 <?php $__env->stopSection(); ?>
+
+
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/moleculas/molecula1.blade.php ENDPATH**/ ?>

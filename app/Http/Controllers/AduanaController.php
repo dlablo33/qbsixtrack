@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\AgenteAduanal;
 use App\Aduana;
+use App\Pago_aduana;
 
 class AduanaController extends Controller
 {
@@ -160,21 +161,23 @@ class AduanaController extends Controller
 
     public function saveAllAgents(Request $request)
     {
-        // Validaciones
-        $request->validate([
-            'agentes' => 'required|array',
-            'agentes.*' => 'nullable|exists:agentes_aduanales,id',  // Validar que cada agente exista
-            'tipo_de_cambio_global' => 'required|numeric',  // Validar el tipo de cambio global
-        ]);
-    
+        $agentesData = $request->input('agents');
         $tipoDeCambioGlobal = $request->input('tipo_de_cambio_global');
     
-        // Recorrer cada BoL y asignar el agente aduanal correspondiente
-        try {
-            foreach ($request->input('agentes') as $aduanaId => $agenteId) {
-                $aduana = Aduana::findOrFail($aduanaId);
+        DB::transaction(function () use ($agentesData, $tipoDeCambioGlobal) {
+            foreach ($agentesData as $aduanaId => $agenteId) {
+                $aduana = Aduana::find($aduanaId);
     
-                // Asignar el agente si no está vacío
+                if (!$aduana) {
+                    continue;
+                }
+    
+                // Si ya tiene un agente asignado, no permitir cambios
+                if ($aduana->id_agente) {
+                    continue; // Saltar a la siguiente iteración si ya tiene un agente
+                }
+    
+                // Solo asignar el agente si no está vacío
                 if ($agenteId) {
                     $aduana->id_agente = $agenteId;
     
@@ -187,17 +190,11 @@ class AduanaController extends Controller
                     $aduana->save();
                 }
             }
+        });
     
-            // Redireccionar con un mensaje de éxito y mostrar el modal para el tipo de cambio
-            return redirect()->route('aduana.index')->with('success', 'Agentes aduanales asignados y cálculos realizados con éxito.')
-                                       ->with('showTipoCambioModal', true);
-        } catch (Exception $e) {
-            // Capturar errores y mostrar un mensaje
-            return back()->withErrors(['error' => 'Ocurrió un error al guardar los datos: ' . $e->getMessage()]);
-        }
+        return redirect()->route('aduana.index')->with('success', 'Agentes aduanales asignados y cálculos realizados con éxito.');
     }
-    
-    
+
     public function assignTipoCambio(Request $request)
     {
         $request->validate([
@@ -226,5 +223,84 @@ class AduanaController extends Controller
             return redirect()->route('aduana.index')->with('error', 'No se encontraron aduanas asignadas.');
         }
     }
-    
+
+    public function paySelected(Request $request)
+{
+    // Obtener los IDs de los BoLs seleccionados
+    $selectedIds = explode(',', $request->input('selected_ids'));
+
+    if (empty($selectedIds)) {
+        return redirect()->back()->with('error', 'No se seleccionaron BoLs para pagar.');
+    }
+
+    // Iniciar transacción
+    DB::transaction(function () use ($selectedIds) {
+        $fechaPago = now();  // Registrar la fecha de pago
+
+        foreach ($selectedIds as $bolId) {
+            $aduana = Aduana::find($bolId);
+
+            if ($aduana) {
+                // Cambiar el estatus del BoL a "Pagado"
+                $aduana->status = 'Pagado';
+                $aduana->save();
+
+                // Registrar el pago en la tabla de pagos
+                Pago_aduana::create([
+                    'bol_id' => $aduana->id,
+                    'cantidad' => $aduana->honorarios,
+                    'fecha' => $fechaPago,
+                ]);
+            }
+        }
+    });
+
+    // Redirigir con éxito
+    return redirect()->route('aduana.index')->with('success', 'Pago realizado con éxito.');
 }
+
+public function pagarSeleccionados(Request $request)
+{
+    // Validar que haya seleccionados
+    if (!$request->has('selected_ids') || empty($request->input('selected_ids'))) {
+        return redirect()->back()->with('error', 'No se seleccionaron BoLs para pagar.');
+    }
+
+    // Obtener los IDs seleccionados y la cantidad total
+    $selectedIds = explode(',', $request->input('selected_ids'));
+    $totalPagos = 0;
+
+    foreach ($selectedIds as $bolId) {
+        $aduana = Aduana::find($bolId);
+
+        if (!$aduana) {
+            continue; // Si no se encuentra el BoL, omitir
+        }
+
+        // Registrar el pago en la tabla pagos_aduana
+        Pago_Aduana::create([
+            'bol_id' => $aduana->id,
+            'cantidad' => $aduana->honorarios,
+            'fecha' => now(),
+        ]);
+
+        // Sumar al total
+        $totalPagos += $aduana->honorarios;
+
+        // Cambiar el estatus del BoL si es necesario
+        $aduana->status = 'Pagado';
+        $aduana->save();
+    }
+
+    return redirect()->back()->with('success', 'Pago registrado exitosamente. Total pagado: ' . $totalPagos . ' MXN.');
+}
+
+
+
+
+
+
+
+}
+
+    

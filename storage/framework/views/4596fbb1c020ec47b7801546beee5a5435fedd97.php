@@ -11,6 +11,9 @@
             </div>
         <?php endif; ?>
 
+        <!-- Botón de regreso -->
+        <a href="<?php echo e(route('aduana.index')); ?>" class="btn btn-secondary mb-3">Regresar a Aduanas</a>
+
         <a href="<?php echo e(route('aduana.create')); ?>" class="btn btn-primary mb-3">Agregar Nuevo Agente</a>
 
         <table class="table table-striped">
@@ -39,5 +42,4 @@
         </table>
     </div>
 <?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/aduana/listado.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/aduana/listado.blade.php ENDPATH**/ ?>
