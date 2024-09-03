@@ -167,7 +167,7 @@
                             </li>
 
                             <li class="nav-item ml-2">
-                                <a href="" class="nav-link">
+                                <a href="<?php echo e(route('moleculas.molecula3')); ?>" class="nav-link">
                                     <p>Molecula 3</p>
                                 </a>
                             </li>

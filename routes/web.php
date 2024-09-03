@@ -289,3 +289,11 @@ Route::get('/aduana/formulario-tipo-cambio', [AduanaController::class, 'formular
 Route::post('/aduana/paySelected', [AduanaController::class, 'paySelected'])->name('aduana.paySelected');
 Route::post('/aduana/pagar-seleccionados', [AduanaController::class, 'pagarSeleccionados'])->name('aduana.paySelected');
 Route::post('/aduana/pay-selected', [AduanaController::class, 'pagarSeleccionados'])->name('aduana.paySelected');
+
+// ================================================================================================================================================
+
+Route::get('/Molecula3', [MoleculaController::class, 'molecula3'])->name('moleculas.molecula3');
+Route::post('/migrar-bols', [MoleculaController::class, 'migrarBoLs'])->name('migrar.bols');
+Route::post('/pagar-bols', [MoleculaController::class, 'pagarBoLs'])->name('moleculas.pagar');
+Route::post('/pagar-bols', [MoleculaController::class, 'pagarBoLs'])->name('pagar.bols');
+

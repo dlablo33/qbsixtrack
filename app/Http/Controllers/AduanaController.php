@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use App\AgenteAduanal;
 use App\Aduana;
 use App\Pago_aduana;
+use Dompdf\Dompdf;
+
 
 class AduanaController extends Controller
 {
@@ -224,8 +226,31 @@ class AduanaController extends Controller
         }
     }
 
-    public function paySelected(Request $request)
+    public function generarPdf(Request $request)
 {
+    // Crear una instancia de Dompdf
+    $dompdf = new Dompdf();
+
+    // Renderizar la vista y obtener el contenido HTML
+    $html = view('nombre_de_la_vista', compact('datos'))->render();
+
+    // Cargar el HTML en Dompdf
+    $dompdf->loadHtml($html);
+
+    // Opcional: ajustar el tamaño del papel y la orientación
+    $dompdf->setPaper('A4', 'landscape');
+
+    // Renderizar el PDF
+    $dompdf->render();
+
+    // Descargar el archivo PDF
+    return $dompdf->stream('nombre_del_archivo.pdf');
+    }
+
+    
+
+    public function paySelected(Request $request)
+    {
     // Obtener los IDs de los BoLs seleccionados
     $selectedIds = explode(',', $request->input('selected_ids'));
 
@@ -233,8 +258,10 @@ class AduanaController extends Controller
         return redirect()->back()->with('error', 'No se seleccionaron BoLs para pagar.');
     }
 
+    $pagos = [];
+
     // Iniciar transacción
-    DB::transaction(function () use ($selectedIds) {
+    DB::transaction(function () use ($selectedIds, &$pagos) {
         $fechaPago = now();  // Registrar la fecha de pago
 
         foreach ($selectedIds as $bolId) {
@@ -246,20 +273,45 @@ class AduanaController extends Controller
                 $aduana->save();
 
                 // Registrar el pago en la tabla de pagos
-                Pago_aduana::create([
+                $pago = Pago_aduana::create([
                     'bol_id' => $aduana->id,
                     'cantidad' => $aduana->honorarios,
                     'fecha' => $fechaPago,
                 ]);
+
+                $pagos[] = $pago;  // Añadir el pago al array para generar el PDF
             }
         }
     });
 
-    // Redirigir con éxito
-    return redirect()->route('aduana.index')->with('success', 'Pago realizado con éxito.');
-}
+    // Si se registraron pagos, generar el PDF
+    if (!empty($pagos)) {
+        // Crear una instancia de Dompdf
+        $dompdf = new Dompdf();
 
-public function pagarSeleccionados(Request $request)
+        // Renderizar la vista y obtener el contenido HTML
+        $html = view('aduana.pagos_pdf', ['pagos' => $pagos])->render();
+
+        // Cargar el HTML en Dompdf
+        $dompdf->loadHtml($html);
+
+        // Ajustar el tamaño del papel y la orientación
+        $dompdf->setPaper('A4', 'landscape');
+
+        // Renderizar el PDF
+        $dompdf->render();
+
+        // Forzar la descarga del archivo PDF en lugar de solo mostrarlo en el navegador
+        return response()->streamDownload(function () use ($dompdf) {
+            echo $dompdf->output();
+        }, 'BoLs_Pagados_' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    // Si no hay pagos, redirigir con un mensaje de error
+    return redirect()->route('aduana.index')->with('error', 'No se pudieron registrar los pagos.');
+    }
+
+    public function pagarSeleccionados(Request $request)
 {
     // Validar que haya seleccionados
     if (!$request->has('selected_ids') || empty($request->input('selected_ids'))) {
@@ -293,12 +345,7 @@ public function pagarSeleccionados(Request $request)
     }
 
     return redirect()->back()->with('success', 'Pago registrado exitosamente. Total pagado: ' . $totalPagos . ' MXN.');
-}
-
-
-
-
-
+    }
 
 
 }

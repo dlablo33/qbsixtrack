@@ -428,6 +428,94 @@ class MoleculaController extends Controller
     return response()->json(['error' => 'No records selected'], 400);
 }
 
-                                                                                                                                                                                                                                                                             
+// =============================================================================================================================================
+
+    public function molecula3()
+    {
+    $bols = Molecula3::all(); // Obtén los registros de Molecula3
+
+    $data = [
+        'menu' => 'bols',
+        'menu_sub' => '',
+        'bols' => $bols
+    ];
+
+    // Retorna la vista con los datos
+    return view('moleculas.molecula3', $data);
+    }
+
+    public function migrarBoLs()
+{
+    $bols = Logistica::all();
+
+    // Obtener los precios más recientes para molecula1 y molecula3
+    $precioMolecula1 = PrecioMolecula::where('molecula', 1)->orderBy('created_at', 'desc')->first()->precio;
+    $precioMolecula3 = PrecioMolecula::where('molecula', 2)->orderBy('created_at', 'desc')->first()->precio;
+
+    foreach ($bols as $bol) {
+        // Asumimos que hay un campo en el BoL que contiene la cantidad de litros
+        $litros = $bol->litros;
+
+        // Convertir los litros a barriles
+        $barriles = $litros / 158.9873;
+
+        // Aplicar la fórmula original
+        $resultado = (($precioMolecula3 * 42 - 7.14) - ($precioMolecula1 * 3.7854 * 42));
+
+        // Multiplicar el resultado por la cantidad de barriles
+        $serviceFee = $resultado * $barriles;
+
+        // Calcular el Transportación Fee
+        $transportationFee = $barriles * 7.14;
+
+        // Weight Controller fijo
+        $weightController = 10;
+
+        //
+        $total = $serviceFee + $transportationFee + $weightController;
+
+
+        // Insertar los datos en la tabla molecula3
+        Molecula3::create([
+            'bol_id' => $bol->bol,
+            'precio_molecula1' => $precioMolecula1,
+            'precio_molecula3' => $precioMolecula3,
+            'resultado' => $serviceFee,
+            'transportation_fee' => $transportationFee,
+            'weight_controller' => $weightController,
+            'total' => $total,
+        ]);
+    }
+
+    // Redirigir con un mensaje de éxito
+    return redirect()->back()->with('success', 'BoLs migrados exitosamente.');
+    }
+
+    public function pagarBoLs(Request $request)
+    {
+    $bolIds = $request->input('bol_ids'); // Obtener los BoLs seleccionados para pago
+    
+    if($bolIds) {
+        // Actualizar el estado de los BoLs seleccionados
+        Molecula3::whereIn('bol_id', $bolIds)->update(['status' => 'pagado']);
+
+        // Obtener los BoLs pagados
+        $bolsPagados = Molecula3::whereIn('bol_id', $bolIds)->get();
+
+        // Generar el PDF con los BoLs pagados
+        $pdf = PDF::loadView('moleculas.bols_pagados', compact('bolsPagados'));
+
+        // Retornar el PDF para descarga
+        return $pdf->download('boLs_pagados.pdf');
+
+        // Redirigir de nuevo con mensaje de éxito
+        return redirect()->back()->with('success', 'Los BoLs seleccionados han sido pagados.');
+    }
+
+    return redirect()->back()->with('error', 'No se seleccionaron BoLs para pagar.');
+    }
+
+
+
 
 } 
