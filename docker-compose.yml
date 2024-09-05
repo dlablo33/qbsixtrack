@@ -2,34 +2,55 @@ version: '3.8'
 
 services:
   web:
-    image: dbsaucedo33/my-custom-mysql:9.0.1
+    image: your-laravel-image
+    container_name: web
     ports:
-      - "8080:8080"
+      - "80:80"
+    depends_on:
+      - mysql
     environment:
-      DB_CONNECTION: mysql
-      DB_HOST: viaduct.proxy.rlwy.net
-      DB_PORT: 11013
-      DB_DATABASE: railway
-      DB_USERNAME: root
-      DB_PASSWORD: ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=11013
+      - DB_DATABASE=railway
+      - DB_USERNAME=root
+      - DB_PASSWORD=ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
+    volumes:
+      - .:/var/www/html
+    networks:
+      - app-network
 
   mysql:
     image: mysql:9.0.1
-    command: mysqld --innodb-use-native-aio=0 --disable-log-bin --performance_schema=0
+    container_name: mysql
+    ports:
+      - "11013:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
-    ports:
-      - "3307:3306"
-    volumes:
-      - ./backups:/backups  # Volumen para respaldos
-
-  backup:
-    image: mysql:9.0.1
-    volumes:
-      - ./backups:/backups  # Volumen compartido con mysql para almacenar respaldos
-    environment:
-      MYSQL_USER: root
-      MYSQL_PASSWORD: ftMKHcANburGUFcaNNnVMJqnLQZRBvGo
-      MYSQL_HOST: mysql
       MYSQL_DATABASE: railway
-    entrypoint: /bin/bash -c "while true; do /backups/backup.sh; sleep 86400; done"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

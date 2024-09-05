@@ -20,6 +20,7 @@ console_command = 'php /var/www/html/artisan tinker'
   LOG_STDERR_FORMATTER = 'Monolog\Formatter\JsonFormatter'
   SESSION_DRIVER = 'cookie'
   SESSION_SECURE_COOKIE = 'true'
+  MYSQL_ROOT_PASSWORD = 'ftMKHcANburGUFcaNNnVMJqnLQZRBvGo'  # Añade esta línea para especificar la contraseña del root
 
 [http_service]
   internal_port = 8080
@@ -33,4 +34,5 @@ console_command = 'php /var/www/html/artisan tinker'
   memory = '4096MB'  # Aumenta la memoria a 4GB
   cpu_kind = 'shared'
   cpus = 2  # Aumenta los CPUs a 2
+
 

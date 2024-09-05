@@ -31,7 +31,7 @@
 
             <h3>Total seleccionado: <span id="total-suma">0.00</span></h3>
 
-            <table class="table">
+            <table id="example1" class="table">
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="select-all"></th>

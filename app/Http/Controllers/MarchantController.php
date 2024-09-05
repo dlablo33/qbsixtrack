@@ -32,7 +32,16 @@ class MarchantController extends Controller
             $clientes = Customer::all(); 
             $productos = Product::all(); 
             $precios = precio::all();
-            return view('marchants.create', compact('clientes', 'productos'));
+
+            $data = [
+                'menu' => '',
+                'clientes' => $clientes,
+                'productos' => $productos,
+                'precios' => $precios
+
+            ];
+
+            return view('marchants.create', $data);
         }
     
         public function store(Request $request)

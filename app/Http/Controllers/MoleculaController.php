@@ -515,7 +515,4 @@ class MoleculaController extends Controller
     return redirect()->back()->with('error', 'No se seleccionaron BoLs para pagar.');
     }
 
-
-
-
 } 

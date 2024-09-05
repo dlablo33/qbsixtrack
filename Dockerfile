@@ -1,4 +1,4 @@
-# syntax = docker/dockerfile:experimental
+# syntax=docker/dockerfile:1
 
 # Etapa base para Laravel
 ARG PHP_VERSION=8.2
@@ -45,8 +45,6 @@ RUN if grep -Fq "laravel/octane" /var/www/html/composer.json; then \
 # Etapa para construir los assets estáticos
 FROM node:${NODE_VERSION} as node_modules_go_brrr
 
-RUN mkdir /app
-
 WORKDIR /app
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
@@ -84,9 +82,3 @@ RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
 EXPOSE 8080
 
 ENTRYPOINT ["/entrypoint"]
-
-# Usa la imagen base de MySQL 9.0.1
-FROM mysql:9.0.1
-
-# Configura opciones de inicio de MySQL
-CMD ["mysqld", "--innodb-use-native-aio=0", "--disable-log-bin", "--performance_schema=0"]
