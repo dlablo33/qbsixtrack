@@ -247,8 +247,6 @@ class AduanaController extends Controller
     return $dompdf->stream('nombre_del_archivo.pdf');
     }
 
-    
-
     public function paySelected(Request $request)
     {
     // Obtener los IDs de los BoLs seleccionados

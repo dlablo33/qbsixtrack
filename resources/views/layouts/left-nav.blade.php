@@ -291,6 +291,12 @@
                                     <p>Gastos</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item ml-2">
+                            <a href="{{ route('admin.create') }}" class="nav-link">
+                                    <p>Clientes</p>
+                                </a>
+                            </li>
                             @endif
 
 

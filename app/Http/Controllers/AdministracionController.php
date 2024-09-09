@@ -269,4 +269,31 @@ class AdministracionController extends Controller
     return redirect()->route('Admin.index')->with('success', 'Saldo asignado con éxito.');
     }
      
+    public function create()
+    {
+        $data = [
+            'menu' => 'Admin',
+            'submenu' => '',
+            
+        ];
+
+        return view('Admin.create', $data);  // Asegúrate de que la ruta a la vista es correcta
+    }
+
+    // Almacena el nuevo cliente en la base de datos
+    public function store(Request $request)
+    {
+        // Validación
+        $request->validate([
+            'cliente' => 'required|string|max:255',
+        ]);
+
+        // Crear nuevo cliente
+        CustomerAdmin::create([
+            'cliente' => $request->cliente,
+        ]);
+
+        // Redirigir con mensaje de éxito
+        return redirect()->route('admin.create')->with('success', 'Cliente creado con éxito');
+    }
 }

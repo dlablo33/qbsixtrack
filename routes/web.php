@@ -230,6 +230,10 @@ Route::get('/devoluciones/{cliente_id}', [AdministracionController::class, 'show
 Route::post('/refund-deposit', [AdministracionController::class, 'storeDevolucion'])->name('Admin.refundDeposit');
 Route::get('/admin/ingresos-devoluciones', [AdministracionController::class, 'showIncomesAndRefunds'])->name('Admin.incomesAndRefunds');
 Route::post('/depositos/{id}/asignarSaldo', [AdministracionController::class, 'asignarSaldo'])->name('depositos.asignarSaldo');
+Route::get('/admin/clientes/create', [AdministracionController::class, 'create'])->name('admin.create');
+Route::post('/admin/clientes', [AdministracionController::class, 'store'])->name('admin.store');
+
+
 // ===============================================================================================================================================
 Route::get('/empresa_cuenta', [EmpresaCuentaController::class, 'index'])->name('empresa_cuenta.index');
 Route::post('/empresa_cuenta/agregar', [EmpresaCuentaController::class, 'agregarIngreso'])->name('empresa_cuenta.agregarIngreso');

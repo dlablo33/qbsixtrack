@@ -293,6 +293,12 @@
                                     <p>Gastos</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item ml-2">
+                            <a href="<?php echo e(route('admin.create')); ?>" class="nav-link">
+                                    <p>Clientes</p>
+                                </a>
+                            </li>
                             <?php endif; ?>
 
 
