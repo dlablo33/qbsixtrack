@@ -83,54 +83,63 @@ class LogisticaController extends Controller
     }
 
     public function transferData()
-    {
-        ini_set('max_execution_time', 600);
+{
+    ini_set('max_execution_time', 600);
 
-        DB::transaction(function () {
-            $bluewiRecords = Bluewi::all();
+    DB::transaction(function () {
+        // Obtener una lista de todos los `bol` y `order_number` ya existentes en Logistica
+        $existingRecords = Logistica::pluck('bol', 'order_number')->toArray();
+
+        // Procesar los registros de Bluewi en lotes
+        Bluewi::chunk(1000, function ($bluewiRecords) use ($existingRecords) {
+            $dataToInsert = [];
 
             foreach ($bluewiRecords as $record) {
-                if (!empty($record->bol_number)) {
-                    $exists = Logistica::where('bol', $record->bol_number)
-                                        ->where('order_number', $record->order_number)
-                                        ->exists();
+                if (!empty($record->bol_number) && 
+                    !isset($existingRecords[$record->order_number]) &&
+                    !in_array($record->bol_number, $existingRecords)) {
 
-                    if (!$exists) {
-                        $transportistaId = null;
-                        
-                        if (isset($record->carrier)) {
-                            if ($record->carrier == 'JOSE LUIS LUMBRERAS') {
-                                $transportistaId = 2; // ID del transportista XLV (Liji)
-                            } elseif ($record->carrier == 'Autotransportes SK') {
-                                $transportistaId = 1; // ID del transportista SK
-                            } elseif ($record->carrier == 'TOKKO CARRIERS DE MEXICO SA DE CV') {
-                                $transportistaId = 3; // ID del transportista TOKKO
-                            }
+                    $transportistaId = null;
+
+                    if (isset($record->carrier)) {
+                        if ($record->carrier == 'JOSE LUIS LUMBRERAS') {
+                            $transportistaId = 2;
+                        } elseif ($record->carrier == 'Autotransportes SK') {
+                            $transportistaId = 1;
+                        } elseif ($record->carrier == 'TOKKO CARRIERS DE MEXICO SA DE CV') {
+                            $transportistaId = 3;
                         }
-
-                        Logistica::create([
-                            'bol' => $record->bol_number,
-                            'order_number' => $record->order_number ?? '',
-                            'semana' => Carbon::parse($record->bol_date)->weekOfYear,
-                            'fecha' => $record->bol_date,
-                            'linea' => $record->carrier ?? '',
-                            'no_pipa' => $record->trailer ?? '',
-                            'cliente' => null,
-                            'destino' => null,
-                            'transportista_id' => $transportistaId,
-                            'destino_id' => null,
-                            'status' => "pendiente",
-                            'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,
-                            'cruce' => "rojo",
-                            'pedimento' => null,
-                        ]);
                     }
+
+                    // Preparar los datos para inserción masiva
+                    $dataToInsert[] = [
+                        'bol' => $record->bol_number,
+                        'order_number' => $record->order_number ?? '',
+                        'semana' => Carbon::parse($record->bol_date)->weekOfYear,
+                        'fecha' => $record->bol_date,
+                        'linea' => $record->carrier ?? '',
+                        'no_pipa' => $record->trailer ?? '',
+                        'cliente' => null,
+                        'transportista_id' => $transportistaId,
+                        'destino_id' => null,
+                        'status' => "pendiente",
+                        'litros' => $record->net_usg ? round($record->net_usg * 3.78541) : 0,
+                        'cruce' => "rojo",
+                        'pedimento' => null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
                 }
             }
-        });
 
-        return redirect()->route('logistica.index')->with('success', 'Datos transferidos con éxito');
-    }
+            // Inserción masiva
+            Logistica::insert($dataToInsert);
+        });
+    });
+
+    return redirect()->route('logistica.index')->with('success', 'Datos transferidos con éxito');
+}
+
 
     public function asignarCliente(Request $request)
     {
@@ -191,44 +200,47 @@ class LogisticaController extends Controller
 
     public function guardarTodos(Request $request)
     {
-        $logisticaData = $request->input('logistica');
-
-        DB::transaction(function () use ($logisticaData) {
-            foreach ($logisticaData as $id => $data) {
+        $data = $request->input('logistica');
+    
+        foreach ($data as $id => $values) {
+            // Verifica si $values está asignado
+            if (!empty($values)) {
                 $logistica = Logistica::find($id);
-
-                if (!$logistica) {
-                    continue;
-                }
-
-                if (!$logistica->cliente) {
-                    $cliente = Customer::find($data['cliente']);
-                    if ($cliente) {
-                        $logistica->cliente = $data['cliente'];
-
-                        if (strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false) {
-                            $logistica->destino_id = 5;
-                            $logistica->transportista_id = null;
+    
+                if ($logistica) {
+                    // Guardar el cliente
+                    if (!empty($values['cliente'])) {
+                        $cliente = Customer::find($values['cliente']);
+                        if ($cliente) {
+                            $logistica->cliente = $values['cliente'];
+    
+                            // Asignar destino basado en el nombre comercial del cliente
+                            $logistica->destino_id = strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false ? 5 : $logistica->destino_id;
+                            if ($logistica->destino_id == 5) {
+                                $logistica->transportista_id = null; // Resetea el transportista si es FOB
+                            }
                         }
                     }
+    
+                    // Guardar el destino, si se ha proporcionado
+                    if (!empty($values['destino']) && $values['destino'] != $logistica->destino_id) {
+                        $logistica->destino_id = $values['destino'];
+                    }
+    
+                    // Guardar otros campos
+                    $logistica->status = $values['status'] ?? $logistica->status;
+                    $logistica->cruce = $values['cruce'] ?? $logistica->cruce;
+                    $logistica->fecha_salida = $values['fecha_salida'] ?? $logistica->fecha_salida;
+                    $logistica->fecha_entrega = $values['fecha_entrega'] ?? $logistica->fecha_entrega;
+                    $logistica->fecha_descarga = $values['fecha_descarga'] ?? $logistica->fecha_descarga;
+                    $logistica->pedimento = $values['pedimento'] ?? $logistica->pedimento;
+                    $logistica->precio = $values['precio'] ?? $logistica->precio; // Mantener el precio si no se actualiza
+                    $logistica->save();
                 }
-
-                $logistica->status = $data['status'] ?? $logistica->status;
-                $logistica->cruce = $data['cruce'] ?? $logistica->cruce;
-                $logistica->fecha_salida = $data['fecha_salida'] ? Carbon::parse($data['fecha_salida'])->format('Y-m-d') : $logistica->fecha_salida;
-                $logistica->fecha_entrega = $data['fecha_entrega'] ? Carbon::parse($data['fecha_entrega'])->format('Y-m-d') : $logistica->fecha_entrega;
-                $logistica->fecha_descarga = $data['fecha_descarga'] ? Carbon::parse($data['fecha_descarga'])->format('Y-m-d') : $logistica->fecha_descarga;
-
-                if (isset($data['precio'])) {
-                    $logistica->precio = $data['precio'];
-                }
-
-                $logistica->pedimento = $data['pedimento'] ?? $logistica->pedimento;
-                $logistica->save();
             }
-        });
-
-        return redirect()->back()->with('success', 'Datos actualizados exitosamente');
+        }
+    
+        return redirect()->route('logistica.index')->with('success', 'Datos actualizados con éxito');
     }
-
+    
 }

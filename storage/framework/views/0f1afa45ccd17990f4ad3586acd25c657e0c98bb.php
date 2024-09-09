@@ -1,9 +1,10 @@
 <!-- /.content-wrapper -->
-  <footer class="main-footer">
+<footer class="main-footer text-right" style="padding: 10px; background-color: #f1f1f1;">
+    <strong>STApp V 0.0.1</strong>
     <div class="float-right d-none d-sm-inline-block">
       <!--<b>Version</b> 3.1.0-rc-->
     </div>
-  </footer>
+</footer>
 
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
