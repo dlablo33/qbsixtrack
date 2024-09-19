@@ -32,14 +32,25 @@
 
 <!-- Fila para los botones -->
 <div class="row mb-4">
-    <div class="col-md-12 text-center">
+    <div class="col-md-6 text-left">
         <form action="{{ route('aduana.migrateAll') }}" method="POST" class="d-inline-block">
             @csrf
-            <button type="submit" class="btn btn-success btn-animated btn-sm">Migrar Todos los BoLs</button>
+            <button type="submit" class="btn btn-info">Migrar Todos los BoLs</button>
         </form>
         <form action="{{ route('aduana.listado') }}" method="POST" class="d-inline-block ml-2">
             @csrf
-            <button type="submit" class="btn btn-secondary btn-animated btn-sm">Agentes Aduanales</button>
+            <button type="submit" class="btn btn-info">Agentes Aduanales</button>
+        </form>
+    </div>
+    <div class="col-md-6 text-right">
+        <button id="showFileUpload" class="btn btn-info">Subir Archivo Excel</button>
+        <form id="fileUploadForm" action="{{ route('aduana.subir.excel') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+            @csrf
+            <div class="mt-3">
+                <label for="file">Seleccionar archivo:</label>
+                <input type="file" name="file" required>
+                <button type="submit"class="btn btn-info">Subir y Asignar Pedimentos</button>
+            </div>
         </form>
     </div>
 </div>
@@ -137,6 +148,17 @@
 </section>
 
 <script>
+    // Mostrar formulario de carga de archivo con animación
+    document.getElementById('showFileUpload').addEventListener('click', function() {
+        const fileForm = document.getElementById('fileUploadForm');
+        if (fileForm.style.display === 'none' || fileForm.style.display === '') {
+            fileForm.style.display = 'block';
+            fileForm.classList.add('fadeIn');
+        } else {
+            fileForm.style.display = 'none';
+        }
+    });
+
     // Seleccionar/Deseleccionar todos los checkboxes
     document.getElementById('selectAll').addEventListener('click', function() {
         let checkboxes = document.querySelectorAll('.select-row');
@@ -181,3 +203,4 @@
 </script>
 
 @endsection
+

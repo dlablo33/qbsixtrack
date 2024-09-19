@@ -18,10 +18,13 @@ use App\Molecula3;
 use App\Customer;
 use App\PaymentBatch;
 use App\PaymentBatchItem;
+use App\invoice;
 
 
 class MoleculaController extends Controller
 {
+
+    // MOLECULA 1 
     public function index()
     {
         $moleculas = PrecioMolecula::orderBy('updated_at', 'DESC')->get();
@@ -259,6 +262,8 @@ class MoleculaController extends Controller
 
     // =======================================================================================================================================
 
+    // MOLECULA 2
+
     public function molecula2()
     {
             // Obtiene todos los registros de la tabla molecula2
@@ -430,6 +435,8 @@ class MoleculaController extends Controller
 
 // =============================================================================================================================================
 
+//MOLECULA 3
+
     public function molecula3()
     {
     $bols = Molecula3::all(); // Obtén los registros de Molecula3
@@ -513,6 +520,42 @@ class MoleculaController extends Controller
     }
 
     return redirect()->back()->with('error', 'No se seleccionaron BoLs para pagar.');
+    }
+
+    // ==========================================================================================================================================
+
+    public function syncBOLWithInvoice()
+    {
+        // Obtén los registros de Molecula 1
+        $moleculaRecords = Molecula::whereNotNull('bol_number')->get();
+    
+        foreach ($moleculaRecords as $record) {
+            // Busca la factura en el modelo de Invoice que coincida con el BOL y el nombre del producto
+            $invoices = Invoice::where('bol', $record->bol_number)
+                                ->where('item_names', 'LIKE', '%PETROLEUM DISTILLATES%')
+                                ->get();
+    
+            // Verifica si encontró facturas
+            if ($invoices->count() > 0) {
+                // Sincroniza la factura
+                foreach ($invoices as $invoice) {
+                    $record->update([
+                        'numero_factura' => $invoice->NumeroFactura,
+                    ]);
+                    \Log::info('Factura sincronizada: ' . $invoice->NumeroFactura);
+                }
+            } else {
+                \Log::warning('No se encontró factura para el BOL: ' . $record->bol_number);
+            }
+        }
+    
+        return redirect()->back()->with('success', 'BOLs sincronizados con las facturas correctamente.');
+    }
+    
+    
+    public function syncbol()
+    {
+        
     }
 
 } 

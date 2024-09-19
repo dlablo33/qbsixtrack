@@ -197,6 +197,9 @@ Route::post('/logistica/asignar-cliente', [LogisticaController::class, 'asignarC
 Route::get('logistica/filterByWeek', 'LogisticaController@filterByWeek')->name('logistica.filterByWeek');
 Route::post('/logistica/guardar-todos', [LogisticaController::class, 'guardarTodos'])->name('logistica.guardar_todos');
 Route::post('/calcular-precio', [LogisticaController::class, 'calcularPrecio'])->name('logistica.calcularPrecio');
+
+Route::post('logistica/enlazar-factura/{id}', [LogisticaController::class, 'enlazarFactura'])->name('logistica.enlazarFactura');
+Route::get('/logistica/sync-facturas', [LogisticaController::class, 'syncFacturas'])->name('logistica.syncFacturas');
 // ================================================================================================================================================================================================
 Route::get('/factyremi', [FacturaController::class, 'index'])->name('factura.index');
 Route::post('factyremi/transfer', [FacturaController::class, 'transferLogisticaToFactura'])->name('facturas.transferLogisticaToFactura');
@@ -232,7 +235,10 @@ Route::get('/admin/ingresos-devoluciones', [AdministracionController::class, 'sh
 Route::post('/depositos/{id}/asignarSaldo', [AdministracionController::class, 'asignarSaldo'])->name('depositos.asignarSaldo');
 Route::get('/admin/clientes/create', [AdministracionController::class, 'create'])->name('admin.create');
 Route::post('/admin/clientes', [AdministracionController::class, 'store'])->name('admin.store');
+Route::get('/daily-deposits', [AdministracionController::class, 'dailyDeposits'])->name('Admin.dailyDeposits');
 
+
+Route::post('/aduana/subir-excel', [AduanaController::class, 'subirExcel'])->name('aduana.subir.excel');
 
 // ===============================================================================================================================================
 Route::get('/empresa_cuenta', [EmpresaCuentaController::class, 'index'])->name('empresa_cuenta.index');
@@ -260,6 +266,9 @@ Route::post('/moleculas/processPaymentBatch', [MoleculaController::class, 'proce
 Route::get('/molecula1', [MoleculaController::class, 'molecula1'])->name('molecula1');
 Route::post('/procesar-pagos', [MoleculaController::class, 'procesarPagos'])->name('pagos.procesar');
 Route::post('/pagos/procesar', [MoleculaController::class, 'procesar'])->name('moleculas.procesar');
+
+Route::post('/moleculas/sync-bol-invoice', [MoleculaController::class, 'syncBolWithInvoice'])->name('moleculas.syncBolWithInvoice');
+
 // ===============================================================================================================================================
 Route::get('/tipo-cambio', [TipoCambioController::class, 'index'])->name('tipocambio.index');
 Route::get('/tipo-cambio/create', [TipoCambioController::class, 'create'])->name('tipocambio.create');

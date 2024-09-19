@@ -106,10 +106,11 @@ unset($__errorArgs, $__bag); ?>
                                 </div>
                             </div>-->
 
-                            <!-- /.col 
+                             <!-- 
                             <div class="col-6">
                                 <a href="<?php echo e(Route('register')); ?>" class="btn btn-default btn-block">Registro</a>
-                            </div> -->
+                            </div> 
+-->
 
                             <div class="col-8">
                                 <button type="submit" class="btn btn-primary btn-block"><?php echo e(__('Ingresa')); ?></button>

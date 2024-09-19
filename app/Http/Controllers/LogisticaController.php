@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Bluewi;
+use App\Invoice;
 use App\Logistica;
 use App\Customer;
 use App\Destino;
@@ -11,6 +12,7 @@ use App\Marchant;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Mail\InvoiceMail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LogisticaController extends Controller
 {
@@ -138,8 +140,7 @@ class LogisticaController extends Controller
     });
 
     return redirect()->route('logistica.index')->with('success', 'Datos transferidos con éxito');
-}
-
+    }
 
     public function asignarCliente(Request $request)
     {
@@ -243,4 +244,47 @@ class LogisticaController extends Controller
         return redirect()->route('logistica.index')->with('success', 'Datos actualizados con éxito');
     }
     
+    // ===============================================================================================================================================================================================================================
+
+    public function enlazarFactura($id)
+    {
+        // Obtener el registro de logística
+        $logistica = Logistica::find($id);
+
+        if (!$logistica) {
+            return redirect()->back()->with('error', 'Registro de logística no encontrado.');
+        }
+
+        // Buscar la factura que coincida con el bol
+        $factura = Invoice::where('bol', $logistica->bol)->first();
+
+        if (!$factura) {
+            return redirect()->back()->with('error', 'No se encontró una factura para el BOL.');
+        }
+
+        // Enlazar el número de factura en el registro de logística
+        $logistica->nqb = $factura->numero_factura;
+        $logistica->save();
+
+        return redirect()->back()->with('success', 'Factura enlazada correctamente.');
+    }
+
+    public function syncFacturas()
+    {
+        // Obtener todos los registros de logística sin número de factura
+        $logisticaEntries = Logistica::whereNull('nqb')->get();
+
+        foreach ($logisticaEntries as $logistica) {
+            // Buscar la factura que coincida con el BOL
+            $factura = Invoice::where('bol', $logistica->bol)->first();
+
+            if ($factura) {
+                // Enlazar el número de factura en el registro de logística
+                $logistica->nqb = $factura->numero_factura;
+                $logistica->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Sincronización de facturas realizada con éxito.');
+    }
 }

@@ -81,6 +81,13 @@
         Calcular Mejores Opciones
     </button>
 
+    <!-- Botón para sincronizar los números de BOL -->
+    <form action="{{ route('moleculas.syncBolWithInvoice') }}" method="POST" class="mt-2">
+    @csrf
+    <button type="submit" class="btn btn-primary btn-lg">Sincronizar BOL con Facturas</button>
+    </form>
+
+
     <!-- Ventana modal -->
     <div class="modal fade" id="calculateModal" tabindex="-1" role="dialog" aria-labelledby="calculateModalLabel" aria-hidden="true">
         <div class="modal-dialog custom-modal-dialog" role="document">

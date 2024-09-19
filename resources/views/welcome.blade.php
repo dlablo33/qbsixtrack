@@ -76,10 +76,11 @@
                                 </div>
                             </div>-->
 
-                            <!-- /.col 
+                             <!-- 
                             <div class="col-6">
                                 <a href="{{ Route('register')}}" class="btn btn-default btn-block">Registro</a>
-                            </div> -->
+                            </div> 
+-->
 
                             <div class="col-8">
                                 <button type="submit" class="btn btn-primary btn-block">{{ __('Ingresa') }}</button>

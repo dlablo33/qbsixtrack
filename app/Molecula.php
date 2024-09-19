@@ -17,7 +17,8 @@ class Molecula extends Model
         "total",
         "created_at",
         "updated_at",
-        "estatus"
+        "estatus",
+        "NumeroFactura"
     ];
 
     

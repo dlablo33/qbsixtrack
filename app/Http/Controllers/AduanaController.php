@@ -11,6 +11,7 @@ use App\AgenteAduanal;
 use App\Aduana;
 use App\Pago_aduana;
 use Dompdf\Dompdf;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class AduanaController extends Controller
@@ -99,39 +100,39 @@ class AduanaController extends Controller
     }
 
     public function migrateAll(Request $request)
-    {
-        // Usar transacciones para mantener la consistencia de la base de datos
-        DB::beginTransaction();
-    
-        try {
-            // Buscar todos los BoLs en la tabla logistica que ya tengan pedimento
-            $logisticas = Logistica::whereNotNull('pedimento')->get();
-    
-            if ($logisticas->isEmpty()) {
-                return redirect()->back()->with('error', 'No se encontraron BoLs con pedimento en la tabla logistica');
-            }
-    
-            foreach ($logisticas as $logistica) {
-                // Verificar si el BoL ya ha sido migrado
-                $aduanaExistente = Aduana::where('bol_number', $logistica->bol)->first();
-                if (!$aduanaExistente) {
-                    // Crear un nuevo registro en la tabla aduanas
-                    $aduana = new Aduana();
-                    $aduana->bol_number = $logistica->bol;
-                    $aduana->pedimento = $logistica->pedimento;
-                    $aduana->linea = $logistica->linea;
-                    $aduana->no_pipa = $logistica->no_pipa;
-                    $aduana->save();
-                }
-            }
-    
-            DB::commit();  // Confirmar la transacción
-    
-            return redirect()->route('aduana.index')->with('success', 'BoLs migrados con éxito');
-        } catch (Exception $e) {
-            DB::rollBack();  // Revertir la transacción en caso de error
-            return redirect()->back()->with('error', 'Error al migrar los BoLs: ' . $e->getMessage());
+        {   
+    // Usar transacciones para mantener la consistencia de la base de datos
+    DB::beginTransaction();
+
+    try {
+        // Buscar todos los BoLs en la tabla logistica, sin importar si tienen pedimento
+        $logisticas = Logistica::all();
+
+        if ($logisticas->isEmpty()) {
+            return redirect()->back()->with('error', 'No se encontraron BoLs en la tabla logistica');
         }
+
+        foreach ($logisticas as $logistica) {
+            // Verificar si el BoL ya ha sido migrado
+            $aduanaExistente = Aduana::where('bol_number', $logistica->bol)->first();
+            if (!$aduanaExistente) {
+                // Crear un nuevo registro en la tabla aduanas
+                $aduana = new Aduana();
+                $aduana->bol_number = $logistica->bol;
+                $aduana->pedimento = $logistica->pedimento; // Pedimento puede ser null
+                $aduana->linea = $logistica->linea;
+                $aduana->no_pipa = $logistica->no_pipa;
+                $aduana->save();
+            }
+        }
+
+        DB::commit();  // Confirmar la transacción
+
+        return redirect()->route('aduana.index')->with('success', 'BoLs migrados con éxito');
+    } catch (Exception $e) {
+        DB::rollBack();  // Revertir la transacción en caso de error
+        return redirect()->back()->with('error', 'Error al migrar los BoLs: ' . $e->getMessage());
+    }
     }
 
     public function updateAgente(Request $request, $id)
@@ -345,7 +346,32 @@ class AduanaController extends Controller
     return redirect()->back()->with('success', 'Pago registrado exitosamente. Total pagado: ' . $totalPagos . ' MXN.');
     }
 
+    // ==============================================================================================================================================================================================================================================
 
+    public function subirExcel(Request $request)
+    {
+        $request->validate([
+            'archivo_excel' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        $archivo = $request->file('archivo_excel');
+        $spreadsheet = IOFactory::load($archivo->getPathname());
+        $hoja = $spreadsheet->getActiveSheet();
+        
+        foreach ($hoja->getRowIterator() as $fila) {
+            $celdaIterator = $fila->getCellIterator();
+            $celdaIterator->setIterateOnlyExistingCells(false); 
+
+            foreach ($celdaIterator as $celda) {
+                // Procesar cada celda
+                $valor = $celda->getValue();
+                // Asignar pedimento u otro dato
+            }
+        }
+
+        return back()->with('success', 'Archivo Excel procesado correctamente.');
+    }
+    
 }
 
     

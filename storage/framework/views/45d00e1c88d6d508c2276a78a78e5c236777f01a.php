@@ -11,20 +11,27 @@
         </div>
     <?php endif; ?>
 
+    <!-- Botón para sincronizar datos generales -->
     <a href="<?php echo e(route('logistica.transferData')); ?>" id="transferButton" class="btn btn-primary mb-3">Sincronizar Datos</a>
+
+    <!-- Botón para sincronizar número de factura -->
+   
     
+    <!-- Spinner de carga oculto -->
     <div id="loading" style="display: none;">
         <div class="spinner-border" role="status">
             <span class="sr-only">Loading...</span>
         </div>
     </div>
 
+    <!-- Formulario para guardar todos los cambios -->
     <form action="<?php echo e(route('logistica.guardar_todos')); ?>" method="POST">
         <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-success mb-3">Guardar Todos los Cambios</button>
 
+        <!-- Tabla responsiva -->
         <div class="table-responsive">
-            <table id="example1" class="table table-striped table-hover" whith="100%">
+            <table id="example1" class="table table-striped table-hover" width="100%">
                 <thead>
                     <tr>
                         <th>BOL</th>
@@ -44,7 +51,7 @@
                             <th>Precio</th>
                             <th>Total</th>
                         <?php endif; ?>
-                        <th>Acciones</th>
+                        <th>Acciones</th> <!-- Nueva columna de acciones -->
                     </tr>
                 </thead>
                 <tbody>
@@ -73,29 +80,28 @@
                                     <option value="5" <?php echo e($logi->destino_id == 5 ? 'selected' : ''); ?>>FOB</option>
                                 </select>
                             </td>
-
-                                    <td class="status">
-                                    <select name="logistica[<?php echo e($logi->id); ?>][status]" class="form-control status-select" style="background-color: 
-                                    <?php echo e($logi->status == 'pendiente' ? '#f8d7da' : 
-                                    ($logi->status == 'cargada' ? '#fff3cd' : 
-                                    ($logi->status == 'descargada' ? '#d4edda' : '#fff'))); ?>;">
-                                    <option value="pendiente" <?php echo e($logi->status == 'pendiente' ? 'selected' : ''); ?>>Pendiente</option>
-                                    <option value="cargada" <?php echo e($logi->status == 'cargada' ? 'selected' : ''); ?>>Cargada</option>
-                                    <option value="descargada" <?php echo e($logi->status == 'descargada' ? 'selected' : ''); ?>>Descargada</option>
-                                    </select>
-                                    </td>
-
-                                <td class="cruce" >
+                            <td class="status">
+                                <select name="logistica[<?php echo e($logi->id); ?>][status]" class="form-control status-select" style="background-color: 
+                                <?php echo e($logi->status == 'pendiente' ? '#f8d7da' : 
+                                ($logi->status == 'cargada' ? '#fff3cd' : 
+                                ($logi->status == 'descargada' ? '#d4edda' : '#fff'))); ?>;">
+                                <option value="pendiente" <?php echo e($logi->status == 'pendiente' ? 'selected' : ''); ?>>Pendiente</option>
+                                <option value="cargada" <?php echo e($logi->status == 'cargada' ? 'selected' : ''); ?>>Cargada</option>
+                                <option value="descargada" <?php echo e($logi->status == 'descargada' ? 'selected' : ''); ?>>Descargada</option>
+                                </select>
+                            </td>
+                            <td class="cruce">
                                 <select name="logistica[<?php echo e($logi->id); ?>][cruce]" class="form-control cruce-select" style="background-color: <?php echo e($logi->cruce == 'rojo' ? '#f8d7da' : ($logi->cruce == 'verde' ? '#d4edda' : '#fff')); ?>;">
                                 <option value="rojo" <?php echo e($logi->cruce == 'rojo' ? 'selected' : ''); ?>>Rojo</option>
                                 <option value="verde" <?php echo e($logi->cruce == 'verde' ? 'selected' : ''); ?>>Verde</option>
                                 </select>
-                                </td>
+                            </td>
 
                             <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_salida]" class="form-control" value="<?php echo e($logi->fecha_salida); ?>"></td>
                             <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_entrega]" class="form-control" value="<?php echo e($logi->fecha_entrega); ?>"></td>
                             <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_descarga]" class="form-control" value="<?php echo e($logi->fecha_descarga); ?>"></td>
                             <td><input type="text" name="logistica[<?php echo e($logi->id); ?>][pedimento]" class="form-control" value="<?php echo e($logi->pedimento); ?>"></td>
+
                             <?php if(Auth::user()->tipo_usuario == 1): ?>
                                 <td>
                                     <?php if($logi->cliente): ?>
@@ -117,6 +123,11 @@
                                     <?php endif; ?>
                                 </td>
                             <?php endif; ?>
+
+                            <!-- Campo para ingresar o mostrar el número de factura -->
+
+
+                            <!-- Botón en la columna de acciones -->
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
@@ -126,6 +137,7 @@
             </table>
         </div>
 
+        <!-- Botón para guardar todos los cambios -->
         <button type="submit" class="btn btn-success mt-3">Guardar Todos los Cambios</button>
     </form>
 </div>
@@ -133,7 +145,7 @@
 
 <?php $__env->startPush('styles'); ?>
 <style>
-    /* Contenedor principal */
+    /* Estilos personalizados y animaciones */
     .container {
         background-color: #fff;
         border-radius: 10px;
@@ -143,7 +155,6 @@
         animation: fadeIn 0.8s ease-in-out;
     }
 
-    /* Estilos para el título */
     h1 {
         text-align: center;
         margin-bottom: 20px;
@@ -155,21 +166,18 @@
         animation: slideInLeft 0.6s ease-out;
     }
 
-    /* Estilo de botones */
-    .btn-primary {
+    .btn-primary, .btn-info {
         background-color: #007bff;
         border-color: #007bff;
         color: #fff;
         padding: 8px 16px;
-        text-transform: uppercase;
         border-radius: 50px;
         font-weight: 500;
         transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover, .btn-info:hover {
         background-color: #0056b3;
-        border-color: #004085;
     }
 
     .btn-success {
@@ -177,7 +185,6 @@
         border-color: #28a745;
         color: #fff;
         padding: 8px 16px;
-        text-transform: uppercase;
         border-radius: 50px;
         font-weight: 500;
         transition: background-color 0.3s ease, transform 0.3s ease;
@@ -185,51 +192,42 @@
 
     .btn-success:hover {
         background-color: #218838;
-        border-color: #1e7e34;
     }
 
-    /* Estilos de la tabla */
     .table {
         width: 100%;
-        margin-bottom: 1rem;
-        background-color: transparent;
-        font-size: 0.9rem;
+        margin-top: 20px;
+        background-color: #f8f9fa;
     }
 
-    .table th, .table td {
-        white-space: nowrap;
-        padding: 0.75rem;
-    }
-
-    .table thead th {
+    th {
         background-color: #007bff;
-        color: #fff;
-        text-transform: uppercase;
-        border-bottom: 2px solid #0056b3;
+        color: white;
+        padding: 10px;
     }
 
-    .table tbody tr:hover {
-        background-color: #f1f1f1;
+    td {
+        padding: 8px;
+        vertical-align: middle;
     }
 
-    /* Estilo de select y inputs */
-    .form-control {
-        font-size: 0.9rem;
-        border-radius: 5px;
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
     }
 
-    .form-control.select2 {
-        width: 100% !important;
+    /* Animaciones */
+    @keyframes  fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
     }
 
-    /* Estilo para el spinner de carga */
-    #loading .spinner-border {
-        width: 3rem;
-        height: 3rem;
-        border-width: 0.3em;
-        border-color: #007bff;
+    @keyframes  slideInLeft {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(0); }
     }
 </style>
 <?php $__env->stopPush(); ?>
+
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/logistica/index.blade.php ENDPATH**/ ?>

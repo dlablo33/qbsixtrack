@@ -68,10 +68,22 @@
     .btn-container a {
         margin: 0 5px;
     }
+
+    .total-deposit {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="container mt-4">
     <h1>Clientes y Saldos</h1>
+
+    <!-- Mostrar el total de depósitos del día -->
+    <div class="total-deposit">
+        Depósitos del día: 
+        <USD:>MXN: ${{ $todayDeposits['total_mxn'] }} | USD: ${{ $todayDeposits['total_usd'] }}</p>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -108,7 +120,3 @@
     </table>
 </div>
 @endsection
-
-
-
-

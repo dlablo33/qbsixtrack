@@ -27,7 +27,8 @@ class Logistica extends Model
         'fecha_salida',
         'fecha_entrega',
         'fecha_descarga',
-        'pedimento'
+        'pedimento',
+        'nqb'
         
     ];
 

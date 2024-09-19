@@ -10,27 +10,37 @@ use App\Devolucion;
 use Illuminate\Support\Facades\Log;
 use App\Customer;
 use App\EmpresaCuenta;
+use Carbon\Carbon;
 
 class AdministracionController extends Controller
 {
     public function index()
     {
         $clientes = CustomerAdmin::with('bancos')->get();
-
+    
         $clientes = $clientes->map(function ($cliente) {
             $cliente->saldo_mxn = $cliente->bancos->sum('pivot.saldo_mxn');
             $cliente->saldo_usd = $cliente->bancos->sum('pivot.saldo_usd');
             return $cliente;
         });
-
+    
+        $hoy = now()->format('Y-m-d');
+        $depositosDelDia = ClienteBanco::whereDate('created_at', $hoy)->get();
+    
+        // Llama a la función para obtener los totales
+        $todayDeposits = $this->calcularDepositosDelDia();
+    
         $data = [
             'menu' => 'Admin',
             'submenu' => '',
             'clientes' => $clientes,
+            'depositosDelDia' => $depositosDelDia,
+            'todayDeposits' => $todayDeposits, // Asegúrate de pasar esto a la vista
         ];
-
+    
         return view('Admin.index', $data);
     }
+    
 
     public function showDepositForm()
     {
@@ -144,6 +154,7 @@ class AdministracionController extends Controller
         $banco = Banco::where('banco', $nombreBanco)->first();
         return $banco ? $banco->id : null;
     }
+
     public function showDevolucionesForm($cliente_id)
     {
         
@@ -153,6 +164,7 @@ class AdministracionController extends Controller
             'bancos' => $bancos
         ]);
     }
+
     public function storeDevolucion(Request $request)
     {
         try {
@@ -296,4 +308,35 @@ class AdministracionController extends Controller
         // Redirigir con mensaje de éxito
         return redirect()->route('admin.create')->with('success', 'Cliente creado con éxito');
     }
+
+    public function calcularDepositosDelDia()
+    {
+    // Sumar depósitos del día actual
+    $totalDepositos = ClienteBanco::whereDate('created_at', Carbon::today())
+        ->selectRaw('SUM(saldo_mxn) as total_mxn, SUM(saldo_usd) as total_usd')
+        ->first();
+
+    // Verificar si hay depósitos
+    return [
+        'total_mxn' => $totalDepositos->total_mxn ?? 0,
+        'total_usd' => $totalDepositos->total_usd ?? 0,
+    ];
+    }
+
+    public function showClientsAndDeposits()
+    {
+        // Llama a la función para obtener los totales
+        $todayDeposits = $this->calcularDepositosDelDia();
+    
+        // Obtener clientes y sus saldos
+        $clientes = ClienteBanco::with('cliente')->get();
+    
+        return view('Admin.showClientsAndDeposits', [
+            'clientes' => $clientes,
+            'todayDeposits' => $todayDeposits,
+        ]);
+    }
+    
+
+    
 }

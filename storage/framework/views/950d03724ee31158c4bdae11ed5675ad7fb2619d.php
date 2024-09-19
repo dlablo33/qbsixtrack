@@ -68,10 +68,22 @@
     .btn-container a {
         margin: 0 5px;
     }
+
+    .total-deposit {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="container mt-4">
     <h1>Clientes y Saldos</h1>
+
+    <!-- Mostrar el total de depósitos del día -->
+    <div class="total-deposit">
+        Depósitos del día: 
+        <USD:>MXN: $<?php echo e($todayDeposits['total_mxn']); ?> | USD: $<?php echo e($todayDeposits['total_usd']); ?></p>
+    </div>
 
     <?php if(session('success')): ?>
         <div class="alert alert-success">
@@ -109,9 +121,4 @@
     </table>
 </div>
 <?php $__env->stopSection(); ?>
-
-
-
-
-
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/Admin/index.blade.php ENDPATH**/ ?>
