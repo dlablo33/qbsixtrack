@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 <style>
     /* Estilo para la cabecera de la modal */
     .modal-header {
@@ -46,7 +46,7 @@
     }
 
     /* Animación para el contenido de la modal */
-    @keyframes slideDown {
+    @keyframes  slideDown {
         from {
             transform: translateY(-100%);
             opacity: 0;
@@ -58,7 +58,7 @@
     }
 
     /* Animación para el contenido de la tabla */
-    @keyframes fadeIn {
+    @keyframes  fadeIn {
         from {
             opacity: 0;
         }
@@ -73,7 +73,8 @@
 
     <!-- Total de Facturas Pendientes -->
     <div class="alert alert-info mt-4">
-        <strong>Total de Facturas con Estatus Pendiente:</strong> ${{ number_format($totalPendiente, 2, '.', ',') }}
+        <strong>Total de Facturas con Estatus Pendiente:</strong> $<?php echo e(number_format($totalPendiente, 2, '.', ',')); ?>
+
     </div>
 
     <!-- Botón para abrir la ventana modal -->
@@ -82,8 +83,8 @@
     </button>
 
     <!-- Botón para sincronizar los números de BOL -->
-    <form action="{{ route('moleculas.syncBolWithInvoice') }}" method="POST" class="mt-2">
-    @csrf
+    <form action="<?php echo e(route('moleculas.syncBolWithInvoice')); ?>" method="POST" class="mt-2">
+    <?php echo csrf_field(); ?>
     <button type="submit" class="btn btn-primary btn-lg">Sincronizar BOL con Facturas</button>
     </form>
 
@@ -100,8 +101,8 @@
                 </div>
                 <div class="modal-body">
                     <!-- Formulario para introducir el presupuesto -->
-                    <form id="calculateForm" action="{{ route('moleculas.calculateBestOptions') }}" method="POST" class="mt-2">
-                        @csrf
+                    <form id="calculateForm" action="<?php echo e(route('moleculas.calculateBestOptions')); ?>" method="POST" class="mt-2">
+                        <?php echo csrf_field(); ?>
                         <div class="form-group">
                             <label for="budget">Presupuesto:</label>
                             <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="Introduce el presupuesto" required>
@@ -116,25 +117,27 @@
     </div>
 
     <!-- Mensajes de éxito y error -->
-    @if (session('success'))
+    <?php if(session('success')): ?>
         <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+            <?php echo e(session('success')); ?>
 
-    @if (session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
         </div>
-    @endif
+    <?php endif; ?>
+
+    <?php if(session('error')): ?>
+        <div class="alert alert-danger">
+            <?php echo e(session('error')); ?>
+
+        </div>
+    <?php endif; ?>
 
     <!-- Botón para migrar los datos -->
-    <form action="{{ route('moleculas.migrateLogisticaToMolecula1') }}" method="POST" class="mt-2">
-        @csrf
+    <form action="<?php echo e(route('moleculas.migrateLogisticaToMolecula1')); ?>" method="POST" class="mt-2">
+        <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-primary btn-lg">Migrar Datos a Molecula 1</button>
     </form>
 
-    @if ($molecula1Records->count() > 0)
+    <?php if($molecula1Records->count() > 0): ?>
         <table id="" class="table table-striped table-hover mt-4">
             <thead>
                 <tr>
@@ -149,22 +152,22 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($molecula1Records as $record)
+                <?php $__currentLoopData = $molecula1Records; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $record): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td>{{ $record->NumeroFactura }}</td>
-                        <td>{{ $record->bol_number }}</td>
-                        <td>{{ number_format($record->litros, 2, '.', ',') }}</td>
-                        <td>${{ number_format($record->rate, 2, '.', ',') }}</td>
-                        <td>${{ number_format($record->total, 2, '.', ',') }}</td>
-                        <td>{{ $record->created_at }}</td>
-                        <td>{{ $record->estatus }}</td>
+                        <td><?php echo e($record->NumeroFactura); ?></td>
+                        <td><?php echo e($record->bol_number); ?></td>
+                        <td><?php echo e(number_format($record->litros, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($record->rate, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($record->total, 2, '.', ',')); ?></td>
+                        <td><?php echo e($record->created_at); ?></td>
+                        <td><?php echo e($record->estatus); ?></td>
                     </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
-    @else
+    <?php else: ?>
         <p class="mt-4">No hay registros en Molecula 1.</p>
-    @endif
+    <?php endif; ?>
 </div>
 
 <!-- Scripts para manejar el formulario y mostrar los resultados en la modal -->
@@ -188,7 +191,7 @@ $(document).ready(function() {
             method: 'POST',
             body: new FormData(this),
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
             }
         })
         .then(response => response.json())
@@ -261,6 +264,8 @@ $(document).ready(function() {
         animation: fadeIn 0.5s ease-in-out;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
 
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/moleculas/molecula1.blade.php ENDPATH**/ ?>

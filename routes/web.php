@@ -309,4 +309,3 @@ Route::get('/Molecula3', [MoleculaController::class, 'molecula3'])->name('molecu
 Route::post('/migrar-bols', [MoleculaController::class, 'migrarBoLs'])->name('migrar.bols');
 Route::post('/pagar-bols', [MoleculaController::class, 'pagarBoLs'])->name('moleculas.pagar');
 Route::post('/pagar-bols', [MoleculaController::class, 'pagarBoLs'])->name('pagar.bols');
-

@@ -526,26 +526,31 @@ class MoleculaController extends Controller
 
     public function syncBOLWithInvoice()
     {
-        // Obtén los registros de Molecula 1
-        $moleculaRecords = Molecula::whereNotNull('bol_number')->get();
-    
+        // Obtén los registros de Molecula 1 que tienen un BOL y están pendientes
+        $moleculaRecords = Molecula::whereNotNull('bol_number')
+                                    ->whereNull('NumeroFactura') // Asegúrate de que aún no se haya asignado una factura
+                                    ->get();
+        
         foreach ($moleculaRecords as $record) {
-            // Busca la factura en el modelo de Invoice que coincida con el BOL y el nombre del producto
-            $invoices = Invoice::where('bol', $record->bol_number)
+            // Limpia el número de BOL (elimina espacios en blanco si hay)
+            $bolNumber = trim($record->bol_number);
+        
+            // Busca la factura en el modelo de Invoice que coincida con el BOL y que contenga 'PETROLEUM DISTILLATES'
+            $invoice = Invoice::where('bol', $bolNumber)
                                 ->where('item_names', 'LIKE', '%PETROLEUM DISTILLATES%')
-                                ->get();
+                                ->first();
+        
+            // Verifica si encontró una factura
+            if ($invoice) {
+                // Actualiza el campo NumeroFactura en la tabla Molecula
+                $record->update([
+                    'NumeroFactura' => $invoice->NumeroFactura,
+                ]);
     
-            // Verifica si encontró facturas
-            if ($invoices->count() > 0) {
-                // Sincroniza la factura
-                foreach ($invoices as $invoice) {
-                    $record->update([
-                        'numero_factura' => $invoice->NumeroFactura,
-                    ]);
-                    \Log::info('Factura sincronizada: ' . $invoice->NumeroFactura);
-                }
+                // Log para verificación
+                \Log::info('BOL: ' . $bolNumber . ' sincronizado con la factura: ' . $invoice->NumeroFactura);
             } else {
-                \Log::warning('No se encontró factura para el BOL: ' . $record->bol_number);
+                \Log::warning('No se encontró una factura para el BOL: ' . $bolNumber);
             }
         }
     
@@ -553,9 +558,4 @@ class MoleculaController extends Controller
     }
     
     
-    public function syncbol()
-    {
-        
-    }
-
 } 

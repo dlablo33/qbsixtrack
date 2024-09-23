@@ -1,9 +1,15 @@
 
 
+<?php echo $__env->yieldPushContent('styles'); ?>
+
 <?php $__env->startSection('content'); ?>
+
+<?php echo $__env->yieldContent('content'); ?>
+<?php echo $__env->yieldPushContent('scripts'); ?>
+
 <div class="display">
     <h1>Logística</h1>
-    
+
     <?php if(session('success')): ?>
         <div class="alert alert-success">
             <?php echo e(session('success')); ?>
@@ -14,9 +20,6 @@
     <!-- Botón para sincronizar datos generales -->
     <a href="<?php echo e(route('logistica.transferData')); ?>" id="transferButton" class="btn btn-primary mb-3">Sincronizar Datos</a>
 
-    <!-- Botón para sincronizar número de factura -->
-   
-    
     <!-- Spinner de carga oculto -->
     <div id="loading" style="display: none;">
         <div class="spinner-border" role="status">
@@ -124,9 +127,6 @@
                                 </td>
                             <?php endif; ?>
 
-                            <!-- Campo para ingresar o mostrar el número de factura -->
-
-
                             <!-- Botón en la columna de acciones -->
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
@@ -228,6 +228,62 @@
     }
 </style>
 <?php $__env->stopPush(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+    $(document).ready(function() {
+        // Inicializa DataTables
+        var table = $('#example1').DataTable();
+
+        // Cargar datos guardados desde localStorage para todos los campos
+        function cargarDatos() {
+            $('input, select').each(function() {
+                var valorGuardado = localStorage.getItem($(this).attr('name'));
+                if (valorGuardado) {
+                    $(this).val(valorGuardado);
+                }
+            });
+        }
+
+        // Guardar datos al cambiar algún campo
+        function guardarDatos() {
+            $('input, select').on('change', function() {
+                localStorage.setItem($(this).attr('name'), $(this).val());
+            });
+        }
+
+        // Ejecutar la función para cargar los datos
+        cargarDatos();
+
+        // Ejecutar la función para guardar los cambios
+        guardarDatos();
+
+        // Evento DataTables: recargar datos al cambiar de página, búsqueda, etc.
+        table.on('draw', function() {
+            cargarDatos(); // Recargar los datos al redibujar la tabla
+        });
+
+        // Sincronizar datos generales
+        $('#transferButton').on('click', function(e) {
+            e.preventDefault();
+            $('#loading').show(); // Mostrar el spinner de carga
+            $.ajax({
+                url: $(this).attr('href'),
+                method: 'GET',
+                success: function() {
+                    $('#loading').hide(); // Ocultar el spinner de carga
+                    alert('Datos sincronizados correctamente.');
+                },
+                error: function() {
+                    $('#loading').hide(); // Ocultar el spinner de carga
+                    alert('Error al sincronizar los datos.');
+                }
+            });
+        });
+    });
+</script>
+<?php $__env->stopPush(); ?>
+
 
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/logistica/index.blade.php ENDPATH**/ ?>
