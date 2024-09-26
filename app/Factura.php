@@ -62,4 +62,10 @@ class Factura extends Model
         return $this->belongsTo(Customer::class, 'cliente_id');
     }
 
+    public function facturas()
+    {
+        return $this->hasMany(Factura::class, 'lote_pago_id', 'id');
+        // Asegúrate de usar los nombres correctos de la clave foránea y la clave local
+    }
+
 }

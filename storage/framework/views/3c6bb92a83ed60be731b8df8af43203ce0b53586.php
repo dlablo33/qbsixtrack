@@ -10,6 +10,12 @@
         <button type="submit" class="btn btn-primary btn-lg">Migrar Datos para Molecula 2</button>
     </form>
 
+     <!-- Botón para sincronizar los BOLs con las facturas en Molecula 2 -->
+     <form action="<?php echo e(route('sync.bols.factura2')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
+            <button type="submit" class="btn btn-primary mb-3">Sincronizar BOLs con Facturas en Molecula 2</button>
+        </form>
+
     <form id="process-payments-form" method="POST" action="<?php echo e(route('pagos.procesar')); ?>">
         <?php echo csrf_field(); ?>
         <div class="table-responsive">
@@ -18,6 +24,7 @@
                     <tr>
                         <th></th>
                         <th>BOL</th>
+                        <th>Numero de Facturacion</th>
                         <th>Codigo Transporte</th>
                         <th>Cliente</th>
                         <th>Destino</th>
@@ -44,9 +51,10 @@
                             <?php endif; ?>
                         </td>
                         <td><?php echo e($record->bol); ?></td>
+                        <td><?php echo e($record->NumeroFactura); ?></td>
                         <td>
                         <?php if($record->status !== 'pagado'): ?>
-                            <input type="text" name="codeka[<?php echo e($record->id); ?>]" class="form-control" placeholder="Ingrese Codeka">
+                            <input type="text" name="codeka[<?php echo e($record->id); ?>]" class="form-control" placeholder="Ingrese Codigo">
                         <?php else: ?>
                             <?php echo e($record->codeka); ?>
 

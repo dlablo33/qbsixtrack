@@ -138,13 +138,14 @@ Route::get('/precios/{cliente_id}/{product_id}', function ($cliente_id, $product
     }
   });
 // ==============================================================================================================================================================================================
-  Route::get('/Cuentas/Index', 'PagoController@index')->name('cuentas.index');
-  Route::get('/Cuentas/index', [PagoController::class, 'index']);
-  Route::get('/clientes/{cliente_name}/detalles', [PagoController::class, 'show'])->name('cuentas.cnc-detalle');
-  Route::get('/facturas/{factura}/pagos/create', [PagoController::class, 'create'])->name('cuentas.create');
+
+Route::get('/cuentas/index', [PagoController::class, 'index'])->name('cuentas.index');
+Route::get('/clientes/{cliente_name}/detalles', [PagoController::class, 'show'])->name('cuentas.cnc-detalle');
+Route::get('/facturas/{factura}/pagos/create', [PagoController::class, 'create'])->name('cuentas.create');
 Route::post('/pagos', [PagoController::class, 'store'])->name('cuentas.store');
 Route::post('/facturas/{factura}/pagar-completo', [PagoController::class, 'pagarCompleto'])->name('cuentas.pagarCompleto');
-Route::post('/usar-saldo/{factura}', 'PagoController@usarSaldo')->name('cuentas.usarSaldo');
+Route::post('/usar-saldo/{factura}', [PagoController::class, 'usarSaldo'])->name('cuentas.usarSaldo');
+
 // ============================================================================================================================================================================================== 
 Route::get('/get-products-by-customer/{cliente_id}', [InvoiceController::class, 'getProductsByCustomer']);
 Route::get('/get-prices-by-product-and-customer/{cliente_id}/{product_id}', [InvoiceController::class, 'getPricesByProductAndCustomer']);
@@ -309,3 +310,37 @@ Route::get('/Molecula3', [MoleculaController::class, 'molecula3'])->name('molecu
 Route::post('/migrar-bols', [MoleculaController::class, 'migrarBoLs'])->name('migrar.bols');
 Route::post('/pagar-bols', [MoleculaController::class, 'pagarBoLs'])->name('moleculas.pagar');
 Route::post('/pagar-bols', [MoleculaController::class, 'pagarBoLs'])->name('pagar.bols');
+Route::post('/sync-bols-factura', [MoleculaController::class, 'syncBOLWithMolecula3'])->name('sync.bols.factura');
+Route::post('/sync-bols-factura2', [MoleculaController::class, 'syncBOLWithMolecula2'])->name('sync.bols.factura2');
+
+//==================================================================================================================================================
+
+Route::get('/cuentas/estado/{cliente_id}', [PagoController::class, 'estadoCuenta'])->name('cuentas.estadoCuenta');
+Route::get('/estado-cuenta/{cliente}', [PagoController::class, 'descargarEstadoCuenta'])->name('estado.cuenta.descargar');
+Route::get('/descargar-estado-cuenta', 'PagoController@descargarEstadoDeCuentaPDF')->name('cuentas.descargar_pdf');
+Route::get('/cuentas/descargar-estado-cuenta', [PagoController::class, 'descargarEstadoDeCuentaPDF'])->name('estado_cuenta.descargar_pdf');
+Route::get('/pagos/lote/{cliente_name}', [PagoController::class, 'seleccionarFacturasLote'])->name('pago.por_lote');
+Route::post('/pagos/lote/procesar', [PagoController::class, 'procesarPagoPorLote'])->name('pago.por_lote.procesar');
+Route::post('/procesar-pagos', [PagoController::class, 'procesar'])->name('pagos.procesar');
+Route::get('/pago/{id}/pdf', [PagoController::class, 'generarPdf'])->name('pago.pdf');
+Route::get('/cuentas/pago-pdf/{cliente_name}', [PagoController::class, 'descargarPdf'])->name('cuentas.pago-pdf');
+Route::get('/pagos/{clienteName}', [PagoController::class, 'pagosPorCliente'])->name('pagos.por_cliente');
+Route::get('/pagos/lote/detalle/{loteId}', [PagoController::class, 'detalleLotePagos'])->name('pagos.detalle.lote');
+Route::get('/pagos', [PagoController::class, 'index'])->name('pagos.index');
+Route::get('/cuentas/pagos-por-cliente/{clienteName}', [PagoController::class, 'pagosPorCliente'])->name('cuentas.pagos_por_cliente');
+Route::get('/cuentas/detalle-lote-pagos/{loteId}', [PagoController::class, 'detalleLotePagos'])->name('cuentas.detalle_lote_pagos');
+Route::get('/cuentas/pagos/{loteId}/pdf', [PagoController::class, 'descargarPdf'])->name('cuentas.pagos.pdf');
+Route::get('/descargar-lote/{id}', [PagoController::class, 'descargarLote'])->name('descargar.lote');
+Route::get('/pagos/descargar-lote/{id}', [PagoController::class, 'descargarLote'])->name('pagos.descargar.lote');
+
+
+
+Route::resource('pagos', PagoController::class);
+Route::get('pagos/{pago}/edit', [PagoController::class, 'edit'])->name('pagos.edit');
+Route::get('pagos/{pago}/copy', [PagoController::class, 'copy'])->name('pagos.copy');
+Route::delete('pagos/{pago}', [PagoController::class, 'destroy'])->name('pagos.destroy');
+
+
+
+
+

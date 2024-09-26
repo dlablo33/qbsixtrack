@@ -1,9 +1,9 @@
-@extends('layouts.master')
 
-@section('styles')
+
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Importar la fuente */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import  url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
         /* Estilos generales */
         body {
@@ -101,48 +101,50 @@
             transform: translateY(-2px);
         }
 
-        @keyframes fadeIn {
+        @keyframes  fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
 
-        @keyframes fadeInUp {
+        @keyframes  fadeInUp {
             from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container">
-        <h1>Facturas del Cliente: {{ $cliente_name }}</h1>
-        <h2>Saldo a Favor: ${{ number_format($saldoAFavor, 2, '.', '') }}</h2>
+        <h1>Facturas del Cliente: <?php echo e($cliente_name); ?></h1>
+        <h2>Saldo a Favor: $<?php echo e(number_format($saldoAFavor, 2, '.', '')); ?></h2>
 
-        <a href="{{ route('estado.cuenta.descargar', $cliente_name) }}" class="btn btn-primary mb-3">
+        <a href="<?php echo e(route('estado.cuenta.descargar', $cliente_name)); ?>" class="btn btn-primary mb-3">
             Descargar Estado de Cuenta
         </a>
 
 <!-- Botón para ir a la sección de pagos -->
-<a href="{{ route('cuentas.pagos_por_cliente', $cliente_name) }}" class="btn btn-primary mb-3">
+<a href="<?php echo e(route('cuentas.pagos_por_cliente', $cliente_name)); ?>" class="btn btn-primary mb-3">
     Ir a Pagos
 </a>
 
 
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="alert alert-success">
-                <strong>Éxito:</strong> {{ session('success') }}
-            </div>
-        @endif
+                <strong>Éxito:</strong> <?php echo e(session('success')); ?>
 
-        @if(session('error'))
+            </div>
+        <?php endif; ?>
+
+        <?php if(session('error')): ?>
             <div class="alert alert-danger">
-                <strong>Error:</strong> {{ session('error') }}
-            </div>
-        @endif
+                <strong>Error:</strong> <?php echo e(session('error')); ?>
 
-        <form id="payment-form" method="POST" action="{{ route('pagos.procesar') }}">
-            @csrf
-            <input type="hidden" name="cliente_name" value="{{ $cliente_name }}">
+            </div>
+        <?php endif; ?>
+
+        <form id="payment-form" method="POST" action="<?php echo e(route('pagos.procesar')); ?>">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="cliente_name" value="<?php echo e($cliente_name); ?>">
 
             <div class="table-responsive">
                 <table class="table">
@@ -157,22 +159,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($facturas as $factura)
+                        <?php $__currentLoopData = $facturas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $factura): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="selected_facturas[]" value="{{ $factura->id }}">
+                                    <input type="checkbox" name="selected_facturas[]" value="<?php echo e($factura->id); ?>">
                                 </td>
-                                <td>{{ $factura->id }}</td>
-                                <td>{{ $factura->producto_name }}</td>
-                                <td>${{ number_format($factura->total, 2, '.', '') }}</td>
+                                <td><?php echo e($factura->id); ?></td>
+                                <td><?php echo e($factura->producto_name); ?></td>
+                                <td>$<?php echo e(number_format($factura->total, 2, '.', '')); ?></td>
                                 <td>
-                                    @foreach ($factura->pagos as $pago)
-                                        <p><strong>{{ $pago->fecha_pago }}:</strong> ${{ number_format($pago->monto, 2, '.', '') }}</p>
-                                    @endforeach
+                                    <?php $__currentLoopData = $factura->pagos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pago): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <p><strong><?php echo e($pago->fecha_pago); ?>:</strong> $<?php echo e(number_format($pago->monto, 2, '.', '')); ?></p>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </td>
-                                <td>${{ number_format($factura->montoPendiente(), 2, '.', '') }}</td>
+                                <td>$<?php echo e(number_format($factura->montoPendiente(), 2, '.', '')); ?></td>
                             </tr>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
             </div>
@@ -183,12 +185,12 @@
         </form>
 
         <div class="text-center mt-4">
-            <a href="{{ route('cuentas.index') }}" class="btn btn-secondary">Regresar</a>
+            <a href="<?php echo e(route('cuentas.index')); ?>" class="btn btn-secondary">Regresar</a>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         document.getElementById('payment-form').addEventListener('submit', function(event) {
             const checkboxes = document.querySelectorAll('input[name="selected_facturas[]"]:checked');
@@ -198,5 +200,7 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/cuentas/cnc-detalle.blade.php ENDPATH**/ ?>

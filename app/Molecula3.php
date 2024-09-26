@@ -21,7 +21,8 @@ class Molecula3 extends Model
         'transportation_fee',
         'weight_controller',
         'total',
-        'status' 
+        'status',
+        'NumeroFactura'
 
     ];
 

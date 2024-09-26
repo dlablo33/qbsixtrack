@@ -3,26 +3,38 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Factura;
 
 class Pago extends Model
 {
     protected $table = "pagos";
+
     protected $fillable = [
-        'id',
         'factura_id',
         'monto',
         'referencia',
         'fecha_pago',
+        'complemento',
+        'lote_pago_id',
+        'batch_id' // Asegúrate de que este campo esté presente si lo necesitas
     ];
 
+    // Relación con Factura
     public function factura()
     {
-        return $this->hasmany(Factura::class);
+        return $this->belongsTo(Factura::class, 'factura_id'); // Cambia hasMany a belongsTo
     }
 
+    // Relación con Customer
     public function cliente()
     {
-        return $this->belongsTo(Customer::class); 
-}
+        return $this->belongsTo(Customer::class, 'cliente_id'); // Asegúrate de tener 'cliente_id' en pagos
+    }
+
+    // Relación con LotePago
+    public function lotePago()
+    {
+        return $this->belongsTo(LotePago::class, 'lote_pago_id');
+    }
+
+    
 }

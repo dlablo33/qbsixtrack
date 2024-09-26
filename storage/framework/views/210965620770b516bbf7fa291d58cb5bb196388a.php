@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('styles')
+
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Estilos personalizados */
         h1 {
@@ -46,19 +46,19 @@
             transform: scale(1.05);
         }
 
-        @keyframes fadeInUp {
+        @keyframes  fadeInUp {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <h1>Estado de Cuenta de Clientes</h1>
 
-    <a href="{{ route('estado_cuenta.descargar_pdf') }}" class="btn btn-primary">Descargar Estado de Cuenta</a>
+    <a href="<?php echo e(route('estado_cuenta.descargar_pdf')); ?>" class="btn btn-primary">Descargar Estado de Cuenta</a>
 
 
     <table id="example1" class="table">
@@ -71,21 +71,21 @@
             </tr>
         </thead>
         <tbody>
-        @foreach ($deudasPorCliente as $cliente)
+        <?php $__currentLoopData = $deudasPorCliente; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cliente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <tr>
-                <td>{{ $cliente->cliente_name }}</td>
-                <td>${{ number_format($cliente->saldoRestante, 2, '.', ',') }}</td>
-                <td>${{ number_format($cliente->saldoAFavor, 2, '.', ',') }}</td>
+                <td><?php echo e($cliente->cliente_name); ?></td>
+                <td>$<?php echo e(number_format($cliente->saldoRestante, 2, '.', ',')); ?></td>
+                <td>$<?php echo e(number_format($cliente->saldoAFavor, 2, '.', ',')); ?></td>
                 <td>
-                    <a href="{{ route('cuentas.cnc-detalle', ['cliente_name' => $cliente->cliente_name]) }}" class="btn btn-primary">Estado de Cuenta</a>
+                    <a href="<?php echo e(route('cuentas.cnc-detalle', ['cliente_name' => $cliente->cliente_name])); ?>" class="btn btn-primary">Estado de Cuenta</a>
                 </td>
             </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </tbody>
     </table>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         $(document).ready(function() {
             $('#example1').DataTable({
@@ -106,4 +106,6 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/cuentas/index.blade.php ENDPATH**/ ?>

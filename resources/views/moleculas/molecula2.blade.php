@@ -10,6 +10,12 @@
         <button type="submit" class="btn btn-primary btn-lg">Migrar Datos para Molecula 2</button>
     </form>
 
+     <!-- Botón para sincronizar los BOLs con las facturas en Molecula 2 -->
+     <form action="{{ route('sync.bols.factura2') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-primary mb-3">Sincronizar BOLs con Facturas en Molecula 2</button>
+        </form>
+
     <form id="process-payments-form" method="POST" action="{{ route('pagos.procesar') }}">
         @csrf
         <div class="table-responsive">
@@ -18,6 +24,7 @@
                     <tr>
                         <th></th>
                         <th>BOL</th>
+                        <th>Numero de Facturacion</th>
                         <th>Codigo Transporte</th>
                         <th>Cliente</th>
                         <th>Destino</th>
@@ -44,9 +51,10 @@
                             @endif
                         </td>
                         <td>{{ $record->bol }}</td>
+                        <td>{{ $record->NumeroFactura }}</td>
                         <td>
                         @if ($record->status !== 'pagado')
-                            <input type="text" name="codeka[{{ $record->id }}]" class="form-control" placeholder="Ingrese Codeka">
+                            <input type="text" name="codeka[{{ $record->id }}]" class="form-control" placeholder="Ingrese Codigo">
                         @else
                             {{ $record->codeka }}
                         @endif
