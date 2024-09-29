@@ -332,6 +332,10 @@ Route::get('/cuentas/detalle-lote-pagos/{loteId}', [PagoController::class, 'deta
 Route::get('/cuentas/pagos/{loteId}/pdf', [PagoController::class, 'descargarPdf'])->name('cuentas.pagos.pdf');
 Route::get('/descargar-lote/{id}', [PagoController::class, 'descargarLote'])->name('descargar.lote');
 Route::get('/pagos/descargar-lote/{id}', [PagoController::class, 'descargarLote'])->name('pagos.descargar.lote');
+Route::post('/pagos/asignar-serial', [PagoController::class, 'asignarSerial'])->name('pagos.asignar_serial');
+Route::post('/pagos/asignar-banco-y-cuenta', [PagoController::class, 'asignarBancoYCuenta'])->name('pagos.asignar_banco_y_cuenta');
+Route::post('/pagos/asignar-datos', [PagoController::class, 'asignarDatos'])->name('pagos.asignar_datos');
+
 
 
 

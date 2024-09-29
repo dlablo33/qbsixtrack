@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use PDF;
 use App\LotePago;
 use Carbon\Carbon;
+use App\ClienteBanco;
 
 class PagoController extends Controller
 {
@@ -422,8 +423,7 @@ class PagoController extends Controller
                      ->with('complemento', $complemento); // Pasar el complemento si es necesario
     }
 
-
-    public function pagosPorCliente($clienteName) 
+    public function pagosPorCliente($clienteName)
     {
         // Obtener los datos del cliente
         $cliente = Customer::where('NOMBRE_COMERCIAL', $clienteName)->first();
@@ -435,14 +435,18 @@ class PagoController extends Controller
     
         // Obtener los pagos del cliente y las facturas relacionadas
         $pagos = Pago::whereHas('factura', function($query) use ($cliente) {
-            $query->where('cliente_id', $cliente->id);
-        })->with('factura') // Carga la relación de factura para evitar consultas adicionales
-          ->get()
-          ->map(function($pago) {
-              // Asegurarse de que 'fecha_pago' sea un objeto Carbon
-              $pago->fecha_pago = Carbon::parse($pago->fecha_pago);
-              return $pago;
-          });
+                $query->where('cliente_id', $cliente->id);
+            })
+            ->with(['factura', 'clienteBanco.banco']) // Cargar las relaciones de factura y clienteBanco con su banco
+            ->get()
+            ->map(function($pago) {
+                // Asegurarse de que 'fecha_pago' sea un objeto Carbon
+                $pago->fecha_pago = Carbon::parse($pago->fecha_pago);
+                return $pago;
+            });
+    
+        // Obtener los depósitos relacionados con el cliente
+        $depositos = ClienteBanco::where('asignado', $cliente->id)->with('banco')->get(); // Filtra por el campo 'asignado' y carga la relación de banco
     
         // Calcular el total pagado
         $totalAPagar = $pagos->sum('monto');
@@ -458,15 +462,14 @@ class PagoController extends Controller
             'pagos' => $pagos,
             'totalAPagar' => $totalAPagar,
             'factura' => $factura,
-            // Agregar el id del lote_pago si es necesario
-            'lote_pago_id' => $pagos->first() ? $pagos->first()->lote_pago_id : null,
+            'depositos' => $depositos, // Añadir depósitos aquí
         ];
     
         // Retornar la vista con los datos
         return view('cuentas.pagos_por_cliente', $data);
     }
     
-    
+
     public function descargarLote($id)
     {
         $lotePago = LotePago::with(['pagos.factura'])->findOrFail($id);
@@ -482,6 +485,63 @@ class PagoController extends Controller
         return $pdf->download('lote_pago_' . $id . '.pdf');
     }
     
-    
+    public function asignarSerial(Request $request) 
+    {
+        // Validar el campo serial_baunche y complemento
+        $request->validate([
+            'serial_baunche' => 'required|string',
+            'complemento' => 'required|string'
+        ]);
 
+        // Actualizar todos los pagos que tengan el mismo complemento
+        Pago::where('complemento', $request->complemento)
+            ->update(['serial_baunche' => $request->serial_baunche]);
+
+        // Redireccionar de vuelta con un mensaje de éxito
+        return redirect()->back()->with('success', 'Serial Baunche asignado correctamente.');
+    }
+
+    // Asignar Banco Proveniente y Número de Cuenta
+    public function asignarBancoYCuenta(Request $request)
+    {
+        // Validar los campos
+        $request->validate([
+            'complemento' => 'required|string',
+            'banco_prov' => 'required|string',
+            'num_cuenta' => 'required|string',
+        ]);
+
+        // Actualizar todos los pagos que tengan el mismo complemento
+        Pago::where('complemento', $request->complemento)
+            ->update([
+                'banco_prov' => $request->banco_prov,
+                'num_cuenta' => $request->num_cuenta,
+            ]);
+
+        // Redireccionar de vuelta con un mensaje de éxito
+        return redirect()->back()->with('success', 'Banco Proveniente y Número de Cuenta asignados correctamente.');
+    }
+
+    public function asignarDatos(Request $request)
+{
+    // Validar los campos
+    $request->validate([
+        'complemento' => 'required|string',
+        'serial_baunche' => 'nullable|string',
+        'banco_prov' => 'nullable|string',
+        'num_cuenta' => 'nullable|string',
+    ]);
+
+    // Actualizar todos los pagos que tengan el mismo complemento
+    Pago::where('complemento', $request->complemento)
+        ->update([
+            'serial_baunche' => $request->serial_baunche,
+            'banco_prov' => $request->banco_prov,
+            'num_cuenta' => $request->num_cuenta,
+        ]);
+
+    // Redireccionar de vuelta con un mensaje de éxito
+    return redirect()->back()->with('success', 'Datos asignados correctamente.');
 }
+}
+

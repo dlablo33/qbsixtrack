@@ -36,6 +36,7 @@
             margin-bottom: 30px;
         }
 
+        /* Estilo de la tabla */
         .table {
             width: 100%;
             margin-bottom: 20px;
@@ -44,29 +45,29 @@
         }
 
         .table thead th {
-            background-color: #007bff;
+            background-color: #0056b3;
             color: #fff;
             padding: 15px;
-            border-bottom: 2px solid #0056b3;
+            border-bottom: 2px solid #004080;
             text-align: center;
         }
 
         .table tbody tr {
             border-bottom: 1px solid #dee2e6;
-            text-align: center;
             transition: background-color 0.3s ease;
+            text-align: center;
         }
 
         .table tbody tr:hover {
-            background-color: #f1f1f1;
+            background-color: #e9f2ff;
             transform: scale(1.01);
         }
 
         .table td {
             padding: 15px;
-            text-align: center;
         }
 
+        /* Botones */
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
@@ -122,11 +123,9 @@
             Descargar Estado de Cuenta
         </a>
 
-<!-- Botón para ir a la sección de pagos -->
-<a href="{{ route('cuentas.pagos_por_cliente', $cliente_name) }}" class="btn btn-primary mb-3">
-    Ir a Pagos
-</a>
-
+        <a href="{{ route('cuentas.pagos_por_cliente', $cliente_name) }}" class="btn btn-primary mb-3">
+            Ir a Pagos
+        </a>
 
         @if(session('success'))
             <div class="alert alert-success">
@@ -160,7 +159,9 @@
                         @foreach ($facturas as $factura)
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="selected_facturas[]" value="{{ $factura->id }}">
+                                    @if($factura->montoPendiente() > 0)
+                                        <input type="checkbox" name="selected_facturas[]" value="{{ $factura->id }}">
+                                    @endif
                                 </td>
                                 <td>{{ $factura->id }}</td>
                                 <td>{{ $factura->producto_name }}</td>
@@ -199,4 +200,3 @@
         });
     </script>
 @endsection
-

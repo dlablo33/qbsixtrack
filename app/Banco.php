@@ -21,4 +21,6 @@ class Banco extends Model
     }
 
     
+
+    
 }

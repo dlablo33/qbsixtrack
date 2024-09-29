@@ -39,4 +39,10 @@ class Customer extends Model
         return $this->hasMany(Molecula2::class, 'cliente_id');
     }
     
+    // En el modelo Customer o Cliente
+public function depositos()
+{
+    return $this->hasMany(ClienteBanco::class, 'cliente_id');
+}
+
 }

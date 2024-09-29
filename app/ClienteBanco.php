@@ -35,4 +35,9 @@ class ClienteBanco extends Model
         return $this->belongsTo(CustomerAdmin::class, 'cliente_id');
     }
     
+    public function pagos()
+    {
+    return $this->hasMany(Pago::class);
+    }
+
 }

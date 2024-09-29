@@ -1,59 +1,201 @@
 @extends('layouts.master')
 
 @section('content')
-<div class="container">
-    <h1>Pagos para el Cliente: {{ $cliente->NOMBRE_COMERCIAL }}</h1>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Depósitos en la parte superior derecha -->
+        <div class="col-md-4 offset-md-8 text-right" id="depositos-section">
+            <h4>Depósitos del Cliente: {{ $cliente->NOMBRE_COMERCIAL }}</h4>
+            <div class="depositos-content">
+                <h5>Depósitos Registrados</h5>
+                @if($depositos->isEmpty())
+                    <p>No hay depósitos registrados para este cliente.</p>
+                @else
+                    <ul class="list-unstyled">
+                        @foreach($depositos as $deposito)
+                            <li class="deposito-item">
+                                <strong>ID:</strong> {{ $deposito->id }} |
+                                <strong>Banco:</strong> {{ $deposito->banco->banco ?? 'N/A' }} |
+                                <strong>Saldo MXN:</strong> ${{ number_format($deposito->saldo_mxn, 2) }} |
+                                <strong>Saldo USD:</strong> ${{ number_format($deposito->saldo_usd, 2) }} |
+                                <strong>Fecha de Registro:</strong> {{ $deposito->created_at->format('d/m/Y') }}
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
 
-    @if($factura)
-        <h2>Última Factura: #{{ $factura->id }}</h2>
-        <h3>Total: ${{ number_format($factura->total, 2) }}</h3>
-    @else
-        <p>No hay facturas asociadas a este cliente.</p>
-    @endif
+        <!-- Tabla de Pagos centrada -->
+        <div class="col-md-10 offset-md-1">
+            <div class="table-responsive" id="pagos-section">
+                <h4 class="text-center">Pagos para el Cliente: {{ $cliente->NOMBRE_COMERCIAL }}</h4>
+                @if($factura)
+                    <h5 class="text-center">Última Factura: #{{ $factura->id }} | Total: ${{ number_format($factura->total, 2) }}</h5>
+                @else
+                    <p class="text-center">No hay facturas asociadas a este cliente.</p>
+                @endif
 
-    <h4>Pagos Registrados:</h4>
-    @if($pagos->isEmpty())
-        <p>No hay pagos registrados para este cliente.</p>
-    @else
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID Pago</th>
-                    <th>Monto</th>
-                    <th>Fecha de Pago</th>
-                    <th>Referencia</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $ultimoComplemento = null; @endphp
-                @foreach($pagos as $pago)
-                    <tr>
-                        <td>{{ $pago->id }}</td>
-                        <td>${{ number_format($pago->monto, 2) }}</td>
-                        <td>{{ $pago->fecha_pago->format('d/m/Y') }}</td>
-                        <td>{{ $pago->complemento }}</td>
-                        <td>
-                            @if($pago->complemento !== $ultimoComplemento)
-                                <a href="{{ route('pagos.descargar.lote', $pago->lote_pago_id) }}" class="btn btn-primary">
-                                    Descargar PDF
-                                </a>
-                            @endif
-                        </td>
-                    </tr>
-                    @php $ultimoComplemento = $pago->complemento; @endphp
-                @endforeach
-            </tbody>
-        </table>
-    @endif
+                <h5 class="text-center mt-3">Pagos Registrados:</h5>
+                @if($pagos->isEmpty())
+                    <p class="text-center">No hay pagos registrados para este cliente.</p>
+                @else
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>ID Pago</th>
+                                <th>Monto</th>
+                                <th>Fecha de Pago</th>
+                                <th>Referencia</th>
+                                
+                                <th>Banco Proveniente</th>
+                                <th>Número de Cuenta</th>
+                                <th>Complemento</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $ultimoComplemento = null; @endphp
+                            @foreach($pagos as $pago)
+                                <tr>
+                                    <td>{{ $pago->id }}</td>
+                                    <td>${{ number_format($pago->monto, 2) }}</td>
+                                    <td>{{ $pago->fecha_pago->format('d/m/Y') }}</td>
+                                    <td>{{ $pago->complemento }}</td>
+                                    <td>
+                                        <input type="text" name="banco_proveniente[]" class="form-control form-control-sm" placeholder="Banco Proveniente" required>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="numero_cuenta[]" class="form-control form-control-sm" placeholder="Número de Cuenta" required>
+                                    </td>
+                                    <td>
+                                        {{ $pago->serial_baunche ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        @if($pago->complemento !== $ultimoComplemento)
+                                            <a href="{{ route('pagos.descargar.lote', $pago->lote_pago_id) }}" class="btn btn-primary btn-sm">
+                                                Descargar PDF
+                                            </a>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @php $ultimoComplemento = $pago->complemento; @endphp
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
+        </div>
+    </div>
 
+    <!-- Botones Centrados -->
     <div class="text-center mt-4">
-        <a href="{{ route('cuentas.index') }}" class="btn btn-secondary">Regresar</a>
+        <form action="{{ route('pagos.asignar_datos') }}" method="POST" class="d-inline-block">
+            @csrf
+            <button type="submit" class="btn btn-success btn-lg mx-2">Guardar Cambios</button>
+        </form>
+        <a href="{{ route('cuentas.index') }}" class="btn btn-secondary btn-lg mx-2">Regresar</a>
     </div>
 </div>
 @endsection
 
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const pagosSection = document.getElementById('pagos-section');
+            pagosSection.style.opacity = 0;
+            setTimeout(() => {
+                pagosSection.style.opacity = 1;
+                pagosSection.style.transition = 'opacity 0.5s ease-in-out';
+            }, 200);
+        });
+    </script>
+@endsection
 
+<style>
+    /* Fuentes y Estilos Generales */
+    body {
+        font-family: 'Lato', sans-serif;
+    }
+
+    h4, h5 {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .container-fluid {
+        padding: 15px;
+    }
+
+    /* Depósitos en la parte superior derecha */
+    #depositos-section {
+        margin-top: 20px;
+    }
+
+    .depositos-content {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+    .deposito-item {
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #ffffff;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    .deposito-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Tabla centrada y responsiva */
+    #pagos-section {
+        margin-top: 30px;
+    }
+
+    .table-responsive {
+        margin-top: 20px;
+    }
+
+    .table {
+        background-color: #fff;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Botones centrados */
+    .btn {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+    }
+
+    .btn-lg {
+        padding: 10px 25px;
+        font-size: 18px;
+    }
+
+    /* Media Queries para Responsividad */
+    @media (max-width: 768px) {
+        .col-md-4 {
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .deposito-item {
+            font-size: 14px;
+        }
+
+        .btn-lg {
+            font-size: 16px;
+            padding: 8px 20px;
+        }
+    }
+</style>
 
 
 
