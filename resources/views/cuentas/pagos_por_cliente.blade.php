@@ -40,14 +40,15 @@
                 @if($pagos->isEmpty())
                     <p class="text-center">No hay pagos registrados para este cliente.</p>
                 @else
-                    <table class="table table-bordered text-center">
+                <form action="{{ route('pagos.asignar_datos') }}" method="POST">
+                    @csrf
+                    <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>ID Pago</th>
+                                <th>ID</th>
                                 <th>Monto</th>
                                 <th>Fecha de Pago</th>
                                 <th>Referencia</th>
-                                
                                 <th>Banco Proveniente</th>
                                 <th>Número de Cuenta</th>
                                 <th>Complemento</th>
@@ -59,17 +60,37 @@
                             @foreach($pagos as $pago)
                                 <tr>
                                     <td>{{ $pago->id }}</td>
+                                    <input type="hidden" name="pago_ids[]" value="{{ $pago->id }}">
                                     <td>${{ number_format($pago->monto, 2) }}</td>
                                     <td>{{ $pago->fecha_pago->format('d/m/Y') }}</td>
                                     <td>{{ $pago->complemento }}</td>
+                                    
                                     <td>
-                                        <input type="text" name="banco_proveniente[]" class="form-control form-control-sm" placeholder="Banco Proveniente" required>
+                                        @if($pago->banco_proveniente)
+                                            {{ $pago->banco_proveniente }}
+                                        @else
+                                            @if($pago->complemento !== $ultimoComplemento)
+                                                <input type="text" name="banco_proveniente[{{ $pago->complemento }}]" class="form-control form-control-sm" placeholder="Banco Proveniente" value="{{ old('banco_proveniente.'.$pago->complemento) }}">
+                                            @endif
+                                        @endif
                                     </td>
                                     <td>
-                                        <input type="text" name="numero_cuenta[]" class="form-control form-control-sm" placeholder="Número de Cuenta" required>
+                                        @if($pago->numero_cuenta)
+                                            {{ $pago->numero_cuenta }}
+                                        @else
+                                            @if($pago->complemento !== $ultimoComplemento)
+                                                <input type="text" name="numero_cuenta[{{ $pago->complemento }}]" class="form-control form-control-sm" placeholder="Número de Cuenta" value="{{ old('numero_cuenta.'.$pago->complemento) }}">
+                                            @endif
+                                        @endif
                                     </td>
                                     <td>
-                                        {{ $pago->serial_baunche ?? 'N/A' }}
+                                        @if($pago->serial_baunche)
+                                            {{ $pago->serial_baunche }}
+                                        @else
+                                            @if($pago->complemento !== $ultimoComplemento)
+                                                <input type="text" name="serial_baunche[{{ $pago->complemento }}]" class="form-control form-control-sm" value="{{ old('serial_baunche.'.$pago->complemento, $pago->serial_baunche) }}" placeholder="Serial Baunche">
+                                            @endif
+                                        @endif
                                     </td>
                                     <td>
                                         @if($pago->complemento !== $ultimoComplemento)
@@ -83,18 +104,11 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <button type="submit" class="btn btn-success">Actualizar Pagos</button>
+                </form>
                 @endif
             </div>
         </div>
-    </div>
-
-    <!-- Botones Centrados -->
-    <div class="text-center mt-4">
-        <form action="{{ route('pagos.asignar_datos') }}" method="POST" class="d-inline-block">
-            @csrf
-            <button type="submit" class="btn btn-success btn-lg mx-2">Guardar Cambios</button>
-        </form>
-        <a href="{{ route('cuentas.index') }}" class="btn btn-secondary btn-lg mx-2">Regresar</a>
     </div>
 </div>
 @endsection
@@ -196,7 +210,3 @@
         }
     }
 </style>
-
-
-
-

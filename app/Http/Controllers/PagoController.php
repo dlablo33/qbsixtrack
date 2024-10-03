@@ -12,6 +12,9 @@ use PDF;
 use App\LotePago;
 use Carbon\Carbon;
 use App\ClienteBanco;
+use App\Complemento;
+use Illuminate\Support\Facades\Log;
+
 
 class PagoController extends Controller
 {
@@ -19,38 +22,25 @@ class PagoController extends Controller
     {
         // Obtener las facturas con saldos pendientes
         $deudasPorCliente = Factura::select('cliente_name', DB::raw('SUM(total) as totalFacturas'))
-        ->groupBy('cliente_name')
-        ->havingRaw('SUM(total) > 0')
-        ->get()
-        ->map(function ($factura) {
-            // Obtener todas las facturas del cliente
-            $facturasDelCliente = Factura::where('cliente_name', $factura->cliente_name)->get();
-            
-            $totalFacturas = 0;
-            $totalPagos = 0;
+            ->groupBy('cliente_name')
+            ->havingRaw('SUM(total) > 0')
+            ->with('pagos') // Cargar pagos relacionados
+            ->get()
+            ->map(function ($factura) {
+                $totalPagos = $factura->pagos->sum('monto'); // Sumar pagos directamente
+                $saldoRestante = $factura->totalFacturas - $totalPagos; // Calcular saldo restante
     
-            foreach ($facturasDelCliente as $facturaCliente) {
-                // Sumar el total de todas las facturas
-                $totalFacturas += $facturaCliente->total;
+                // Obtener saldo a favor del cliente
+                $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
+                $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
     
-                // Sumar todos los pagos de las facturas
-                $totalPagos += Pago::where('factura_id', $facturaCliente->id)->sum('monto');
-            }
+                return (object) [
+                    'cliente_name' => $factura->cliente_name,
+                    'saldoRestante' => $saldoRestante,
+                    'saldoAFavor' => $saldoAFavor,
+                ];
+            });
     
-            // Calcular el saldo restante correctamente
-            $saldoRestante = $totalFacturas - $totalPagos;
-    
-            // Obtener saldo a favor del cliente
-            $cliente = Customer::where('NOMBRE_COMERCIAL', $factura->cliente_name)->first();
-            $saldoAFavor = $cliente ? $cliente->saldo_a_favor : 0;
-    
-            return (object) [
-                'cliente_name' => $factura->cliente_name,
-                'saldoRestante' => $saldoRestante,
-                'saldoAFavor' => $saldoAFavor,
-            ];
-        });
-
         // Preparar los datos para la vista
         return view('cuentas.index', [
             'menu' => "deudasPorCliente",
@@ -58,7 +48,7 @@ class PagoController extends Controller
             'deudasPorCliente' => $deudasPorCliente,
         ]);
     }
-
+    
     public function facturasCliente($cliente)
     {
         $facturas = Factura::where('cliente_name', $cliente)->get();
@@ -93,8 +83,6 @@ class PagoController extends Controller
         ]);
     }
     
-    
-
     public function create($factura_id)
     {
         $factura = Factura::findOrFail($factura_id);
@@ -469,7 +457,6 @@ class PagoController extends Controller
         return view('cuentas.pagos_por_cliente', $data);
     }
     
-
     public function descargarLote($id)
     {
         $lotePago = LotePago::with(['pagos.factura'])->findOrFail($id);
@@ -502,46 +489,32 @@ class PagoController extends Controller
     }
 
     // Asignar Banco Proveniente y Número de Cuenta
-    public function asignarBancoYCuenta(Request $request)
-    {
-        // Validar los campos
-        $request->validate([
-            'complemento' => 'required|string',
-            'banco_prov' => 'required|string',
-            'num_cuenta' => 'required|string',
-        ]);
-
-        // Actualizar todos los pagos que tengan el mismo complemento
-        Pago::where('complemento', $request->complemento)
-            ->update([
-                'banco_prov' => $request->banco_prov,
-                'num_cuenta' => $request->num_cuenta,
-            ]);
-
-        // Redireccionar de vuelta con un mensaje de éxito
-        return redirect()->back()->with('success', 'Banco Proveniente y Número de Cuenta asignados correctamente.');
-    }
-
     public function asignarDatos(Request $request)
-{
-    // Validar los campos
-    $request->validate([
-        'complemento' => 'required|string',
-        'serial_baunche' => 'nullable|string',
-        'banco_prov' => 'nullable|string',
-        'num_cuenta' => 'nullable|string',
-    ]);
-
-    // Actualizar todos los pagos que tengan el mismo complemento
-    Pago::where('complemento', $request->complemento)
-        ->update([
-            'serial_baunche' => $request->serial_baunche,
-            'banco_prov' => $request->banco_prov,
-            'num_cuenta' => $request->num_cuenta,
-        ]);
-
-    // Redireccionar de vuelta con un mensaje de éxito
-    return redirect()->back()->with('success', 'Datos asignados correctamente.');
-}
+    {
+        $pago_ids = $request->input('pago_ids');
+        $bancos = $request->input('banco_proveniente');
+        $cuentas = $request->input('numero_cuenta');
+        $seriales = $request->input('serial_baunche');
+    
+        foreach ($pago_ids as $pago_id) {
+            $pago = Pago::find($pago_id);
+            
+            // Verificar si ya está asignado
+            if (!$pago->banco_proveniente && !$pago->numero_cuenta && !$pago->serial_baunche) {
+                // Asignar los valores del banco, cuenta y serial correspondientes al complemento
+                $complemento = $pago->complemento;
+                
+                $pago->banco_proveniente = $bancos[$complemento];
+                $pago->numero_cuenta = $cuentas[$complemento];
+                $pago->serial_baunche = $seriales[$complemento];
+                
+                $pago->save();
+            }
+        }
+    
+        return redirect()->back()->with('success', 'Datos asignados correctamente.');
+    }
+    
+    
 }
 

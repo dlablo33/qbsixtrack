@@ -17,8 +17,8 @@ class Pago extends Model
         'lote_pago_id',
         'batch_id',
         'serial_baunche',
-        'num_cuenta',
-        'banco_prov', // Asegúrate de que este campo esté presente si lo necesitas
+        'numero_cuenta',
+        'banco_proveniente',
     ];
 
     // Relación con Factura
@@ -43,6 +43,11 @@ class Pago extends Model
     {
     return $this->belongsTo(ClienteBanco::class, 'cliente_id');
     }
+
+    public function complemento()
+    {
+    return $this->hasOne(Complemento::class, 'pago_id');
+    }   
 
     
 }

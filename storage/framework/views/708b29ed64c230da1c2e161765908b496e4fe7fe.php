@@ -41,14 +41,15 @@
                 <?php if($pagos->isEmpty()): ?>
                     <p class="text-center">No hay pagos registrados para este cliente.</p>
                 <?php else: ?>
-                    <table class="table table-bordered text-center">
+                <form action="<?php echo e(route('pagos.asignar_datos')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
+                    <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>ID Pago</th>
+                                <th>ID</th>
                                 <th>Monto</th>
                                 <th>Fecha de Pago</th>
                                 <th>Referencia</th>
-                                
                                 <th>Banco Proveniente</th>
                                 <th>Número de Cuenta</th>
                                 <th>Complemento</th>
@@ -60,18 +61,40 @@
                             <?php $__currentLoopData = $pagos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pago): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
                                     <td><?php echo e($pago->id); ?></td>
+                                    <input type="hidden" name="pago_ids[]" value="<?php echo e($pago->id); ?>">
                                     <td>$<?php echo e(number_format($pago->monto, 2)); ?></td>
                                     <td><?php echo e($pago->fecha_pago->format('d/m/Y')); ?></td>
                                     <td><?php echo e($pago->complemento); ?></td>
+                                    
                                     <td>
-                                        <input type="text" name="banco_proveniente[]" class="form-control form-control-sm" placeholder="Banco Proveniente" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="numero_cuenta[]" class="form-control form-control-sm" placeholder="Número de Cuenta" required>
-                                    </td>
-                                    <td>
-                                        <?php echo e($pago->serial_baunche ?? 'N/A'); ?>
+                                        <?php if($pago->banco_proveniente): ?>
+                                            <?php echo e($pago->banco_proveniente); ?>
 
+                                        <?php else: ?>
+                                            <?php if($pago->complemento !== $ultimoComplemento): ?>
+                                                <input type="text" name="banco_proveniente[<?php echo e($pago->complemento); ?>]" class="form-control form-control-sm" placeholder="Banco Proveniente" value="<?php echo e(old('banco_proveniente.'.$pago->complemento)); ?>">
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if($pago->numero_cuenta): ?>
+                                            <?php echo e($pago->numero_cuenta); ?>
+
+                                        <?php else: ?>
+                                            <?php if($pago->complemento !== $ultimoComplemento): ?>
+                                                <input type="text" name="numero_cuenta[<?php echo e($pago->complemento); ?>]" class="form-control form-control-sm" placeholder="Número de Cuenta" value="<?php echo e(old('numero_cuenta.'.$pago->complemento)); ?>">
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if($pago->serial_baunche): ?>
+                                            <?php echo e($pago->serial_baunche); ?>
+
+                                        <?php else: ?>
+                                            <?php if($pago->complemento !== $ultimoComplemento): ?>
+                                                <input type="text" name="serial_baunche[<?php echo e($pago->complemento); ?>]" class="form-control form-control-sm" value="<?php echo e(old('serial_baunche.'.$pago->complemento, $pago->serial_baunche)); ?>" placeholder="Serial Baunche">
+                                            <?php endif; ?>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if($pago->complemento !== $ultimoComplemento): ?>
@@ -85,18 +108,11 @@
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
+                    <button type="submit" class="btn btn-success">Actualizar Pagos</button>
+                </form>
                 <?php endif; ?>
             </div>
         </div>
-    </div>
-
-    <!-- Botones Centrados -->
-    <div class="text-center mt-4">
-        <form action="<?php echo e(route('pagos.asignar_datos')); ?>" method="POST" class="d-inline-block">
-            <?php echo csrf_field(); ?>
-            <button type="submit" class="btn btn-success btn-lg mx-2">Guardar Cambios</button>
-        </form>
-        <a href="<?php echo e(route('cuentas.index')); ?>" class="btn btn-secondary btn-lg mx-2">Regresar</a>
     </div>
 </div>
 <?php $__env->stopSection(); ?>
@@ -198,9 +214,5 @@
         }
     }
 </style>
-
-
-
-
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/cuentas/pagos_por_cliente.blade.php ENDPATH**/ ?>
