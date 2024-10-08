@@ -12,7 +12,7 @@ class Molecula2 extends Model
         'bol', 'order_number', 'semana', 'fecha', 'linea', 'no_pipa', 
         'cliente', 'destino', 'transportista_id', 'destino_id', 'status',
         'cruce', 'litros', 'precio', 'fecha_salida', 'fecha_entrega', 
-        'fecha_descarga', 'pedimento' , 'moneda','codeka','NumeroFactura'
+        'fecha_descarga', 'pedimento' , 'moneda','codeka','NumeroFactura','customer_name'
     ];
 
     public function destino()

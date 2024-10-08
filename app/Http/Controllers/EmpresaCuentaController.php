@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Banco;
 use Illuminate\Http\Request;
 use App\EmpresaCuenta;
 use App\Gasto;
+use App\CurrencyConversion;
+use Illuminate\Support\Facades\DB; 
+use App\Traspaso;
 
 class EmpresaCuentaController extends Controller
 {
     public function index()
     {
         $cuentas = EmpresaCuenta::all();
+        $bancos = Banco::all();
         $data = [
             'menu' => 'Admin',
             'submenu' => '',
             'cuentas' => $cuentas,
+            'bancos' => $bancos
         ];
         return view('empresa_cuenta.index', $data);
     }
@@ -224,4 +230,127 @@ class EmpresaCuentaController extends Controller
 
         return view('empresa_cuenta.lista_gastos', $data);
     }
+
+    // ========================================================================================================================================
+
+
+    public function convertCurrency(Request $request)
+    {
+        // Tasa de cambio obtenida dinámicamente del formulario
+        $exchangeRate = $request->input('exchange_rate');
+    
+        // Validar el formulario
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'from_currency' => 'required|in:MXN,USD',
+            'to_currency' => 'required|in:MXN,USD',
+            'exchange_rate' => 'required|numeric|min:0.01',
+        ]);
+    
+        // Obtener los datos del formulario
+        $amount = $request->input('amount');
+        $fromCurrency = $request->input('from_currency');
+        $toCurrency = $request->input('to_currency');
+    
+        // Asegurarse de que las monedas sean diferentes
+        if ($fromCurrency === $toCurrency) {
+            return back()->with('error', 'Las monedas de origen y destino deben ser diferentes.');
+        }
+    
+        // Buscar la cuenta de la empresa
+        $cuenta = EmpresaCuenta::first(); // Ajusta esto según tu lógica de selección de cuenta
+    
+        if (!$cuenta) {
+            return back()->with('error', 'No se encontró una cuenta para realizar la conversión.');
+        }
+    
+        // Lógica de conversión
+        if ($fromCurrency == 'MXN' && $toCurrency == 'USD') {
+            if ($amount > $cuenta->saldo_final_mxn) {
+                return back()->with('error', 'Saldo insuficiente en pesos.');
+            }
+    
+            // Realizar la conversión de MXN a USD
+            $convertedAmount = $amount / $exchangeRate;
+            $cuenta->saldo_final_mxn -= $amount; // Resta del saldo en pesos
+            $cuenta->saldo_final_usd += $convertedAmount; // Suma al saldo en dólares
+    
+        } elseif ($fromCurrency == 'USD' && $toCurrency == 'MXN') {
+            if ($amount > $cuenta->saldo_final_usd) {
+                return back()->with('error', 'Saldo insuficiente en dólares.');
+            }
+    
+            // Realizar la conversión de USD a MXN
+            $convertedAmount = $amount * $exchangeRate;
+            $cuenta->saldo_final_usd -= $amount; // Resta del saldo en dólares
+            $cuenta->saldo_final_mxn += $convertedAmount; // Suma al saldo en pesos
+        }
+    
+        // Guardar los cambios en la base de datos
+        $cuenta->save();
+    
+        // Registrar la conversión en la tabla currency_conversions
+        CurrencyConversion::create([
+            'amount' => $amount,
+            'from_currency' => $fromCurrency,
+            'to_currency' => $toCurrency,
+            'exchange_rate' => $exchangeRate,
+            'converted_amount' => $convertedAmount,
+            'empresa_cuenta_id' => $cuenta->id, // Asignar la cuenta relacionada
+        ]);
+    
+        // Retornar con éxito y mostrar el monto convertido
+        return back()->with('success', 'Conversión realizada con éxito. Monto convertido: ' . number_format($convertedAmount, 2) . ' ' . $toCurrency);
+    }
+    
+    public function transferFunds(Request $request)
+    {
+        $request->validate([
+            'banco_origen' => 'required|exists:empresa_cuenta,id',
+            'cantidad' => 'required|numeric|min:0',
+            'banco_destino' => 'required|exists:empresa_cuenta,id',
+            'moneda' => 'required|in:MXN,USD',
+        ]);
+    
+        $bancoOrigen = EmpresaCuenta::find($request->banco_origen);
+        $bancoDestino = EmpresaCuenta::find($request->banco_destino);
+        $cantidad = $request->cantidad; 
+        $moneda = $request->moneda;
+    
+        try {
+            DB::transaction(function() use ($bancoOrigen, $bancoDestino, $cantidad, $moneda) {
+                // Verificar saldo
+                if ($moneda === 'MXN' && $bancoOrigen->saldo_final_mxn < $cantidad) {
+                    throw new \Exception('Saldo insuficiente en MXN en el banco origen.');
+                } elseif ($moneda === 'USD' && $bancoOrigen->saldo_final_usd < $cantidad) {
+                    throw new \Exception('Saldo insuficiente en USD en el banco origen.');
+                }
+    
+                // Actualizar saldos
+                if ($moneda === 'MXN') {
+                    $bancoOrigen->saldo_final_mxn -= $cantidad;
+                    $bancoDestino->saldo_final_mxn += $cantidad;
+                } else {
+                    $bancoOrigen->saldo_final_usd -= $cantidad;
+                    $bancoDestino->saldo_final_usd += $cantidad;
+                }
+    
+                $bancoOrigen->save();
+                $bancoDestino->save();
+    
+                // Registrar el traspaso
+                Traspaso::create([
+                    'banco_origen' => $bancoOrigen->id,
+                    'banco_destino' => $bancoDestino->id,
+                    'cantidad' => $cantidad,
+                    'moneda' => $moneda,
+                ]);
+            });
+    
+            return back()->with('success', 'Transferencia realizada con éxito.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+    
 }

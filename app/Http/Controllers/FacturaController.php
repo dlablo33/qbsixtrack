@@ -183,7 +183,6 @@ class FacturaController extends Controller
     return redirect()->route('facturas.index')->with('success', 'Datos transferidos con éxito');
     }
   
-
     private function generarNumeroFactura()
     {
         return 'FAC-' . uniqid();
@@ -196,4 +195,5 @@ class FacturaController extends Controller
 
     // =====================================================================================================================================================================
 
+    
 }

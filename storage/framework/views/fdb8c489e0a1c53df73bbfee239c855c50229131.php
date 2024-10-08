@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 <style>
     .form-check-input:checked {
         background-color: #0d6efd; /* Color del switch cuando está activo */
@@ -99,14 +99,14 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('empresa_cuenta.convertCurrency') }}" method="POST">
-                        @csrf
+                    <form action="<?php echo e(route('empresa_cuenta.convertCurrency')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
                         <div class="form-group">
                             <label for="banco">Banco</label>
                             <select class="form-control" name="banco" required>
-                                @foreach($cuentas as $cuenta)
-                                    <option value="{{ $cuenta->id }}">{{ $cuenta->banco }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = $cuentas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cuenta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($cuenta->id); ?>"><?php echo e($cuenta->banco); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
                         <div class="form-group">
@@ -139,17 +139,19 @@
     </div>
 
     <!-- Mensajes de éxito o error -->
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div class="alert alert-success mt-3">
-            {{ session('success') }}
-        </div>
-    @endif
+            <?php echo e(session('success')); ?>
 
-    @if(session('error'))
-        <div class="alert alert-danger mt-3">
-            {{ session('error') }}
         </div>
-    @endif
+    <?php endif; ?>
+
+    <?php if(session('error')): ?>
+        <div class="alert alert-danger mt-3">
+            <?php echo e(session('error')); ?>
+
+        </div>
+    <?php endif; ?>
 
     <!-- Tabla de resumen -->
     <div class="table-responsive mt-4">
@@ -169,31 +171,31 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($cuentas as $cuenta)
+                <?php $__currentLoopData = $cuentas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cuenta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td>{{ $cuenta->id }}</td>
-                        <td>{{ $cuenta->banco }}</td>
-                        <td>${{ number_format($cuenta->ingreso_mxn, 2, '.', ',') }}</td>
-                        <td>${{ number_format($cuenta->ingreso_usd, 2, '.', ',') }}</td>
-                        <td>${{ number_format($cuenta->comision_mxn, 2, '.', ',') }}</td>
-                        <td>${{ number_format($cuenta->comision_usd, 2, '.', ',') }}</td>
-                        <td>${{ number_format($cuenta->saldo_final_mxn, 2, '.', ',') }}</td>
-                        <td>${{ number_format($cuenta->saldo_final_usd, 2, '.', ',') }}</td>
-                        <td>{{ $cuenta->created_at->format('d/m/Y H:i') }}</td>
+                        <td><?php echo e($cuenta->id); ?></td>
+                        <td><?php echo e($cuenta->banco); ?></td>
+                        <td>$<?php echo e(number_format($cuenta->ingreso_mxn, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($cuenta->ingreso_usd, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($cuenta->comision_mxn, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($cuenta->comision_usd, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($cuenta->saldo_final_mxn, 2, '.', ',')); ?></td>
+                        <td>$<?php echo e(number_format($cuenta->saldo_final_usd, 2, '.', ',')); ?></td>
+                        <td><?php echo e($cuenta->created_at->format('d/m/Y H:i')); ?></td>
                         <td>
-                            <button type="button" class="btn btn-warning btn-animated" onclick="openTransferModal({{ $cuenta->id }}, '{{ $cuenta->banco }}', {{ $cuenta->saldo_final_mxn }}, {{ $cuenta->saldo_final_usd }})">Transferir</button>
+                            <button type="button" class="btn btn-warning btn-animated" onclick="openTransferModal(<?php echo e($cuenta->id); ?>, '<?php echo e($cuenta->banco); ?>', <?php echo e($cuenta->saldo_final_mxn); ?>, <?php echo e($cuenta->saldo_final_usd); ?>)">Transferir</button>
                         </td>
                     </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
     </div>
 
     <!-- Botones para acciones adicionales -->
     <div class="btn-container mt-4">
-        <a href="{{ route('Admin.index') }}" class="btn btn-success btn-animated">Volver</a>
-        <a href="{{ route('empresa_cuenta.showGastosForm') }}" class="btn btn-primary btn-animated">Registrar Gasto</a>
-        <a href="{{ route('empresa_cuenta.listaGastos') }}" class="btn btn-info btn-animated">Listado de Gastos</a>
+        <a href="<?php echo e(route('Admin.index')); ?>" class="btn btn-success btn-animated">Volver</a>
+        <a href="<?php echo e(route('empresa_cuenta.showGastosForm')); ?>" class="btn btn-primary btn-animated">Registrar Gasto</a>
+        <a href="<?php echo e(route('empresa_cuenta.listaGastos')); ?>" class="btn btn-info btn-animated">Listado de Gastos</a>
     </div>
 
     <!-- Modal para Transferir Fondos -->
@@ -207,8 +209,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                <form id="transferForm" method="POST" action="{{ route('empresa_cuenta.transferFunds') }}">
-    @csrf
+                <form id="transferForm" method="POST" action="<?php echo e(route('empresa_cuenta.transferFunds')); ?>">
+    <?php echo csrf_field(); ?>
     <input type="hidden" name="banco_origen" id="banco_origen">
     <input type="hidden" name="banco_destino" id="banco_destino">
     <input type="hidden" name="moneda" id="moneda">
@@ -244,9 +246,9 @@
         <label for="bancoDestino">Banco Destino</label>
         <select class="form-control" name="banco_destino" id="banco_destino_select" required>
             <option value="" disabled selected>Seleccione un banco</option>
-            @foreach($bancos as $banco)
-                <option value="{{ $banco->id }}">{{ $banco->banco }}</option>
-            @endforeach
+            <?php $__currentLoopData = $bancos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $banco): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($banco->id); ?>"><?php echo e($banco->banco); ?></option>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
     </div>
 
@@ -304,6 +306,8 @@
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\sauce\sixtrackqb\resources\views/empresa_cuenta/index.blade.php ENDPATH**/ ?>

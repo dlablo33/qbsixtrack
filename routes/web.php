@@ -335,14 +335,18 @@ Route::get('/pagos/descargar-lote/{id}', [PagoController::class, 'descargarLote'
 Route::post('/pagos/asignar-serial', [PagoController::class, 'asignarSerial'])->name('pagos.asignar_serial');
 Route::post('/pagos/asignar-banco-y-cuenta', [PagoController::class, 'asignarBancoYCuenta'])->name('pagos.asignar_banco_y_cuenta');
 Route::post('/pagos/asignar-datos', [PagoController::class, 'asignarDatos'])->name('pagos.asignar_datos');
-
-
-
-
 Route::resource('pagos', PagoController::class);
 Route::get('pagos/{pago}/edit', [PagoController::class, 'edit'])->name('pagos.edit');
 Route::get('pagos/{pago}/copy', [PagoController::class, 'copy'])->name('pagos.copy');
 Route::delete('pagos/{pago}', [PagoController::class, 'destroy'])->name('pagos.destroy');
+
+//==================================================================================================================================================
+
+Route::post('/empresa/cuenta/convertir-divisa', [EmpresaCuentaController::class, 'convertCurrency'])->name('empresa_cuenta.convertCurrency');
+Route::post('/empresa-cuenta/transfer', [EmpresaCuentaController::class, 'transferFunds'])->name('empresa_cuenta.transferFunds');
+
+
+
 
 
 

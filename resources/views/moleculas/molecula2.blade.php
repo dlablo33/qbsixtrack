@@ -32,6 +32,7 @@
                         <th>Litros</th>
                         <th>Precio</th>
                         <th>Moneda</th>
+                        <th>Empresa</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -65,6 +66,7 @@
                         <td>{{ number_format($record->litros, 2, '.', ',') }}</td> 
                         <td>${{ number_format($record->precio, 2, '.', ',') }}</td>
                         <td>{{ $record->moneda }}</td>
+                        <td>{{ $record->customer_name }} </td>
                         <td>{{ $record->status }}</td>
                     </tr>
                 @endforeach

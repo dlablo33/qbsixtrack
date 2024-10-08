@@ -22,7 +22,8 @@ class Molecula3 extends Model
         'weight_controller',
         'total',
         'status',
-        'NumeroFactura'
+        'NumeroFactura',
+        'customer_name'
 
     ];
 

@@ -147,7 +147,9 @@
                     <th>Rate</th>
                     <th>Total</th>
                     <th>Fecha de Creación</th>
+                    <th>Empresa</th>
                     <th>Estatus</th>
+                    
                     
                 </tr>
             </thead>
@@ -160,7 +162,9 @@
                         <td>$<?php echo e(number_format($record->rate, 2, '.', ',')); ?></td>
                         <td>$<?php echo e(number_format($record->total, 2, '.', ',')); ?></td>
                         <td><?php echo e($record->created_at); ?></td>
+                        <td><?php echo e($record->customer_name); ?></td>
                         <td><?php echo e($record->estatus); ?></td>
+                        
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>

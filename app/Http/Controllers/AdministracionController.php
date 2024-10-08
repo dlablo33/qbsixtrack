@@ -337,6 +337,29 @@ class AdministracionController extends Controller
         ]);
     }
     
-
+    public function convertCurrency(Request $request)
+    {
+        // Suponemos que la tasa de cambio es obtenida de una fuente confiable o almacenada en base de datos
+        $exchangeRate = 18.5; // Ejemplo: 1 USD = 18.5 MXN
+    
+        // Obtener los datos del formulario
+        $amount = $request->input('amount');
+        $fromCurrency = $request->input('from_currency');
+        $toCurrency = $request->input('to_currency');
+    
+        // Lógica de conversión
+        if ($fromCurrency == 'MXN' && $toCurrency == 'USD') {
+            $convertedAmount = $amount / $exchangeRate;
+        } elseif ($fromCurrency == 'USD' && $toCurrency == 'MXN') {
+            $convertedAmount = $amount * $exchangeRate;
+        } else {
+            return back()->with('error', 'Monedas no válidas para la conversión.');
+        }
+    
+        // Aquí puedes agregar lógica adicional, como guardar el cambio en la base de datos si es necesario.
+    
+        return back()->with('success', 'Conversión realizada con éxito. Monto convertido: ' . number_format($convertedAmount, 2));
+    }
+    
     
 }

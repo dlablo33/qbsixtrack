@@ -32,6 +32,7 @@
                         <th>Litros</th>
                         <th>Precio</th>
                         <th>Moneda</th>
+                        <th>Empresa</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -66,6 +67,7 @@
                         <td><?php echo e(number_format($record->litros, 2, '.', ',')); ?></td> 
                         <td>$<?php echo e(number_format($record->precio, 2, '.', ',')); ?></td>
                         <td><?php echo e($record->moneda); ?></td>
+                        <td><?php echo e($record->customer_name); ?> </td>
                         <td><?php echo e($record->status); ?></td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

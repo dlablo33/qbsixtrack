@@ -49,6 +49,7 @@
                         <th>Transportación Fee</th>
                         <th>Weight Controller</th>
                         <th>Total</th>
+                        <th>Empresa</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -72,6 +73,7 @@
                             <td><?php echo e(number_format($bol->transportation_fee, 2)); ?></td>
                             <td><?php echo e(number_format($bol->weight_controller, 2)); ?></td>
                             <td><?php echo e(number_format($bol->total, 2)); ?></td>
+                            <td><?php echo e($bol->customer_name); ?></td>
                             <td>
                                 <?php if($bol->status === 'pagado'): ?>
                                     <span class="badge bg-success">Pagado</span>

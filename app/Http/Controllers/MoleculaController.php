@@ -435,7 +435,7 @@ class MoleculaController extends Controller
 
 // =============================================================================================================================================
 
-//MOLECULA 3
+    // MOLECULA 3
 
     public function molecula3()
     {
@@ -527,37 +527,39 @@ class MoleculaController extends Controller
     // Sincronizar Numero de factura molecula 1
 
     public function syncBOLWithInvoice()
-    {
-        // Obtén los registros de Molecula 1 que tienen un BOL y están pendientes
-        $moleculaRecords = Molecula::whereNotNull('bol_number')
-                                    ->whereNull('NumeroFactura') // Asegúrate de que aún no se haya asignado una factura
-                                    ->get();
-        
-        foreach ($moleculaRecords as $record) {
-            // Limpia el número de BOL (elimina espacios en blanco si hay)
-            $bolNumber = trim($record->bol_number);
-        
-            // Busca la factura en el modelo de Invoice que coincida con el BOL y que contenga 'PETROLEUM DISTILLATES'
-            $invoice = Invoice::where('bol', $bolNumber)
-                                ->where('item_names', 'LIKE', '%PETROLEUM DISTILLATES%')
-                                ->first();
-        
-            // Verifica si encontró una factura
-            if ($invoice) {
-                // Actualiza el campo NumeroFactura en la tabla Molecula
-                $record->update([
-                    'NumeroFactura' => $invoice->NumeroFactura,
-                ]);
-    
-                // Log para verificación
-                \Log::info('BOL: ' . $bolNumber . ' sincronizado con la factura: ' . $invoice->NumeroFactura);
-            } else {
-                \Log::warning('No se encontró una factura para el BOL: ' . $bolNumber);
-            }
+{
+    // Obtén los registros de Molecula 1 que tienen un BOL y están pendientes
+    $moleculaRecords = Molecula::whereNotNull('bol_number')
+                                ->whereNull('NumeroFactura') // Asegúrate de que aún no se haya asignado una factura
+                                ->get();
+
+    foreach ($moleculaRecords as $record) {
+        // Limpia el número de BOL (elimina espacios en blanco si hay)
+        $bolNumber = trim($record->bol_number);
+
+        // Busca la factura en el modelo de Invoice que coincida con el BOL y que contenga 'PETROLEUM DISTILLATES'
+        $invoice = Invoice::where('bol', $bolNumber)
+                            ->where('item_names', 'LIKE', '%PETROLEUM DISTILLATES%')
+                            ->first();
+
+        // Verifica si encontró una factura
+        if ($invoice) {
+            // Actualiza el campo NumeroFactura y customer_name en la tabla Molecula
+            $record->update([
+                'NumeroFactura' => $invoice->NumeroFactura,
+                'customer_name' => $invoice->customer_name, // Migra también el campo customer_name
+            ]);
+
+            // Log para verificación
+            \Log::info('BOL: ' . $bolNumber . ' sincronizado con la factura: ' . $invoice->NumeroFactura);
+        } else {
+            \Log::warning('No se encontró una factura para el BOL: ' . $bolNumber);
         }
-    
-        return redirect()->back()->with('success', 'BOLs sincronizados con las facturas correctamente.');
     }
+
+    return redirect()->back()->with('success', 'BOLs sincronizados con las facturas correctamente.');
+    }
+
     
     //Sincronizar Numero de molecula 3
     public function syncBOLWithMolecula3()
@@ -581,6 +583,7 @@ class MoleculaController extends Controller
             // Actualiza el campo NumeroFactura en la tabla Molecula 3
             $record->update([
                 'NumeroFactura' => $invoice->NumeroFactura,
+                'customer_name' => $invoice->customer_name
             ]);
 
             // Log para verificación
@@ -615,6 +618,7 @@ class MoleculaController extends Controller
             // Actualiza el campo NumeroFactura en la tabla Molecula 2
             $record->update([
                 'NumeroFactura' => $invoice->NumeroFactura,
+                'customer_name' => $invoice->customer_name,
             ]);
 
             // Log para verificación

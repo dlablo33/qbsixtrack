@@ -47,6 +47,7 @@
                         <th>Transportación Fee</th>
                         <th>Weight Controller</th>
                         <th>Total</th>
+                        <th>Empresa</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -70,6 +71,7 @@
                             <td>{{ number_format($bol->transportation_fee, 2) }}</td>
                             <td>{{ number_format($bol->weight_controller, 2) }}</td>
                             <td>{{ number_format($bol->total, 2) }}</td>
+                            <td>{{ $bol->customer_name }}</td>
                             <td>
                                 @if($bol->status === 'pagado')
                                     <span class="badge bg-success">Pagado</span>
