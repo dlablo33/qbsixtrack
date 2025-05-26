@@ -1,6 +1,4 @@
-@extends('layouts.master')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
@@ -10,7 +8,7 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
                         <li class="breadcrumb-item active">Dashboard</li>
                     </ol>
                 </div><!-- /.col -->
@@ -40,7 +38,7 @@
                         </div>
                         <div class="card-body">
                             <div id="saldoResumen"></div>
-                            <p>Facturas o remisiones sin pagar: {{ $facturasSinPagar }}</p>
+                            <p>Facturas o remisiones sin pagar: <?php echo e($facturasSinPagar); ?></p>
                         </div>
                     </div>
                 </div>
@@ -71,16 +69,16 @@ var myPieChart = new Chart(ctxPie, {
         labels: ['Cuentas por pagar', 'Pagado esta semana', 'Saldo a favor'],
         datasets: [{
             label: 'Balance',
-            data: [{{ $totalCuentasPorPagar }}, {{ $pagadoEstaSemana }}, {{ $saldoAFavor < 0 ? 0 : $saldoAFavor }}], // Asegúrate de que el saldo a favor sea positivo
+            data: [<?php echo e($totalCuentasPorPagar); ?>, <?php echo e($pagadoEstaSemana); ?>, <?php echo e($saldoAFavor < 0 ? 0 : $saldoAFavor); ?>], // Asegúrate de que el saldo a favor sea positivo
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
-                '{{ $saldoAFavor < 0 ? "rgba(255, 255, 255, 0)" : "rgba(75, 192, 192, 0.2)" }}' // Color transparente si el saldo a favor es negativo
+                '<?php echo e($saldoAFavor < 0 ? "rgba(255, 255, 255, 0)" : "rgba(75, 192, 192, 0.2)"); ?>' // Color transparente si el saldo a favor es negativo
             ],
             borderColor: [
                 'rgba(255, 99, 132, 1)',
                 'rgba(54, 162, 235, 1)',
-                '{{ $saldoAFavor < 0 ? "rgba(255, 255, 255, 0)" : "rgba(75, 192, 192, 1)" }}' // Color transparente si el saldo a favor es negativo
+                '<?php echo e($saldoAFavor < 0 ? "rgba(255, 255, 255, 0)" : "rgba(75, 192, 192, 1)"); ?>' // Color transparente si el saldo a favor es negativo
             ],
             borderWidth: 1
         }]
@@ -107,9 +105,9 @@ var myPieChart = new Chart(ctxPie, {
     }
 });
         // Script para calcular el resumen
-        var saldoAFavor = {{ $saldoAFavor }};
+        var saldoAFavor = <?php echo e($saldoAFavor); ?>;
         var saldoResumen = document.getElementById('saldoResumen');
-        var saldoDiferencia = saldoAFavor - ({{ $totalCuentasPorPagar }} - {{ $pagadoEstaSemana }});
+        var saldoDiferencia = saldoAFavor - (<?php echo e($totalCuentasPorPagar); ?> - <?php echo e($pagadoEstaSemana); ?>);
         var saldoTexto = saldoDiferencia >= 0 ? 'Saldo a favor: ' : 'Saldo en contra: ';
         saldoResumen.innerHTML = saldoTexto + Math.abs(saldoDiferencia);
         saldoResumen.style.color = saldoDiferencia >= 0 ? 'green' : 'red';
@@ -119,10 +117,10 @@ var myPieChart = new Chart(ctxPie, {
         var myBarChart = new Chart(ctxBar, {
             type: 'bar',
             data: {
-                labels: {!! json_encode($dates) !!},
+                labels: <?php echo json_encode($dates); ?>,
                 datasets: [{
                     label: 'Número de Facturas',
-                    data: {!! json_encode($invoicesData) !!},
+                    data: <?php echo json_encode($invoicesData); ?>,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -155,4 +153,6 @@ var myPieChart = new Chart(ctxPie, {
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\garci\Documents\qbsixtrack\resources\views/dashboard.blade.php ENDPATH**/ ?>

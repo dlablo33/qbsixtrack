@@ -146,12 +146,12 @@ Route::post('/pagos', [PagoController::class, 'store'])->name('cuentas.store');
 Route::post('/facturas/{factura}/pagar-completo', [PagoController::class, 'pagarCompleto'])->name('cuentas.pagarCompleto');
 Route::post('/usar-saldo/{factura}', [PagoController::class, 'usarSaldo'])->name('cuentas.usarSaldo');
 
-// ============================================================================================================================================================================================== 
+// ==============================================================================================================================================================================================
 Route::get('/get-products-by-customer/{cliente_id}', [InvoiceController::class, 'getProductsByCustomer']);
 Route::get('/get-prices-by-product-and-customer/{cliente_id}/{product_id}', [InvoiceController::class, 'getPricesByProductAndCustomer']);
 Route::get('/get-price-by-customer', 'InvoiceController@getPriceByCustomer')->name('getPriceByCustomer');
 Route::get('/getLastPriceByCustomer', [InvoiceController::class, 'getLastPriceByCustomer'])->name('getLastPriceByCustomer');
-Route::get('/getLastPriceByCustomer', 'InvoiceController@getLastPriceByCustomer'); 
+Route::get('/getLastPriceByCustomer', 'InvoiceController@getLastPriceByCustomer');
 Route::get('/getLastPriceByCustomer', [InvoiceController::class, 'getLastPriceByCustomer'])->name('getLastPriceByCustomer');
 Route::get('/get-last-price/{customerId}', [InvoiceController::class, 'getLastPrice'])->name('getLastPrice');
 Route::post('/invoices/{invoice}/update-status', 'InvoiceController@updateStatus')->name('invoice.update.status');
@@ -192,6 +192,7 @@ Route::post('/bluewi/upload', [BluewiController::class, 'upload'])->name('bluewi
 Route::get('/bluewi/compare-bol', 'BluewiController@compareBol')->name('bluewi.compare.bol');
 // ==============================================================================================================================================================================================R¿
 Route::get('/Logistica', [LogisticaController::class, 'index'])->name('logistica.index');
+Route::post('/precio-data', [LogisticaController::class, 'precioData'])->name('logistica.precioData');
 Route::get('/transfer-data', [LogisticaController::class, 'transferData'])->name('logistica.transferData');
 Route::get('/logistica/formulario-asignar-cliente', [LogisticaController::class, 'showForm'])->name('logistica.mostrar_formulario');
 Route::post('/logistica/asignar-cliente', [LogisticaController::class, 'asignarCliente'])->name('logistica.asignar_cliente');

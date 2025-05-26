@@ -1,23 +1,22 @@
-@extends('layouts.master')
+<?php echo $__env->yieldPushContent('styles'); ?>
 
-@stack('styles')
+<?php $__env->startSection('content'); ?>
 
-@section('content')
-
-@yield('content')
-@stack('scripts')
+<?php echo $__env->yieldContent('content'); ?>
+<?php echo $__env->yieldPushContent('scripts'); ?>
 
 <div class="display">
     <h1>Logística</h1>
 
-    @if (session('success'))
+    <?php if(session('success')): ?>
         <div class="alert alert-success">
-            {{ session('success') }}
+            <?php echo e(session('success')); ?>
+
         </div>
-    @endif
+    <?php endif; ?>
 
     <!-- Botón para sincronizar datos generales -->
-    <a href="{{ route('logistica.transferData') }}" id="transferButton" class="btn btn-primary mb-3">Sincronizar Datos</a>
+    <a href="<?php echo e(route('logistica.transferData')); ?>" id="transferButton" class="btn btn-primary mb-3">Sincronizar Datos</a>
 
     <!-- Spinner de carga oculto -->
     <div id="loading" style="display: none;">
@@ -27,8 +26,8 @@
     </div>
 
     <!-- Formulario para guardar todos los cambios -->
-    <form action="{{ route('logistica.guardar_todos') }}" method="POST">
-        @csrf
+    <form action="<?php echo e(route('logistica.guardar_todos')); ?>" method="POST">
+        <?php echo csrf_field(); ?>
         <button type="submit" class="btn btn-success mb-3">Guardar Todos los Cambios</button>
 
         <!-- Tabla responsiva -->
@@ -49,83 +48,85 @@
                         <th>Fecha Entrega</th>
                         <th>Fecha Descarga</th>
                         <th>Pedimento</th>
-                        @if (Auth::user()->tipo_usuario == 1)
+                        <?php if(Auth::user()->tipo_usuario == 1): ?>
                             <th>Precio</th>
                             <th>Total</th>
-                        @endif
+                        <?php endif; ?>
                         <th>Acciones</th> <!-- Nueva columna de acciones -->
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($logis as $logi)
+                    <?php $__currentLoopData = $logis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $logi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                            <td>{{ $logi->bol }}</td>
-                            <td class="text-center">{{ $logi->fecha->weekOfYear }}</td>
-                            <td>{{ $logi->fecha->format('d-m-Y') }}</td>
-                            <td>{{ $logi->linea }}</td>
-                            <td>{{ $logi->no_pipa }}</td>
+                            <td><?php echo e($logi->bol); ?></td>
+                            <td class="text-center"><?php echo e($logi->fecha->weekOfYear); ?></td>
+                            <td><?php echo e($logi->fecha->format('d-m-Y')); ?></td>
+                            <td><?php echo e($logi->linea); ?></td>
+                            <td><?php echo e($logi->no_pipa); ?></td>
                             <td>
-                                <input type="hidden" name="logistica[{{ $logi->id }}][id]" value="{{ $logi->id }}">
-                                <select name="logistica[{{ $logi->id }}][cliente]" class="form-control cliente-select" {{ $logi->cliente ? 'disabled' : '' }}>
+                                <input type="hidden" name="logistica[<?php echo e($logi->id); ?>][id]" value="<?php echo e($logi->id); ?>">
+                                <select name="logistica[<?php echo e($logi->id); ?>][cliente]" class="form-control cliente-select" <?php echo e($logi->cliente ? 'disabled' : ''); ?>>
                                     <option value="">Selecciona un cliente</option>
-                                    @foreach($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}" {{ $logi->cliente == $cliente->id ? 'selected' : '' }}>{{ $cliente->NOMBRE_COMERCIAL }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = $clientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cliente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($cliente->id); ?>" <?php echo e($logi->cliente == $cliente->id ? 'selected' : ''); ?>><?php echo e($cliente->NOMBRE_COMERCIAL); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </td>
                             <td>
-                                <select name="logistica[{{ $logi->id }}][destino]" class="form-control destino-select" {{ $logi->destino_id ? 'disabled' : '' }}>
+                                <select name="logistica[<?php echo e($logi->id); ?>][destino]" class="form-control destino-select" <?php echo e($logi->destino_id ? 'disabled' : ''); ?>>
                                     <option value="">Selecciona un destino</option>
-                                    @foreach($destinos as $destino)
-                                        <option value="{{ $destino->id }}" {{ $logi->destino_id == $destino->id ? 'selected' : '' }}>{{ $destino->nombre }}</option>
-                                    @endforeach
-                                    <option value="5" {{ $logi->destino_id == 5 ? 'selected' : '' }}>FOB</option>
+                                    <?php $__currentLoopData = $destinos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $destino): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($destino->id); ?>" <?php echo e($logi->destino_id == $destino->id ? 'selected' : ''); ?>><?php echo e($destino->nombre); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="5" <?php echo e($logi->destino_id == 5 ? 'selected' : ''); ?>>FOB</option>
                                 </select>
                             </td>
                             <td class="status">
-                                <select name="logistica[{{ $logi->id }}][status]" class="form-control status-select" style="background-color:
-                                {{ $logi->status == 'pendiente' ? '#f8d7da' :
+                                <select name="logistica[<?php echo e($logi->id); ?>][status]" class="form-control status-select" style="background-color:
+                                <?php echo e($logi->status == 'pendiente' ? '#f8d7da' :
                                 ($logi->status == 'cargada' ? '#fff3cd' :
-                                ($logi->status == 'descargada' ? '#d4edda' : '#fff')) }};">
-                                <option value="pendiente" {{ $logi->status == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                                <option value="cargada" {{ $logi->status == 'cargada' ? 'selected' : '' }}>Cargada</option>
-                                <option value="descargada" {{ $logi->status == 'descargada' ? 'selected' : '' }}>Descargada</option>
+                                ($logi->status == 'descargada' ? '#d4edda' : '#fff'))); ?>;">
+                                <option value="pendiente" <?php echo e($logi->status == 'pendiente' ? 'selected' : ''); ?>>Pendiente</option>
+                                <option value="cargada" <?php echo e($logi->status == 'cargada' ? 'selected' : ''); ?>>Cargada</option>
+                                <option value="descargada" <?php echo e($logi->status == 'descargada' ? 'selected' : ''); ?>>Descargada</option>
                                 </select>
                             </td>
                             <td class="cruce">
-                                <select name="logistica[{{ $logi->id }}][cruce]" class="form-control cruce-select" style="background-color: {{ $logi->cruce == 'rojo' ? '#f8d7da' : ($logi->cruce == 'verde' ? '#d4edda' : '#fff') }};">
-                                <option value="rojo" {{ $logi->cruce == 'rojo' ? 'selected' : '' }}>Rojo</option>
-                                <option value="verde" {{ $logi->cruce == 'verde' ? 'selected' : '' }}>Verde</option>
+                                <select name="logistica[<?php echo e($logi->id); ?>][cruce]" class="form-control cruce-select" style="background-color: <?php echo e($logi->cruce == 'rojo' ? '#f8d7da' : ($logi->cruce == 'verde' ? '#d4edda' : '#fff')); ?>;">
+                                <option value="rojo" <?php echo e($logi->cruce == 'rojo' ? 'selected' : ''); ?>>Rojo</option>
+                                <option value="verde" <?php echo e($logi->cruce == 'verde' ? 'selected' : ''); ?>>Verde</option>
                                 </select>
                             </td>
 
-                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_salida]" class="form-control" value="{{ $logi->fecha_salida }}"></td>
-                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_entrega]" class="form-control" value="{{ $logi->fecha_entrega }}"></td>
-                            <td><input type="date" name="logistica[{{ $logi->id }}][fecha_descarga]" class="form-control" value="{{ $logi->fecha_descarga }}"></td>
-                            <td><input type="text" name="logistica[{{ $logi->id }}][pedimento]" class="form-control" value="{{ $logi->pedimento }}"></td>
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_salida]" class="form-control" value="<?php echo e($logi->fecha_salida); ?>"></td>
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_entrega]" class="form-control" value="<?php echo e($logi->fecha_entrega); ?>"></td>
+                            <td><input type="date" name="logistica[<?php echo e($logi->id); ?>][fecha_descarga]" class="form-control" value="<?php echo e($logi->fecha_descarga); ?>"></td>
+                            <td><input type="text" name="logistica[<?php echo e($logi->id); ?>][pedimento]" class="form-control" value="<?php echo e($logi->pedimento); ?>"></td>
 
-                            @if (Auth::user()->tipo_usuario == 1)
+                            <?php if(Auth::user()->tipo_usuario == 1): ?>
                                 <td>
-                                    @if ($logi->cliente)
-                                        <input id="logistica[{{ $logi->id }}][precio]" type="text" name="logistica[{{ $logi->id }}][precio]" class="form-control" value="{{ $logi->precio }}" readonly
-                                        onclick="openPrecioModal('{{ $logi->fecha }}', '{{ $logi->cliente }}','logistica[{{ $logi->id }}][precio]')">
-                                    @else
-                                        {{ $logi->precio }}
-                                    @endif
+                                    <?php if($logi->cliente): ?>
+                                        <input id="logistica[<?php echo e($logi->id); ?>][precio]" type="text" name="logistica[<?php echo e($logi->id); ?>][precio]" class="form-control" value="<?php echo e($logi->precio); ?>" readonly
+                                        onclick="openPrecioModal('<?php echo e($logi->fecha); ?>', '<?php echo e($logi->cliente); ?>','logistica[<?php echo e($logi->id); ?>][precio]')">
+                                    <?php else: ?>
+                                        <?php echo e($logi->precio); ?>
+
+                                    <?php endif; ?>
                                 </td>
-                                <td id="total-{{ $logi->id }}">
-                                    @if (isset($totales[$logi->id]))
-                                        ${{ number_format($totales[$logi->id], 2) }}
-                                    @endif
+                                <td id="total-<?php echo e($logi->id); ?>">
+                                    <?php if(isset($totales[$logi->id])): ?>
+                                        $<?php echo e(number_format($totales[$logi->id], 2)); ?>
+
+                                    <?php endif; ?>
                                 </td>
-                            @endif
+                            <?php endif; ?>
 
                             <!-- Botón en la columna de acciones -->
                             <td>
                                 <button type="submit" class="btn btn-primary">Guardar</button>
                             </td>
                         </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
@@ -135,7 +136,7 @@
     </form>
 </div>
 
-{{-- Modal --}}
+
 <div class="modal fade" id="precioModal" role="dialog" aria-labelledby="precioModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -153,9 +154,9 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
     /* Estilos personalizados y animaciones */
     .container {
@@ -229,17 +230,17 @@
     }
 
     /* Animaciones */
-    @keyframes fadeIn {
+    @keyframes  fadeIn {
         0% { opacity: 0; }
         100% { opacity: 1; }
     }
 
-    @keyframes slideInLeft {
+    @keyframes  slideInLeft {
         0% { transform: translateX(-100%); }
         100% { transform: translateX(0); }
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
@@ -294,7 +295,7 @@
     }
 </script>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     $(document).ready(function() {
         // Inicializa DataTables
@@ -347,6 +348,8 @@
         });
     });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
 
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\garci\Documents\qbsixtrack\resources\views/logistica/index.blade.php ENDPATH**/ ?>

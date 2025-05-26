@@ -12,63 +12,42 @@ use App\Marchant;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Mail\InvoiceMail;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LogisticaController extends Controller
 {
     public function index()
     {
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 300);;
 
         // Obtener solo los datos necesarios
         $logis = Logistica::with(['cliente', 'destino', 'transportista'])
                           ->orderBy(DB::raw('YEAR(fecha)'), 'desc')
                           ->orderBy(DB::raw('WEEK(fecha)'), 'desc')
                           ->paginate(50); // Paginación para manejar grandes volúmenes de datos
-
         $clientes = Customer::all();
         $transportistas = Transportista::all();
         $destinos = Destino::all();
 
-        $precios = [];
-        $totales = [];
-
-        foreach ($logis as $logi) {
-            // Asegúrate de definir y asignar $semana antes de usarla
-            $semana = Carbon::parse($logi->fecha)->weekOfYear;
-        
-            // Verifica si el ID del cliente es un valor numérico
-            if (is_numeric($logi->cliente)) {
-                $cliente = Customer::find($logi->cliente);
-        
-                // Verifica que $cliente no es null
-                if ($cliente && isset($cliente->CVE_CTE)) {
-                    $clienteCveCte = $cliente->CVE_CTE;
-        
-                    // Busca los precios para el cliente y semana específica
-                    $precios[$logi->id] = Marchant::where('cliente_id', $clienteCveCte)
-                        ->where('semana', '>=', $semana)
-                        ->pluck('precio', 'id');
-        
-                    if (isset($precios[$logi->id])) {
-                        $precioSeleccionado = $logi->precio ?? 0;
-                        $litros = $logi->litros;
-                        // Calcula el total multiplicando el precio por los litros
-                        $totales[$logi->id] = $precioSeleccionado * $litros;
-                    } else {
-                        $totales[$logi->id] = null;
-                    }
+        // Solo hacemos la consulta cuando sea necesario
+        if(Auth::user()->tipo_usuario == 1){
+            $totales = [];
+            foreach ($logis as $logi) {
+                // Busca los precios para el cliente
+                $precios[$logi->id] = $logi->precio;
+                Log::info($precios);
+                if (isset($precios[$logi->id])) {
+                    $precioSeleccionado = $logi->precio ?? 0;
+                    $litros = $logi->litros;
+                    // Calcula el total multiplicando el precio por los litros
+                    $totales[$logi->id] = $precioSeleccionado * $litros;
                 } else {
-                    $precios[$logi->id] = collect();
                     $totales[$logi->id] = null;
                 }
-            } else {
-                // Maneja el caso donde 'cliente' no es numérico
-                $precios[$logi->id] = collect();
-                $totales[$logi->id] = null;
             }
         }
-        
 
         $data = [
             'menu' => 'logistica',
@@ -77,11 +56,45 @@ class LogisticaController extends Controller
             'clientes' => $clientes,
             'transportistas' => $transportistas,
             'destinos' => $destinos,
-            'precios' => $precios,
-            'totales' => $totales
         ];
 
+        if(Auth::user()->tipo_usuario == 1){
+            $data += ['precios' => $precios,
+                      'totales' => $totales];
+        }
+
         return view('logistica.index', $data);
+    }
+
+    public function precioData(Request $request)
+    {
+        $cliente = $request->cliente;
+        $fecha = $request->fecha;
+        $precios = [];
+
+            // Asegúrate de definir y asignar $semana antes de usarla
+            $semana = Carbon::parse($fecha)->weekOfYear;
+
+            // Verifica si el ID del cliente es un valor numérico
+            if (is_numeric($cliente)) {
+                $cliente = Customer::find($cliente);
+
+                // Verifica que $cliente no es null
+                if ($cliente && isset($cliente->CVE_CTE)) {
+                    $clienteCveCte = $cliente->CVE_CTE;
+                    // Busca los precios para el cliente y semana específica
+                    $precios = Marchant::where('cliente_id', $clienteCveCte)
+                        ->where('semana', '>=', $semana)
+                        ->pluck('precio', 'id');
+                } else {
+                    $precios = collect();
+                }
+            } else {
+                // Maneja el caso donde 'cliente' no es numérico
+                $precios = collect();
+            }
+
+        return $precios;
     }
 
     public function transferData()
@@ -97,7 +110,7 @@ class LogisticaController extends Controller
             $dataToInsert = [];
 
             foreach ($bluewiRecords as $record) {
-                if (!empty($record->bol_number) && 
+                if (!empty($record->bol_number) &&
                     !isset($existingRecords[$record->order_number]) &&
                     !in_array($record->bol_number, $existingRecords)) {
 
@@ -202,19 +215,19 @@ class LogisticaController extends Controller
     public function guardarTodos(Request $request)
     {
         $data = $request->input('logistica');
-    
+
         foreach ($data as $id => $values) {
             // Verifica si $values está asignado
             if (!empty($values)) {
                 $logistica = Logistica::find($id);
-    
+
                 if ($logistica) {
                     // Guardar el cliente
                     if (!empty($values['cliente'])) {
                         $cliente = Customer::find($values['cliente']);
                         if ($cliente) {
                             $logistica->cliente = $values['cliente'];
-    
+
                             // Asignar destino basado en el nombre comercial del cliente
                             $logistica->destino_id = strpos($cliente->NOMBRE_COMERCIAL, 'FOB') !== false ? 5 : $logistica->destino_id;
                             if ($logistica->destino_id == 5) {
@@ -222,12 +235,12 @@ class LogisticaController extends Controller
                             }
                         }
                     }
-    
+
                     // Guardar el destino, si se ha proporcionado
                     if (!empty($values['destino']) && $values['destino'] != $logistica->destino_id) {
                         $logistica->destino_id = $values['destino'];
                     }
-    
+
                     // Guardar otros campos
                     $logistica->status = $values['status'] ?? $logistica->status;
                     $logistica->cruce = $values['cruce'] ?? $logistica->cruce;
@@ -240,10 +253,10 @@ class LogisticaController extends Controller
                 }
             }
         }
-    
+
         return redirect()->route('logistica.index')->with('success', 'Datos actualizados con éxito');
     }
-    
+
     // ===============================================================================================================================================================================================================================
 
     public function enlazarFactura($id)
